@@ -37,15 +37,7 @@
         <div class="footer-brand">
           <!-- Logo emblem -->
           <div class="brand-logo">
-            <svg viewBox="0 0 40 40" fill="none" width="42" height="42">
-              <polygon points="20,3 37,12 37,28 20,37 3,28 3,12" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
-              <polygon points="20,8 32,15 32,25 20,32 8,25 8,15" fill="none" stroke="#c9a84c" stroke-width="0.6" opacity="0.5"/>
-              <circle cx="20" cy="20" r="4" fill="#c9a84c"/>
-            </svg>
-            <div class="brand-name">
-              <span class="brand-title">Bharat Governance</span>
-              <span class="brand-sub">Council</span>
-            </div>
+            <img :src="'/BGC.png'" alt="BGC Logo" class="brand-logo-img" />
           </div>
 
           <p class="brand-desc">A community of citizens, scholars, and practitioners committed to evidence-based governance in Bharat.</p>
@@ -204,24 +196,13 @@ footer {
   margin-bottom: 16px;
 }
 
-.brand-name {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
+.brand-logo-img {
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 }
-.brand-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-.brand-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 13px;
-  color: #c9a84c;
-}
+
 
 .brand-desc {
   font-size: 13px;

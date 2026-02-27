@@ -6,20 +6,8 @@
     <!-- Logo -->
     <a href="#" class="nav-logo" @click.prevent="scrollTo('hero')">
       <div class="logo-emblem">
-        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
-          <polygon points="20,3 37,12 37,28 20,37 3,28 3,12" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
-          <polygon points="20,8 32,15 32,25 20,32 8,25 8,15" fill="none" stroke="#c9a84c" stroke-width="0.6" opacity="0.5"/>
-          <circle cx="20" cy="20" r="4" fill="#c9a84c"/>
-          <line x1="20" y1="8" x2="20" y2="13" stroke="#c9a84c" stroke-width="0.8" opacity="0.7"/>
-          <line x1="20" y1="27" x2="20" y2="32" stroke="#c9a84c" stroke-width="0.8" opacity="0.7"/>
-          <line x1="8" y1="15" x2="12.5" y2="17.5" stroke="#c9a84c" stroke-width="0.8" opacity="0.7"/>
-          <line x1="27.5" y1="22.5" x2="32" y2="25" stroke="#c9a84c" stroke-width="0.8" opacity="0.7"/>
-          <line x1="8" y1="25" x2="12.5" y2="22.5" stroke="#c9a84c" stroke-width="0.8" opacity="0.7"/>
-          <line x1="27.5" y1="17.5" x2="32" y2="15" stroke="#c9a84c" stroke-width="0.8" opacity="0.7"/>
-        </svg>
-        <span class="logo-text">BGC</span>
+        <img :src="'/BGC.png'" alt="BGC Logo" class="logo-img" />
       </div>
-      <span class="logo-wordmark">Bharat Governance<br><span class="logo-sub">Council</span></span>
     </a>
 
     <!-- Desktop nav links -->
@@ -164,15 +152,14 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   justify-content: center;
 }
 
-.logo-svg {
-  width: 38px;
-  height: 38px;
-  filter: drop-shadow(0 0 6px rgba(201,168,76,0.35));
-  transition: filter 0.3s;
+.logo-img {
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s;
 }
 
-.nav-logo:hover .logo-svg {
-  filter: drop-shadow(0 0 12px rgba(201,168,76,0.65));
+.nav-logo:hover .logo-img {
   animation: logoPulse 1s ease-in-out;
 }
 
@@ -183,24 +170,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   100% { transform: rotate(0deg); }
 }
 
-.logo-text {
-  display: none;
-}
-
-.logo-wordmark {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  letter-spacing: 0.04em;
-  line-height: 1.15;
-}
-
-.logo-sub {
-  font-style: italic;
-  color: #c9a84c;
-  font-size: 13px;
-}
 
 /* ── Nav links ──────────────────────────────────── */
 .nav-links {
