@@ -10,3 +10,7 @@ Route::get('/', function () {
 Route::get('/insights', function () {
     return Inertia::render('Insights/Index');
 });
+
+Route::get('/insights/{slug}', function (string $slug) {
+    return Inertia::render('Insights/Show', ['slug' => $slug]);
+});

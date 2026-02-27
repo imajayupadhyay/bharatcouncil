@@ -76,7 +76,7 @@
             <span class="feat-readtime">{{ featuredPost.readTime }}</span>
           </div>
 
-          <a href="#" class="feat-read-link">
+          <a href="/insights/reforming-fiscal-federalism" class="feat-read-link">
             Read Full Analysis
             <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
               <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -168,7 +168,7 @@
             <span class="card-date">{{ post.date }}</span>
           </div>
 
-          <a href="#" class="card-read-link">
+          <a href="/insights/reforming-fiscal-federalism" class="card-read-link">
             Read
             <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
               <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
