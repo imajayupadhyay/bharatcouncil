@@ -14,3 +14,15 @@ Route::get('/insights', function () {
 Route::get('/insights/{slug}', function (string $slug) {
     return Inertia::render('Insights/Show', ['slug' => $slug]);
 });
+
+Route::get('/work-with-us', function () {
+    return Inertia::render('WorkWithUs/Index');
+});
+
+Route::get('/who-we-are', function () {
+    return Inertia::render('WhoWeAre/Index');
+});
+
+Route::get('/governing-board', function () {
+    return Inertia::render('GoverningBoard/Index');
+});
