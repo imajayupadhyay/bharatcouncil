@@ -114,7 +114,7 @@
       <div class="hero-eyebrow" :class="{ visible: revealed }">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span class="eyebrow-text">Bharat Governance Council</span>
+        <span class="eyebrow-text">Anmol Goel</span>
         <span class="eyebrow-tag">Est. 2024</span>
       </div>
 
