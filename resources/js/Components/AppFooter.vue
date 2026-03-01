@@ -86,6 +86,7 @@
             </svg>
             You're subscribed!
           </p>
+          <p v-if="miniError" class="mini-error">Please enter a valid email.</p>
         </div>
 
       </div>
@@ -122,11 +123,20 @@ import { ref, computed } from 'vue'
 const year      = computed(() => new Date().getFullYear())
 const miniEmail = ref('')
 const miniSent  = ref(false)
+const miniError = ref(false)
 
-function miniSubmit() {
-  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(miniEmail.value)) {
-    miniSent.value = true
+async function miniSubmit() {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(miniEmail.value)) {
+    miniError.value = true
+    return
+  }
+  miniError.value = false
+  try {
+    await window.axios.post('/newsletter/subscribe', { email: miniEmail.value, source: 'footer' })
+    miniSent.value  = true
     miniEmail.value = ''
+  } catch {
+    miniError.value = true
   }
 }
 
@@ -329,6 +339,12 @@ footer {
   font-size: 11px;
   color: #2ecc71;
   font-family: 'DM Mono', monospace;
+}
+.mini-error {
+  font-size: 11px;
+  color: rgba(231,76,60,0.8);
+  font-family: 'DM Mono', monospace;
+  margin-top: 4px;
 }
 
 /* ── Divider ─────────────────────────────── */

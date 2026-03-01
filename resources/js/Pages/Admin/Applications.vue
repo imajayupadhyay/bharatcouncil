@@ -180,7 +180,10 @@ const navItems = [
   {
     id: 'applications', label: 'Applications', href: '/admin/applications',
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="1.5" width="12" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5h6M5 8h6M5 10.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-    badge: null,
+  },
+  {
+    id: 'newsletters', label: 'Newsletter', href: '/admin/newsletters',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M1 4l7 5 7-5M1 4h14v10H1V4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
   },
 ]
 

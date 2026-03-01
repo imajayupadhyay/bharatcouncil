@@ -124,14 +124,19 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
   o: 0.12 + (i % 4) * 0.06,
 }))
 
-function handleSubmit() {
+async function handleSubmit() {
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
   if (!valid) { showError.value = true; return }
   submitting.value = true
-  setTimeout(() => {
+  try {
+    await window.axios.post('/newsletter/subscribe', { email: email.value, source: 'homepage' })
+    submitted.value = true
+    email.value = ''
+  } catch {
+    showError.value = true
+  } finally {
     submitting.value = false
-    submitted.value  = true
-  }, 1400)
+  }
 }
 
 let observer = null
