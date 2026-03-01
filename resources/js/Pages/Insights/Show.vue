@@ -1,4 +1,14 @@
 <template>
+  <Head>
+    <title>{{ pageTitle }}</title>
+    <meta name="description" :content="pageDescription" />
+    <meta property="og:title" :content="pageTitle" />
+    <meta property="og:description" :content="pageDescription" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" :content="pageTitle" />
+    <meta name="twitter:description" :content="pageDescription" />
+  </Head>
   <div class="page-root">
 
     <!-- Reading progress bar -->
@@ -17,14 +27,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { Head } from '@inertiajs/vue3'
 import AppHeader       from '@/Components/AppHeader.vue'
 import ArticleHero     from './Components/ArticleHero.vue'
 import ArticleBody     from './Components/ArticleBody.vue'
 import RelatedArticles from './Components/RelatedArticles.vue'
 import AppFooter       from '@/Components/AppFooter.vue'
 
+const props = defineProps({ slug: String })
+
 const progress = ref(0)
+
+const pageTitle = computed(() => {
+  if (!props.slug) return 'Insights | Bharat Governance Council'
+  const readable = props.slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return `${readable} | Bharat Governance Council`
+})
+
+const pageDescription = computed(() =>
+  'Read the latest policy analysis and research from the Bharat Governance Council on governance, institutional reform, and public policy in India.'
+)
 
 function updateProgress() {
   const scrollTop  = window.scrollY

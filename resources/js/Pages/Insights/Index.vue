@@ -1,4 +1,14 @@
 <template>
+  <Head>
+    <title>Insights & Publications | Bharat Governance Council</title>
+    <meta name="description" content="Explore in-depth policy analyses, research articles, and expert commentary from the Bharat Governance Council on India's most pressing governance, economic, and institutional challenges." />
+    <meta property="og:title" content="Insights & Publications | Bharat Governance Council" />
+    <meta property="og:description" content="In-depth policy analyses, research articles, and expert commentary on India's most pressing governance, economic, and institutional challenges." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Insights & Publications | Bharat Governance Council" />
+    <meta name="twitter:description" content="Policy analyses, research articles, and expert commentary on India's governance and institutional challenges." />
+  </Head>
   <div class="page-root">
     <AppHeader />
     <main>
@@ -10,6 +20,7 @@
 </template>
 
 <script setup>
+import { Head } from '@inertiajs/vue3'
 import AppHeader    from '@/Components/AppHeader.vue'
 import InsightsHero from './Components/InsightsHero.vue'
 import InsightsList from './Components/InsightsList.vue'

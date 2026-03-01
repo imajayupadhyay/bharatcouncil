@@ -1,4 +1,14 @@
 <template>
+  <Head>
+    <title>Who We Are | Bharat Governance Council</title>
+    <meta name="description" content="Learn about the Bharat Governance Council — our story, founding team, values, and mandate to strengthen democratic governance, institutional integrity, and public policy in India." />
+    <meta property="og:title" content="Who We Are | Bharat Governance Council" />
+    <meta property="og:description" content="Our story, founding team, values, and mandate to strengthen democratic governance, institutional integrity, and public policy in India." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Who We Are | Bharat Governance Council" />
+    <meta name="twitter:description" content="Our story, founding team, values, and mandate to strengthen democratic governance and public policy in India." />
+  </Head>
   <div class="page-root">
     <AppHeader />
     <main>
@@ -16,6 +26,7 @@
 </template>
 
 <script setup>
+import { Head } from '@inertiajs/vue3'
 import AppHeader from '@/Components/AppHeader.vue'
 import AppFooter from '@/Components/AppFooter.vue'
 import HeroSection from './Components/HeroSection.vue'

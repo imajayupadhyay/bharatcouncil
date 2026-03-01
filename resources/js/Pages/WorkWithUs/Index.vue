@@ -1,4 +1,14 @@
 <template>
+  <Head>
+    <title>Work With Us | Bharat Governance Council</title>
+    <meta name="description" content="Join the Bharat Governance Council through our internship programme, fellowship tracks, or membership. Work on meaningful governance research and policy with India's leading thinkers." />
+    <meta property="og:title" content="Work With Us | Bharat Governance Council" />
+    <meta property="og:description" content="Join BGC through internships, fellowships, or membership. Work on meaningful governance research and policy with India's leading thinkers." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Work With Us | Bharat Governance Council" />
+    <meta name="twitter:description" content="Internships, fellowships, and membership opportunities at the Bharat Governance Council." />
+  </Head>
   <div class="page-root">
     <AppHeader />
     <main>
@@ -24,6 +34,7 @@
 
 <script setup>
 import { ref, nextTick } from 'vue'
+import { Head } from '@inertiajs/vue3'
 import AppHeader from '@/Components/AppHeader.vue'
 import AppFooter from '@/Components/AppFooter.vue'
 import HeroSection from './Components/HeroSection.vue'

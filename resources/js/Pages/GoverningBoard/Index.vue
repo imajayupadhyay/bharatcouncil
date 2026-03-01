@@ -1,4 +1,14 @@
 <template>
+  <Head>
+    <title>Governing Board | Bharat Governance Council</title>
+    <meta name="description" content="Meet the Governing Board of the Bharat Governance Council, including our Chairman, Executive Officers, and distinguished Board Members leading India's governance reform agenda." />
+    <meta property="og:title" content="Governing Board | Bharat Governance Council" />
+    <meta property="og:description" content="Chairman, Executive Officers, and distinguished Board Members leading India's governance reform agenda at the Bharat Governance Council." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Governing Board | Bharat Governance Council" />
+    <meta name="twitter:description" content="Meet the Chairman, Executive Officers, and Board Members leading India's governance reform at BGC." />
+  </Head>
   <div class="page-root">
     <AppHeader />
     <main>
@@ -13,6 +23,7 @@
 </template>
 
 <script setup>
+import { Head } from '@inertiajs/vue3'
 import AppHeader from '@/Components/AppHeader.vue'
 import AppFooter from '@/Components/AppFooter.vue'
 import HeroSection from './Components/HeroSection.vue'
