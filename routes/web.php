@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InternApplicationController;
 use App\Http\Controllers\MemberApplicationController;
 use App\Http\Controllers\NewsletterController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,7 @@ Route::get('/work-with-us', function () {
     return Inertia::render('WorkWithUs/Index');
 });
 Route::post('/work-with-us/apply', [MemberApplicationController::class, 'store'])->name('application.store');
+Route::post('/work-with-us/intern-apply', [InternApplicationController::class, 'store'])->name('intern-application.store');
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 Route::get('/who-we-are', function () {

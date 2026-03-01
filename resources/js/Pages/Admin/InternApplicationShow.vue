@@ -35,11 +35,11 @@
       <!-- Top bar -->
       <header class="admin-topbar">
         <div class="topbar-left">
-          <h2 class="topbar-title">Application #{{ application.id }}</h2>
+          <h2 class="topbar-title">Intern Application #{{ application.id }}</h2>
           <div class="topbar-breadcrumb">
             <span>Admin</span>
             <span class="bc-sep">›</span>
-            <Link href="/admin/applications" class="bc-link">Applications</Link>
+            <Link href="/admin/intern-applications" class="bc-link">Intern Applications</Link>
             <span class="bc-sep">›</span>
             <span class="bc-active">{{ application.full_name }}</span>
           </div>
@@ -64,11 +64,11 @@
 
         <!-- Back + Status controls -->
         <div class="action-bar">
-          <Link href="/admin/applications" class="btn-back">
+          <Link href="/admin/intern-applications" class="btn-back">
             <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
               <path d="M10 6H2M6 2L2 6l4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
             </svg>
-            Back to Applications
+            Back to Intern Applications
           </Link>
           <div class="status-controls">
             <span class="status-label">Status:</span>
@@ -91,7 +91,7 @@
             <div class="profile-avatar">{{ application.full_name.charAt(0).toUpperCase() }}</div>
             <div class="profile-info">
               <h3 class="profile-name">{{ application.full_name }}</h3>
-              <p class="profile-role">{{ application.designation }}<span v-if="application.organisation"> · {{ application.organisation }}</span></p>
+              <p class="profile-role">{{ application.institution }} · {{ application.programme }}</p>
               <p class="profile-city">{{ application.city }}</p>
             </div>
             <div class="profile-meta">
@@ -104,20 +104,12 @@
                 <span class="meta-val">{{ application.phone }}</span>
               </div>
               <div class="meta-row">
-                <span class="meta-key">Membership Sought</span>
-                <span class="meta-val">{{ application.membership_type }}</span>
+                <span class="meta-key">Discipline</span>
+                <span class="meta-val">{{ application.discipline }}</span>
               </div>
               <div class="meta-row">
-                <span class="meta-key">Mode Preference</span>
-                <span class="meta-val">{{ application.mode }}</span>
-              </div>
-              <div class="meta-row">
-                <span class="meta-key">Contribution Area</span>
-                <span class="meta-val">{{ application.contribution_area }}</span>
-              </div>
-              <div class="meta-row" v-if="application.board_relation">
-                <span class="meta-key">Board Relation</span>
-                <span class="meta-val">{{ application.board_relation }}</span>
+                <span class="meta-key">Graduation Year</span>
+                <span class="meta-val">{{ application.grad_year }}</span>
               </div>
               <div class="meta-row">
                 <span class="meta-key">Applied</span>
@@ -131,42 +123,42 @@
           </div>
         </div>
 
-        <!-- Two-column grid for sections -->
+        <!-- Details grid -->
         <div class="sections-grid">
 
-          <!-- Background -->
+          <!-- Internship Preferences -->
           <div class="card">
-            <div class="section-label">Background</div>
-            <p class="section-text">{{ application.background }}</p>
-          </div>
-
-          <!-- Reflective Answers -->
-          <div class="card span-full">
-            <div class="section-label">Reflective Answers</div>
-            <div class="answers-grid">
-              <template v-for="(q, i) in questions" :key="i">
-                <div v-if="application[q.field]" class="answer-block">
-                  <div class="answer-num">{{ String(i + 1).padStart(2, '0') }}</div>
-                  <div class="answer-body">
-                    <p class="answer-category">{{ q.category }}</p>
-                    <p class="answer-text">{{ application[q.field] }}</p>
-                  </div>
-                </div>
-              </template>
-              <p v-if="!hasAnswers" class="empty-text">No reflective answers provided.</p>
+            <div class="section-label">Internship Preferences</div>
+            <div class="pref-grid">
+              <div class="pref-item">
+                <span class="pref-key">Research Track</span>
+                <span class="pref-val">{{ application.track }}</span>
+              </div>
+              <div class="pref-item">
+                <span class="pref-key">Cohort</span>
+                <span class="pref-val">{{ application.cohort }}</span>
+              </div>
+              <div class="pref-item">
+                <span class="pref-key">Mode</span>
+                <span class="pref-val">{{ application.mode }}</span>
+              </div>
+              <div class="pref-item">
+                <span class="pref-key">Duration</span>
+                <span class="pref-val">{{ application.duration }}</span>
+              </div>
             </div>
           </div>
 
-          <!-- Referees -->
-          <div class="card" v-if="application.referees">
-            <div class="section-label">Referees</div>
-            <pre class="section-pre">{{ application.referees }}</pre>
+          <!-- Statement -->
+          <div class="card span-full">
+            <div class="section-label">Statement</div>
+            <p class="section-text">{{ application.statement }}</p>
           </div>
 
-          <!-- Additional Notes -->
-          <div class="card" v-if="application.additional_notes">
-            <div class="section-label">Additional Notes</div>
-            <p class="section-text">{{ application.additional_notes }}</p>
+          <!-- Governance Problem -->
+          <div class="card span-full" v-if="application.governance_problem">
+            <div class="section-label">Governance Problem</div>
+            <p class="section-text">{{ application.governance_problem }}</p>
           </div>
 
         </div>
@@ -176,7 +168,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -213,23 +205,12 @@ const statuses = [
   { value: 'rejected',    label: 'Rejected' },
 ]
 
-const questions = [
-  { field: 'answer_governance',   category: 'Governance Challenge' },
-  { field: 'answer_contribution', category: 'Your Contribution' },
-  { field: 'answer_reform',       category: 'On Reform' },
-  { field: 'answer_bgc',          category: 'Working at BGC' },
-]
-
-const hasAnswers = computed(() =>
-  questions.some(q => props.application[q.field])
-)
-
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function updateStatus(status) {
-  router.patch(`/admin/applications/${props.application.id}/status`, { status })
+  router.patch(`/admin/intern-applications/${props.application.id}/status`, { status })
 }
 
 function logout() {
@@ -250,7 +231,7 @@ body { font-family: 'DM Sans', sans-serif; background: #f2f4f8; }
 <style scoped>
 .admin-root { display: flex; min-height: 100vh; background: #f2f4f8; }
 
-/* ── Sidebar (same as Applications page) ── */
+/* ── Sidebar ── */
 .admin-sidebar {
   width: 240px; flex-shrink: 0; background: #0b1c38;
   display: flex; flex-direction: column;
@@ -267,6 +248,8 @@ body { font-family: 'DM Sans', sans-serif; background: #f2f4f8; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: #8a9bbf; text-decoration: none; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; position: relative; transition: color 0.2s, background 0.2s; white-space: nowrap; overflow: hidden; }
 .nav-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #c9a84c, #e8cf8a); transform: scaleY(0); transition: transform 0.25s; }
 .nav-item:hover { color: #e8cf8a; background: rgba(255,255,255,0.04); }
+.nav-item.active { color: #e8cf8a; background: rgba(201,168,76,0.08); }
+.nav-item.active::before { transform: scaleY(1); }
 .nav-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 16px; }
 .nav-label { flex: 1; }
 .sidebar-toggle { display: flex; align-items: center; justify-content: center; width: 100%; padding: 12px; background: none; border: none; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(138,155,191,0.4); cursor: pointer; transition: color 0.2s; flex-shrink: 0; }
@@ -344,15 +327,12 @@ body { font-family: 'DM Sans', sans-serif; background: #f2f4f8; }
 
 .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #c9a84c; font-family: 'DM Mono', monospace; margin-bottom: 14px; }
 .section-text { font-size: 14px; color: #3a4a62; line-height: 1.75; font-family: 'DM Sans', sans-serif; white-space: pre-wrap; }
-.section-pre { font-family: 'DM Mono', monospace; font-size: 12px; color: #3a4a62; line-height: 1.7; white-space: pre-wrap; }
 
-/* Answers */
-.answers-grid { display: flex; flex-direction: column; gap: 20px; }
-.answer-block { display: flex; gap: 16px; }
-.answer-num { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 700; color: #c9a84c; background: rgba(201,168,76,0.1); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-.answer-body { flex: 1; }
-.answer-category { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #c9a84c; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
-.answer-text { font-size: 13px; color: #3a4a62; line-height: 1.75; font-family: 'DM Sans', sans-serif; white-space: pre-wrap; }
+/* Preferences grid */
+.pref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pref-item { display: flex; flex-direction: column; gap: 4px; }
+.pref-key { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #b8c5d8; font-family: 'DM Mono', monospace; }
+.pref-val { font-size: 13px; color: #3a4a62; font-family: 'DM Sans', sans-serif; }
 
 /* Status badge */
 .status-badge { display: inline-block; padding: 3px 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; font-family: 'DM Mono', monospace; }
@@ -361,9 +341,7 @@ body { font-family: 'DM Sans', sans-serif; background: #f2f4f8; }
 .badge-shortlisted{ background: rgba(39,174,96,0.12);  color: #27ae60; }
 .badge-rejected   { background: rgba(231,76,60,0.1);   color: #e74c3c; }
 
-.empty-text { font-size: 13px; color: #b8c5d8; font-family: 'DM Sans', sans-serif; }
-
-@media (max-width: 900px) { .sections-grid { grid-template-columns: 1fr; } .span-full { grid-column: 1; } }
+@media (max-width: 900px) { .sections-grid { grid-template-columns: 1fr; } .span-full { grid-column: 1; } .pref-grid { grid-template-columns: 1fr; } }
 @media (max-width: 768px) {
   .admin-sidebar { width: 64px; }
   .sidebar-logo-label, .nav-label, .btn-logout span { display: none; }

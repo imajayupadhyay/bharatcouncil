@@ -14,7 +14,7 @@
           :key="item.id"
           :href="item.href"
           class="nav-item"
-          :class="{ active: item.id === 'applications' }"
+          :class="{ active: item.id === 'internships' }"
           :title="sidebarCollapsed ? item.label : ''"
         >
           <span class="nav-icon" v-html="item.icon"/>
@@ -43,11 +43,11 @@
       <!-- Top bar -->
       <header class="admin-topbar">
         <div class="topbar-left">
-          <h2 class="topbar-title">Applications</h2>
+          <h2 class="topbar-title">Intern Applications</h2>
           <div class="topbar-breadcrumb">
             <span>Admin</span>
             <span class="bc-sep">›</span>
-            <span class="bc-active">Member Applications</span>
+            <span class="bc-active">Intern Applications</span>
           </div>
         </div>
         <div class="topbar-right">
@@ -97,8 +97,9 @@
               <tr>
                 <th>#</th>
                 <th>Applicant</th>
-                <th>Membership Type</th>
-                <th>Area</th>
+                <th>Institution</th>
+                <th>Track</th>
+                <th>Cohort</th>
                 <th>Submitted</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -114,14 +115,15 @@
                     <span class="app-email">{{ app.email }}</span>
                   </div>
                 </td>
-                <td class="td-type">{{ app.membership_type }}</td>
-                <td class="td-area">{{ app.contribution_area }}</td>
+                <td class="td-inst">{{ app.institution }}</td>
+                <td class="td-track">{{ app.track }}</td>
+                <td class="td-cohort">{{ app.cohort }}</td>
                 <td class="td-date">{{ formatDate(app.created_at) }}</td>
                 <td class="td-status">
                   <span class="status-badge" :class="`badge-${app.status}`">{{ app.status }}</span>
                 </td>
                 <td class="td-action">
-                  <Link :href="`/admin/applications/${app.id}`" class="btn-view">
+                  <Link :href="`/admin/intern-applications/${app.id}`" class="btn-view">
                     View
                     <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
                       <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
@@ -138,7 +140,7 @@
               <rect x="8" y="6" width="32" height="36" rx="2" stroke="#c9a84c" stroke-width="1.5" opacity="0.3"/>
               <path d="M16 16h16M16 22h16M16 28h10" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
             </svg>
-            <p>No applications found{{ currentFilter !== 'all' ? ` with status "${currentFilter}"` : '' }}.</p>
+            <p>No intern applications found{{ currentFilter !== 'all' ? ` with status "${currentFilter}"` : '' }}.</p>
           </div>
         </div>
 
@@ -147,7 +149,7 @@
           <Link
             v-for="page in applications.last_page"
             :key="page"
-            :href="`/admin/applications?page=${page}${currentFilter !== 'all' ? '&status=' + currentFilter : ''}`"
+            :href="`/admin/intern-applications?page=${page}${currentFilter !== 'all' ? '&status=' + currentFilter : ''}`"
             class="page-btn"
             :class="{ active: applications.current_page === page }"
           >{{ page }}</Link>
@@ -209,7 +211,7 @@ function statusCount(status) {
 function setFilter(status) {
   currentFilter.value = status
   const params = status !== 'all' ? { status } : {}
-  router.get('/admin/applications', params, { preserveState: true, replace: true })
+  router.get('/admin/intern-applications', params, { preserveState: true, replace: true })
 }
 
 function formatDate(dateStr) {
@@ -234,7 +236,7 @@ body { font-family: 'DM Sans', sans-serif; background: #f2f4f8; }
 <style scoped>
 .admin-root { display: flex; min-height: 100vh; background: #f2f4f8; }
 
-/* ── Sidebar (same as Dashboard) ── */
+/* ── Sidebar ── */
 .admin-sidebar {
   width: 240px; flex-shrink: 0;
   background: #0b1c38;
@@ -406,8 +408,9 @@ body { font-family: 'DM Sans', sans-serif; background: #f2f4f8; }
 .app-meta { display: flex; flex-direction: column; gap: 2px; }
 .app-name { font-weight: 500; color: #0b1c38; }
 .app-email { font-size: 11px; color: #8a9bbf; font-family: 'DM Mono', monospace; }
-.td-type { font-size: 12px; max-width: 160px; line-height: 1.4; }
-.td-area { font-size: 12px; max-width: 160px; line-height: 1.4; }
+.td-inst { font-size: 12px; max-width: 180px; line-height: 1.4; }
+.td-track { font-size: 12px; max-width: 180px; line-height: 1.4; }
+.td-cohort { font-size: 12px; white-space: nowrap; }
 .td-date { font-size: 11px; font-family: 'DM Mono', monospace; color: #8a9bbf; white-space: nowrap; }
 
 /* Status badges */

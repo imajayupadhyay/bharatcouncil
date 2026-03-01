@@ -190,45 +190,6 @@
             </div>
           </div>
 
-          <div class="form-divider"/>
-
-          <!-- Documents -->
-          <div class="form-section-title">Documents</div>
-          <div class="form-grid form-grid-single">
-            <div class="form-group">
-              <label>Upload CV / Résumé * (PDF, max 2MB)</label>
-              <div class="file-drop" @click="$refs.cvInput.click()" @dragover.prevent @drop.prevent="handleDrop($event, 'cv')">
-                <input ref="cvInput" type="file" accept=".pdf,.doc,.docx" style="display:none" @change="handleFileChange($event, 'cv')"/>
-                <span class="file-drop-icon">📎</span>
-                <div class="file-drop-text">
-                  <template v-if="form.cvFile">
-                    <strong class="file-selected">{{ form.cvFile }}</strong>
-                  </template>
-                  <template v-else>
-                    Drag &amp; drop your CV here, or <strong>click to browse</strong><br>
-                    <span class="file-hint">PDF preferred · Max 2MB</span>
-                  </template>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Writing Sample (optional, PDF, max 3MB)</label>
-              <div class="file-drop" @click="$refs.sampleInput.click()" @dragover.prevent @drop.prevent="handleDrop($event, 'sample')">
-                <input ref="sampleInput" type="file" accept=".pdf,.doc,.docx" style="display:none" @change="handleFileChange($event, 'sample')"/>
-                <span class="file-drop-icon">📝</span>
-                <div class="file-drop-text">
-                  <template v-if="form.sampleFile">
-                    <strong class="file-selected">{{ form.sampleFile }}</strong>
-                  </template>
-                  <template v-else>
-                    Any essay, report, or article that represents your best analytical work.<br>
-                    <strong>Click to browse</strong> · <span class="file-hint">Max 3MB</span>
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Submit -->
           <div class="submit-row">
             <button type="submit" class="btn-submit" :disabled="submitting">
@@ -247,7 +208,8 @@
                 ✓ Application Submitted
               </span>
             </button>
-            <span class="submit-note">We will acknowledge receipt within 2 working days. Reviews take up to 10 days.</span>
+            <span v-if="serverError" class="err-msg" style="font-size:12px">{{ serverError }}</span>
+            <span v-else class="submit-note">We will acknowledge receipt within 2 working days. Reviews take up to 10 days.</span>
           </div>
 
         </form>
@@ -259,23 +221,22 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import axios from 'axios'
 
 const eligEl    = ref(null)
 const formEl    = ref(null)
 const eligVisible = ref(false)
 const formVisible = ref(false)
-const cvInput   = ref(null)
-const sampleInput = ref(null)
 const submitting = ref(false)
 const submitted  = ref(false)
 const errors     = reactive({})
+const serverError = ref('')
 
 const form = reactive({
   fullName: '', email: '', phone: '', city: '',
   institution: '', programme: '', discipline: '', gradYear: '',
   track: '', cohort: '', mode: '', duration: '',
   statement: '', governanceProblem: '',
-  cvFile: null, sampleFile: null,
 })
 
 const shouldBring = [
@@ -294,16 +255,6 @@ const doNotNeed = [
   'A fixed political or ideological orientation — BGC is non-partisan and welcomes diverse perspectives',
 ]
 
-function handleFileChange(e, type) {
-  const file = e.target.files[0]
-  if (file) form[type === 'cv' ? 'cvFile' : 'sampleFile'] = file.name
-}
-
-function handleDrop(e, type) {
-  const file = e.dataTransfer.files[0]
-  if (file) form[type === 'cv' ? 'cvFile' : 'sampleFile'] = file.name
-}
-
 function validate() {
   Object.keys(errors).forEach(k => delete errors[k])
   if (!form.fullName.trim()) errors.fullName = 'Full name is required'
@@ -316,9 +267,43 @@ function validate() {
 async function handleSubmit() {
   if (!validate()) return
   submitting.value = true
-  await new Promise(r => setTimeout(r, 1600))
-  submitting.value = false
-  submitted.value  = true
+  serverError.value = ''
+  Object.keys(errors).forEach(k => delete errors[k])
+
+  try {
+    await axios.post('/work-with-us/intern-apply', {
+      full_name:          form.fullName,
+      email:              form.email,
+      phone:              form.phone,
+      city:               form.city,
+      institution:        form.institution,
+      programme:          form.programme,
+      discipline:         form.discipline,
+      grad_year:          form.gradYear,
+      track:              form.track,
+      cohort:             form.cohort,
+      mode:               form.mode,
+      duration:           form.duration,
+      statement:          form.statement,
+      governance_problem: form.governanceProblem,
+    })
+    submitted.value = true
+  } catch (err) {
+    if (err.response?.status === 422) {
+      const fieldErrors = err.response.data.errors ?? {}
+      const keyMap = {
+        full_name: 'fullName', grad_year: 'gradYear',
+        governance_problem: 'governanceProblem',
+      }
+      for (const [field, msgs] of Object.entries(fieldErrors)) {
+        errors[keyMap[field] ?? field] = msgs[0]
+      }
+    } else {
+      serverError.value = 'Something went wrong. Please try again later.'
+    }
+  } finally {
+    submitting.value = false
+  }
 }
 
 let observers = []
@@ -537,27 +522,6 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.7; }
   height: 1px; background: rgba(255,255,255,0.07);
   margin: 8px 0 28px;
 }
-
-/* ── File Drop ───────────────────────────────── */
-.file-drop {
-  display: flex; align-items: center; gap: 16px;
-  border: 2px dashed rgba(255,255,255,0.12);
-  padding: 24px; cursor: pointer;
-  transition: border-color 0.22s, background 0.22s;
-}
-.file-drop:hover {
-  border-color: rgba(201,168,76,0.4);
-  background: rgba(201,168,76,0.04);
-}
-.file-drop-icon { font-size: 24px; flex-shrink: 0; }
-.file-drop-text {
-  font-size: 13px; color: rgba(184,197,216,0.45);
-  font-weight: 300; line-height: 1.6;
-  font-family: 'DM Sans', sans-serif;
-}
-.file-drop-text strong { color: #c9a84c; font-weight: 600; }
-.file-selected { color: #e8cf8a !important; }
-.file-hint { font-size: 11px; color: rgba(184,197,216,0.3); }
 
 /* ── Submit Row ──────────────────────────────── */
 .submit-row {

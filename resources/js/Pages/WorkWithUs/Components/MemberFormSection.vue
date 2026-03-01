@@ -156,7 +156,7 @@
               Back
             </button>
             <button class="btn-next" @click="nextStep">
-              Next: Documents
+              Next: Final Details
               <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
                 <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
@@ -168,43 +168,10 @@
       <!-- STEP 3 — DOCUMENTS -->
       <Transition name="step-fade" mode="out-in">
         <div v-if="currentStep === 3" key="step3" class="step-panel" :class="{ visible: revealed }">
-          <div class="step-title">Documents</div>
-          <div class="step-sub">Upload your CV and, if available, a sample of your best analytical or published work. These documents supplement your written answers — they do not replace them.</div>
+          <div class="step-title">Final Details</div>
+          <div class="step-sub">Provide your referees and any additional information you'd like us to consider.</div>
 
           <div class="form-grid form-grid-single">
-            <div class="form-group">
-              <label>Curriculum Vitae * (PDF, max 3MB)</label>
-              <div class="file-drop" @click="$refs.cvInput.click()" @dragover.prevent @drop.prevent="handleDrop($event, 'cv')">
-                <input ref="cvInput" type="file" accept=".pdf,.doc,.docx" style="display:none" @change="handleFile($event,'cv')"/>
-                <span class="file-drop-icon">📄</span>
-                <div class="file-drop-text">
-                  <template v-if="form.cvFile"><strong class="file-selected">{{ form.cvFile }}</strong></template>
-                  <template v-else>Upload your full CV — service record, academic qualifications, publications, positions held.<br><strong>Click to browse or drag &amp; drop</strong> · <span class="file-hint">PDF preferred · Max 3MB</span></template>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Writing or Work Sample (optional, PDF, max 5MB)</label>
-              <div class="file-drop" @click="$refs.sampleInput.click()" @dragover.prevent @drop.prevent="handleDrop($event, 'sample')">
-                <input ref="sampleInput" type="file" accept=".pdf,.doc,.docx" style="display:none" @change="handleFile($event,'sample')"/>
-                <span class="file-drop-icon">📑</span>
-                <div class="file-drop-text">
-                  <template v-if="form.sampleFile"><strong class="file-selected">{{ form.sampleFile }}</strong></template>
-                  <template v-else>A published paper, policy note, judgment, report, or article that represents your analytical thinking.<br><strong>Click to browse or drag &amp; drop</strong> · <span class="file-hint">Max 5MB</span></template>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Additional Supporting Document (optional)</label>
-              <div class="file-drop" @click="$refs.extraInput.click()" @dragover.prevent @drop.prevent="handleDrop($event,'extra')">
-                <input ref="extraInput" type="file" accept=".pdf,.doc,.docx,.jpg,.png" style="display:none" @change="handleFile($event,'extra')"/>
-                <span class="file-drop-icon">📎</span>
-                <div class="file-drop-text">
-                  <template v-if="form.extraFile"><strong class="file-selected">{{ form.extraFile }}</strong></template>
-                  <template v-else>Letter of endorsement, media mention, service record extract.<br><strong>Click to browse</strong> · <span class="file-hint">Max 2MB</span></template>
-                </div>
-              </div>
-            </div>
             <div class="form-group">
               <label>Referees (name, designation, contact — at least one)</label>
               <textarea v-model="form.referees" placeholder="Name &amp; Designation of Referee 1&#10;Email / Phone&#10;&#10;Name &amp; Designation of Referee 2 (optional)&#10;Email / Phone" style="min-height:100px;"></textarea>
@@ -255,17 +222,9 @@ const revealed = ref(false)
 const currentStep = ref(1)
 const submitting  = ref(false)
 const submitted   = ref(false)
-const cvInput     = ref(null)
-const sampleInput = ref(null)
-const extraInput  = ref(null)
 const errors      = reactive({})
 
-// Actual File objects for upload
-const cvFileObj     = ref(null)
-const sampleFileObj = ref(null)
-const extraFileObj  = ref(null)
-
-const steps = ['Profile', 'Your Thinking', 'Documents']
+const steps = ['Profile', 'Your Thinking', 'Final Details']
 
 const form = reactive({
   fullName: '', email: '', phone: '', city: '',
@@ -273,7 +232,6 @@ const form = reactive({
   membershipType: '', mode: '',
   background: '', contributionArea: '', boardRelation: '',
   answers: ['', '', '', ''],
-  cvFile: null, sampleFile: null, extraFile: null,
   referees: '', additionalNotes: '',
 })
 
@@ -322,23 +280,6 @@ function nextStep() {
 function prevStep() { if (currentStep.value > 1) currentStep.value-- }
 function goToStep(n) { if (n < currentStep.value) currentStep.value = n }
 
-function handleFile(e, type) {
-  const file = e.target.files[0]
-  if (file) {
-    if (type === 'cv')         { form.cvFile = file.name;     cvFileObj.value = file }
-    else if (type === 'sample'){ form.sampleFile = file.name; sampleFileObj.value = file }
-    else                       { form.extraFile = file.name;  extraFileObj.value = file }
-  }
-}
-function handleDrop(e, type) {
-  const file = e.dataTransfer.files[0]
-  if (file) {
-    if (type === 'cv')         { form.cvFile = file.name;     cvFileObj.value = file }
-    else if (type === 'sample'){ form.sampleFile = file.name; sampleFileObj.value = file }
-    else                       { form.extraFile = file.name;  extraFileObj.value = file }
-  }
-}
-
 async function handleSubmit() {
   if (!validate()) {
     currentStep.value = 1
@@ -347,27 +288,25 @@ async function handleSubmit() {
   submitting.value = true
   Object.keys(errors).forEach(k => delete errors[k])
 
-  const payload = new FormData()
-  payload.append('full_name',           form.fullName.trim())
-  payload.append('email',               form.email.trim())
-  payload.append('phone',               form.phone.trim())
-  payload.append('city',                form.city.trim())
-  payload.append('designation',         form.designation.trim())
-  payload.append('organisation',        form.organisation.trim())
-  payload.append('membership_type',     form.membershipType)
-  payload.append('mode',                form.mode)
-  payload.append('background',          form.background.trim())
-  payload.append('contribution_area',   form.contributionArea)
-  payload.append('board_relation',      form.boardRelation.trim())
-  payload.append('answer_governance',   form.answers[0])
-  payload.append('answer_contribution', form.answers[1])
-  payload.append('answer_reform',       form.answers[2])
-  payload.append('answer_bgc',          form.answers[3])
-  if (cvFileObj.value)     payload.append('cv_file',     cvFileObj.value)
-  if (sampleFileObj.value) payload.append('sample_file', sampleFileObj.value)
-  if (extraFileObj.value)  payload.append('extra_file',  extraFileObj.value)
-  payload.append('referees',         form.referees)
-  payload.append('additional_notes', form.additionalNotes)
+  const payload = {
+    full_name:           form.fullName.trim(),
+    email:               form.email.trim(),
+    phone:               form.phone.trim(),
+    city:                form.city.trim(),
+    designation:         form.designation.trim(),
+    organisation:        form.organisation.trim(),
+    membership_type:     form.membershipType,
+    mode:                form.mode,
+    background:          form.background.trim(),
+    contribution_area:   form.contributionArea,
+    board_relation:      form.boardRelation.trim(),
+    answer_governance:   form.answers[0],
+    answer_contribution: form.answers[1],
+    answer_reform:       form.answers[2],
+    answer_bgc:          form.answers[3],
+    referees:            form.referees,
+    additional_notes:    form.additionalNotes,
+  }
 
   try {
     await window.axios.post('/work-with-us/apply', payload)
@@ -605,26 +544,6 @@ textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
   color: #0b1c38; margin-bottom: 16px; line-height: 1.4;
 }
 .q-card textarea { min-height: 110px; }
-
-/* ── File Drop ───────────────────────────────── */
-.file-drop {
-  display: flex; align-items: center; gap: 16px;
-  border: 2px dashed #e8eaf0; padding: 22px;
-  cursor: pointer; background: #fff;
-  transition: border-color 0.22s, background 0.22s;
-}
-.file-drop:hover {
-  border-color: rgba(201,168,76,0.4);
-  background: rgba(201,168,76,0.02);
-}
-.file-drop-icon { font-size: 22px; flex-shrink: 0; }
-.file-drop-text {
-  font-size: 13px; color: #b8c5d8; font-weight: 300;
-  line-height: 1.6; font-family: 'DM Sans', sans-serif;
-}
-.file-drop-text strong { color: #c9a84c; font-weight: 600; }
-.file-selected { color: #0b1c38 !important; }
-.file-hint { font-size: 11px; color: #b8c5d8; }
 
 /* ── Step Nav ────────────────────────────────── */
 .step-nav {

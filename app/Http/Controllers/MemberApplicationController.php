@@ -25,26 +25,11 @@ class MemberApplicationController extends Controller
             'answer_contribution' => 'nullable|string',
             'answer_reform'       => 'nullable|string',
             'answer_bgc'          => 'nullable|string',
-            'cv_file'             => 'nullable|file|mimes:pdf,doc,docx|max:3072',
-            'sample_file'         => 'nullable|file|mimes:pdf,doc,docx|max:5120',
-            'extra_file'          => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
             'referees'            => 'nullable|string',
             'additional_notes'    => 'nullable|string',
         ]);
 
-        $data = collect($validated)->except(['cv_file', 'sample_file', 'extra_file'])->toArray();
-
-        if ($request->hasFile('cv_file')) {
-            $data['cv_path'] = $request->file('cv_file')->store('applications/cv', 'public');
-        }
-        if ($request->hasFile('sample_file')) {
-            $data['sample_path'] = $request->file('sample_file')->store('applications/samples', 'public');
-        }
-        if ($request->hasFile('extra_file')) {
-            $data['extra_path'] = $request->file('extra_file')->store('applications/extra', 'public');
-        }
-
-        MemberApplication::create($data);
+        MemberApplication::create($validated);
 
         return response()->json(['success' => true, 'message' => 'Your application has been submitted successfully.']);
     }
