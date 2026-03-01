@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \Inertia\Middleware::class,
+        ]);
         $middleware->alias([
             'admin.auth'  => \App\Http\Middleware\AdminAuthenticate::class,
             'admin.guest' => \App\Http\Middleware\AdminGuest::class,

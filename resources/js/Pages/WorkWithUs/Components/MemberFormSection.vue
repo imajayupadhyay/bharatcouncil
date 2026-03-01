@@ -53,15 +53,18 @@
             </div>
             <div class="form-group">
               <label>Phone Number *</label>
-              <input v-model="form.phone" type="tel" placeholder="+91 98765 43210"/>
+              <input v-model="form.phone" type="tel" placeholder="+91 98765 43210" :class="{ error: errors.phone }"/>
+              <span v-if="errors.phone" class="err-msg">{{ errors.phone }}</span>
             </div>
             <div class="form-group">
               <label>City / State of Residence *</label>
-              <input v-model="form.city" type="text" placeholder="New Delhi, Lucknow, Chennai..."/>
+              <input v-model="form.city" type="text" placeholder="New Delhi, Lucknow, Chennai..." :class="{ error: errors.city }"/>
+              <span v-if="errors.city" class="err-msg">{{ errors.city }}</span>
             </div>
             <div class="form-group">
               <label>Current Designation / Role *</label>
-              <input v-model="form.designation" type="text" placeholder="e.g. Retired IAS Officer / Professor / Lawyer / Researcher"/>
+              <input v-model="form.designation" type="text" placeholder="e.g. Retired IAS Officer / Professor / Lawyer / Researcher" :class="{ error: errors.designation }"/>
+              <span v-if="errors.designation" class="err-msg">{{ errors.designation }}</span>
             </div>
             <div class="form-group">
               <label>Current Organisation / Institution</label>
@@ -69,21 +72,23 @@
             </div>
             <div class="form-group">
               <label>Membership Type Sought *</label>
-              <select v-model="form.membershipType">
+              <select v-model="form.membershipType" :class="{ error: errors.membershipType }">
                 <option value="">Select membership type</option>
                 <option>Research Fellow (1-year, full support)</option>
                 <option>Senior Fellow (3-year, leadership role)</option>
                 <option>Associate Member (annual, open)</option>
               </select>
+              <span v-if="errors.membershipType" class="err-msg">{{ errors.membershipType }}</span>
             </div>
             <div class="form-group">
               <label>Mode Preference *</label>
-              <select v-model="form.mode">
+              <select v-model="form.mode" :class="{ error: errors.mode }">
                 <option value="">Select preference</option>
                 <option>Residential — New Delhi office</option>
                 <option>Non-residential (available for events &amp; remote work)</option>
                 <option>Either is acceptable</option>
               </select>
+              <span v-if="errors.mode" class="err-msg">{{ errors.mode }}</span>
             </div>
             <div class="form-group form-group-full">
               <label>Your Background — in approximately 300 words *</label>
@@ -92,7 +97,7 @@
             </div>
             <div class="form-group form-group-full">
               <label>Proposed Area of Contribution *</label>
-              <select v-model="form.contributionArea">
+              <select v-model="form.contributionArea" :class="{ error: errors.contributionArea }">
                 <option value="">Select primary area</option>
                 <option>State Capacity &amp; Administrative Reform</option>
                 <option>Constitutional Law &amp; Judicial Governance</option>
@@ -106,6 +111,7 @@
                 <option>Social Policy &amp; Welfare</option>
                 <option>Other / Interdisciplinary</option>
               </select>
+              <span v-if="errors.contributionArea" class="err-msg">{{ errors.contributionArea }}</span>
             </div>
             <div class="form-group form-group-full">
               <label>Do you have an existing relationship with any BGC Board member?</label>
@@ -209,6 +215,10 @@
             </div>
           </div>
 
+          <div v-if="errors._server" class="server-error-banner">
+            {{ errors._server }}
+          </div>
+
           <div class="step-nav">
             <button class="btn-prev" @click="prevStep">
               <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
@@ -250,6 +260,11 @@ const sampleInput = ref(null)
 const extraInput  = ref(null)
 const errors      = reactive({})
 
+// Actual File objects for upload
+const cvFileObj     = ref(null)
+const sampleFileObj = ref(null)
+const extraFileObj  = ref(null)
+
 const steps = ['Profile', 'Your Thinking', 'Documents']
 
 const form = reactive({
@@ -287,10 +302,16 @@ const questions = [
 
 function validate() {
   Object.keys(errors).forEach(k => delete errors[k])
-  if (!form.fullName.trim()) errors.fullName = 'Required'
+  if (!form.fullName.trim())    errors.fullName = 'Required'
   if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
     errors.email = 'Valid email required'
-  if (!form.background.trim()) errors.background = 'Required'
+  if (!form.phone.trim())       errors.phone = 'Required'
+  if (!form.city.trim())        errors.city = 'Required'
+  if (!form.designation.trim()) errors.designation = 'Required'
+  if (!form.membershipType)     errors.membershipType = 'Please select a membership type'
+  if (!form.mode)               errors.mode = 'Please select a mode preference'
+  if (!form.background.trim())  errors.background = 'Required'
+  if (!form.contributionArea)   errors.contributionArea = 'Please select an area of contribution'
   return Object.keys(errors).length === 0
 }
 
@@ -304,25 +325,74 @@ function goToStep(n) { if (n < currentStep.value) currentStep.value = n }
 function handleFile(e, type) {
   const file = e.target.files[0]
   if (file) {
-    if (type === 'cv') form.cvFile = file.name
-    else if (type === 'sample') form.sampleFile = file.name
-    else form.extraFile = file.name
+    if (type === 'cv')         { form.cvFile = file.name;     cvFileObj.value = file }
+    else if (type === 'sample'){ form.sampleFile = file.name; sampleFileObj.value = file }
+    else                       { form.extraFile = file.name;  extraFileObj.value = file }
   }
 }
 function handleDrop(e, type) {
   const file = e.dataTransfer.files[0]
   if (file) {
-    if (type === 'cv') form.cvFile = file.name
-    else if (type === 'sample') form.sampleFile = file.name
-    else form.extraFile = file.name
+    if (type === 'cv')         { form.cvFile = file.name;     cvFileObj.value = file }
+    else if (type === 'sample'){ form.sampleFile = file.name; sampleFileObj.value = file }
+    else                       { form.extraFile = file.name;  extraFileObj.value = file }
   }
 }
 
 async function handleSubmit() {
+  if (!validate()) {
+    currentStep.value = 1
+    return
+  }
   submitting.value = true
-  await new Promise(r => setTimeout(r, 1800))
-  submitting.value = false
-  submitted.value  = true
+  Object.keys(errors).forEach(k => delete errors[k])
+
+  const payload = new FormData()
+  payload.append('full_name',           form.fullName.trim())
+  payload.append('email',               form.email.trim())
+  payload.append('phone',               form.phone.trim())
+  payload.append('city',                form.city.trim())
+  payload.append('designation',         form.designation.trim())
+  payload.append('organisation',        form.organisation.trim())
+  payload.append('membership_type',     form.membershipType)
+  payload.append('mode',                form.mode)
+  payload.append('background',          form.background.trim())
+  payload.append('contribution_area',   form.contributionArea)
+  payload.append('board_relation',      form.boardRelation.trim())
+  payload.append('answer_governance',   form.answers[0])
+  payload.append('answer_contribution', form.answers[1])
+  payload.append('answer_reform',       form.answers[2])
+  payload.append('answer_bgc',          form.answers[3])
+  if (cvFileObj.value)     payload.append('cv_file',     cvFileObj.value)
+  if (sampleFileObj.value) payload.append('sample_file', sampleFileObj.value)
+  if (extraFileObj.value)  payload.append('extra_file',  extraFileObj.value)
+  payload.append('referees',         form.referees)
+  payload.append('additional_notes', form.additionalNotes)
+
+  try {
+    await window.axios.post('/work-with-us/apply', payload)
+    submitted.value = true
+  } catch (err) {
+    if (err.response?.status === 422 && err.response?.data?.errors) {
+      const serverErrors = err.response.data.errors
+      const fieldMap = {
+        full_name: 'fullName', membership_type: 'membershipType',
+        contribution_area: 'contributionArea', board_relation: 'boardRelation',
+        additional_notes: 'additionalNotes',
+      }
+      Object.entries(serverErrors).forEach(([key, msgs]) => {
+        errors[fieldMap[key] ?? key] = Array.isArray(msgs) ? msgs[0] : msgs
+      })
+      const step1Keys = ['fullName','email','phone','city','designation','membershipType','mode','background','contributionArea']
+      if (step1Keys.some(k => errors[k])) {
+        currentStep.value = 1
+      }
+    } else {
+      errors._server = 'Something went wrong. Please try again.'
+    }
+  } finally {
+    submitting.value = false
+  }
 }
 
 let observer = null
@@ -485,13 +555,24 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
 }
 input::placeholder, textarea::placeholder { color: #b8c5d8; }
-input.error, textarea.error { border-color: rgba(231,76,60,0.4); }
+input.error, textarea.error, select.error { border-color: rgba(231,76,60,0.4); }
 
 select { cursor: pointer; }
 select option { background: #fff; color: #0b1c38; }
 textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
 
 .err-msg { font-size: 10px; color: rgba(231,76,60,0.75); font-family: 'DM Mono', monospace; }
+
+.server-error-banner {
+  background: rgba(231,76,60,0.07);
+  border: 1px solid rgba(231,76,60,0.2);
+  color: rgba(231,76,60,0.85);
+  padding: 12px 16px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
 
 /* ── Question Cards ──────────────────────────── */
 .q-cards { display: flex; flex-direction: column; gap: 20px; margin-bottom: 32px; }

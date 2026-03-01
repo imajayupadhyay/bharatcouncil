@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ApplicationController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.auth')->group(function () {
         Route::get('/dashboard',  [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout',    [AuthController::class, 'logout'])->name('logout');
+
+        // Member applications
+        Route::get('/applications',                              [ApplicationController::class, 'index'])->name('applications');
+        Route::get('/applications/{application}',               [ApplicationController::class, 'show'])->name('applications.show');
+        Route::patch('/applications/{application}/status',      [ApplicationController::class, 'updateStatus'])->name('applications.status');
     });
 
 });

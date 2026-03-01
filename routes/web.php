@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MemberApplicationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,6 +19,7 @@ Route::get('/insights/{slug}', function (string $slug) {
 Route::get('/work-with-us', function () {
     return Inertia::render('WorkWithUs/Index');
 });
+Route::post('/work-with-us/apply', [MemberApplicationController::class, 'store'])->name('application.store');
 
 Route::get('/who-we-are', function () {
     return Inertia::render('WhoWeAre/Index');

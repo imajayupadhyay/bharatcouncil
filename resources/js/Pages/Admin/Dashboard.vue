@@ -13,19 +13,18 @@
       <!-- Nav -->
       <nav class="sidebar-nav">
         <div class="nav-group-label" v-if="!sidebarCollapsed">Overview</div>
-        <a
+        <Link
           v-for="item in navItems"
           :key="item.id"
-          href="#"
+          :href="item.href"
           class="nav-item"
-          :class="{ active: activeNav === item.id }"
-          @click.prevent="activeNav = item.id"
+          :class="{ active: item.id === 'dashboard' }"
           :title="sidebarCollapsed ? item.label : ''"
         >
           <span class="nav-icon" v-html="item.icon"/>
           <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
           <span v-if="!sidebarCollapsed && item.badge" class="nav-badge">{{ item.badge }}</span>
-        </a>
+        </Link>
       </nav>
 
       <!-- Collapse toggle -->
@@ -185,7 +184,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 
 const props = defineProps({
   admin: Object,
@@ -193,31 +192,18 @@ const props = defineProps({
 
 const mounted          = ref(false)
 const sidebarCollapsed = ref(false)
-const activeNav        = ref('dashboard')
 const currentTime      = ref('')
 const currentDate      = ref('')
 
 // ── Nav items ─────────────────────────────────────────────
 const navItems = [
   {
-    id: 'dashboard', label: 'Dashboard',
+    id: 'dashboard', label: 'Dashboard', href: '/admin/dashboard',
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/></svg>',
   },
   {
-    id: 'insights', label: 'Insights', badge: '128',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 12V6l4-4 4 4v6H2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 12V8h4v4h-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 12V9.5h3V12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-  },
-  {
-    id: 'events', label: 'Events', badge: '3',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="1.5" y="3.5" width="13" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 1.5v4M11 1.5v4M1.5 7.5h13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-  },
-  {
-    id: 'members', label: 'Members',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M11 7a2.5 2.5 0 000-5M15 13c0-2.76-1.34-5-3-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-  },
-  {
-    id: 'settings', label: 'Settings',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.54 11.54l1.41 1.41M3.05 12.95l1.42-1.42M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    id: 'applications', label: 'Applications', href: '/admin/applications',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="1.5" width="12" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5h6M5 8h6M5 10.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
   },
 ]
 
@@ -259,9 +245,7 @@ const quickActions = [
 ]
 
 // ── Computed ───────────────────────────────────────────────
-const currentSection = computed(() => {
-  return navItems.find(n => n.id === activeNav.value)?.label ?? 'Dashboard'
-})
+const currentSection = computed(() => 'Dashboard')
 
 const timeGreeting = computed(() => {
   const h = new Date().getHours()
