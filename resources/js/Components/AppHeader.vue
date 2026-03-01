@@ -275,6 +275,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   background: none; border: none; cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   display: flex; align-items: center; gap: 5px;
+  padding: 0;
 }
 .nav-link-bar {
   position: absolute;

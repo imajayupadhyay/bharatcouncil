@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\ApplicationController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -32,6 +33,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Newsletter subscribers
         Route::get('/newsletters', [NewsletterController::class, 'index'])->name('newsletters');
+
+        // Admin users
+        Route::get('/admin-users',                    [AdminUserController::class, 'index'])->name('admin-users');
+        Route::get('/admin-users/create',             [AdminUserController::class, 'create'])->name('admin-users.create');
+        Route::post('/admin-users',                   [AdminUserController::class, 'store'])->name('admin-users.store');
+        Route::get('/admin-users/{adminUser}/edit',   [AdminUserController::class, 'edit'])->name('admin-users.edit');
+        Route::put('/admin-users/{adminUser}',        [AdminUserController::class, 'update'])->name('admin-users.update');
+        Route::delete('/admin-users/{adminUser}',     [AdminUserController::class, 'destroy'])->name('admin-users.destroy');
     });
 
 });
