@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\InternApplicationController;
 use App\Http\Controllers\Admin\NewsletterController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/admin-users/{adminUser}/edit',   [AdminUserController::class, 'edit'])->name('admin-users.edit');
         Route::put('/admin-users/{adminUser}',        [AdminUserController::class, 'update'])->name('admin-users.update');
         Route::delete('/admin-users/{adminUser}',     [AdminUserController::class, 'destroy'])->name('admin-users.destroy');
+
+        // Homepage management
+        Route::get('/homepage',                          [HomepageController::class, 'index'])->name('homepage');
+        Route::put('/homepage/{section}',                [HomepageController::class, 'updateSection'])->name('homepage.update');
 
         // Blog — Categories
         Route::get('/blog/categories',                       [BlogCategoryController::class, 'index'])->name('blog.categories.index');

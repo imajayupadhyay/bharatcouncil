@@ -12,7 +12,7 @@
   <div class="page-root">
     <AppHeader />
     <main>
-      <HeroSection />
+      <HeroSection :data="sections?.hero" />
       <FeaturedSection />
       <FocusSection />
       <EventsSection />
@@ -27,6 +27,9 @@
 
 <script setup>
 import { Head } from '@inertiajs/vue3'
+
+const props = defineProps({ sections: Object })
+
 import AppHeader from '@/Components/AppHeader.vue'
 import HeroSection from './Components/HeroSection.vue'
 import FeaturedSection from './Components/FeaturedSection.vue'

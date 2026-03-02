@@ -4,11 +4,16 @@ use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\InternApplicationController;
 use App\Http\Controllers\MemberApplicationController;
 use App\Http\Controllers\NewsletterController;
+use App\Models\HomepageSection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home/Index');
+    $sections = HomepageSection::all()->keyBy('section')->map->data;
+
+    return Inertia::render('Home/Index', [
+        'sections' => $sections,
+    ]);
 });
 
 Route::get('/insights', [InsightsController::class, 'index'])->name('insights.index');
