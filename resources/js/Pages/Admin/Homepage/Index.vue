@@ -236,6 +236,91 @@
           </Transition>
         </div>
 
+        <!-- ══════════ FOCUS AREAS SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="focusOpen = !focusOpen">
+            <div class="section-panel-left">
+              <span class="section-num">03</span>
+              <div>
+                <h3 class="section-panel-title">Focus Areas</h3>
+                <p class="section-panel-desc">Section heading and the 5 focus-area cards with titles, descriptions, counts and links</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: focusOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <Transition name="panel-slide">
+            <div v-if="focusOpen" class="section-panel-body">
+              <form @submit.prevent="saveFocus">
+
+                <!-- Header -->
+                <div class="form-group-label">Section Header</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Badge Text</label>
+                    <input v-model="focus.badge_text" type="text" class="form-input" placeholder="What We Work On" />
+                  </div>
+                  <div class="form-group">
+                    <label>Section Title</label>
+                    <input v-model="focus.section_title" type="text" class="form-input" placeholder="Our Focus Areas" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Link Text</label>
+                    <input v-model="focus.link_text" type="text" class="form-input" placeholder="Explore All" />
+                  </div>
+                  <div class="form-group">
+                    <label>Link URL</label>
+                    <input v-model="focus.link_url" type="text" class="form-input" placeholder="#" />
+                  </div>
+                </div>
+
+                <!-- Cards -->
+                <div class="form-group-label">Focus Area Cards</div>
+                <div v-for="(card, i) in focus.cards" :key="i" class="card-edit-block">
+                  <div class="card-edit-header">
+                    <span class="card-edit-num">Card {{ i + 1 }}</span>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Title</label>
+                      <input v-model="card.title" type="text" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                      <label>Count Label</label>
+                      <input v-model="card.count" type="text" class="form-input" placeholder="24 Publications" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea v-model="card.desc" class="form-input form-textarea" rows="2"></textarea>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Link URL</label>
+                      <input v-model="card.link" type="text" class="form-input" placeholder="#" />
+                    </div>
+                    <div class="form-group">
+                      <label>Icon SVG (inner path)</label>
+                      <input v-model="card.svg" type="text" class="form-input form-input-mono" placeholder="<path d=&quot;...&quot;/>" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetFocus">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="focusSaving">
+                    {{ focusSaving ? 'Saving...' : 'Save Focus Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
         <!-- Placeholder panels for future sections -->
         <div class="section-panel section-panel-locked" v-for="s in upcomingSections" :key="s.num">
           <div class="section-panel-header">
@@ -272,6 +357,8 @@ const heroOpen         = ref(true)
 const heroSaving       = ref(false)
 const featuredOpen     = ref(false)
 const featuredSaving   = ref(false)
+const focusOpen        = ref(false)
+const focusSaving      = ref(false)
 
 // ── Hero defaults ────────────────────────────────────────
 const heroDefaults = {
@@ -357,9 +444,85 @@ function resetFeatured() {
   Object.assign(featured, { ...featuredDefaults })
 }
 
+// ── Focus defaults ───────────────────────────────────────
+const focusDefaults = {
+  badge_text:    'What We Work On',
+  section_title: 'Our Focus Areas',
+  link_text:     'Explore All',
+  link_url:      '#',
+  cards: [
+    {
+      title: 'Constitutional Governance',
+      desc:  'Federal structure, separation of powers, and the evolving architecture of India\'s democracy.',
+      count: '24 Publications',
+      link:  '#',
+      svg:   '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17.5h7M17.5 14v7"/>',
+    },
+    {
+      title: 'Economic Policy',
+      desc:  'Fiscal federalism, public finance, employment, and inclusive growth frameworks.',
+      count: '38 Publications',
+      link:  '#',
+      svg:   '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>',
+    },
+    {
+      title: 'Foreign Affairs',
+      desc:  'India\'s strategic posture, multilateral institutions, and neighbourhood diplomacy.',
+      count: '19 Publications',
+      link:  '#',
+      svg:   '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/>',
+    },
+    {
+      title: 'Digital Governance',
+      desc:  'DPI, data regulation, AI governance, and technology\'s role in public administration.',
+      count: '31 Publications',
+      link:  '#',
+      svg:   '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+    },
+    {
+      title: 'Civic Participation',
+      desc:  'Electoral reforms, decentralisation, and strengthening local self-governance.',
+      count: '16 Publications',
+      link:  '#',
+      svg:   '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+    },
+  ],
+}
+
+const savedFocus = props.sections?.focus || {}
+const focus = reactive({
+  ...focusDefaults,
+  ...savedFocus,
+  cards: savedFocus.cards?.length
+    ? savedFocus.cards.map(c => ({ ...c }))
+    : focusDefaults.cards.map(c => ({ ...c })),
+})
+
+function saveFocus() {
+  focusSaving.value = true
+  router.put('/admin/homepage/focus', {
+    data: {
+      badge_text:    focus.badge_text,
+      section_title: focus.section_title,
+      link_text:     focus.link_text,
+      link_url:      focus.link_url,
+      cards:         focus.cards,
+    },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { focusSaving.value = false },
+  })
+}
+
+function resetFocus() {
+  Object.assign(focus, {
+    ...focusDefaults,
+    cards: focusDefaults.cards.map(c => ({ ...c })),
+  })
+}
+
 // ── Upcoming sections ────────────────────────────────────
 const upcomingSections = [
-  { num: '03', title: 'Focus Areas',           desc: 'Key governance focus areas and pillars' },
   { num: '04', title: 'Events Section',        desc: 'Upcoming events and programmes' },
   { num: '05', title: 'Voices Section',        desc: 'Council members and their voices' },
   { num: '06', title: 'Publications Section',  desc: 'Latest publications and reports' },
@@ -471,6 +634,13 @@ onMounted(() => requestAnimationFrame(() => setTimeout(() => { mounted.value = t
 .section-panel-locked .section-panel-header:hover{background:transparent;}
 .section-panel-locked .section-panel-title{color:#8a9bbf;}
 .coming-soon-badge{font-size:9px;font-weight:700;color:#8a9bbf;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(138,155,191,.25);background:rgba(138,155,191,.06);font-family:'DM Mono',monospace;}
+
+/* ── Card edit blocks ── */
+.card-edit-block{padding:16px 18px;background:rgba(11,28,56,.02);border:1px solid rgba(11,28,56,.08);margin-bottom:12px;}
+.card-edit-block:last-of-type{margin-bottom:0;}
+.card-edit-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.card-edit-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#c9a84c;letter-spacing:.1em;padding:3px 8px;border:1px solid rgba(201,168,76,.25);background:rgba(201,168,76,.06);}
+.form-input-mono{font-family:'DM Mono',monospace;font-size:11px;}
 
 /* ── Info box ── */
 .info-box{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;background:rgba(41,128,185,.06);border:1px solid rgba(41,128,185,.18);margin-top:18px;}

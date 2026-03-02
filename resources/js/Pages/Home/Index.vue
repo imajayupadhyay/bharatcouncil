@@ -14,7 +14,7 @@
     <main>
       <HeroSection :data="sections?.hero" />
       <FeaturedSection :data="sections?.featured" :featured-post="featuredBlogPost" :latest-posts="latestPosts" />
-      <FocusSection />
+      <FocusSection :data="sections?.focus" />
       <EventsSection />
       <VoicesSection />
       <PublicationsSection />
