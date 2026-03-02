@@ -12,14 +12,14 @@
   <div class="page-root">
     <AppHeader />
     <main>
-      <HeroSection />
-      <FeaturedSection />
-      <FocusSection />
-      <EventsSection />
-      <VoicesSection />
-      <PublicationsSection />
-      <DiscussionsSection />
-      <NewsletterSection />
+      <HeroSection :data="sections?.hero" />
+      <FeaturedSection :data="sections?.featured" :featured-post="featuredBlogPost" :latest-posts="latestPosts" />
+      <FocusSection :data="sections?.focus" />
+      <EventsSection :data="sections?.events" :events="upcomingEvents" />
+      <VoicesSection :data="sections?.voices" />
+      <PublicationsSection :data="sections?.publications" :posts="publicationPosts" :categories="publicationCategories" />
+      <DiscussionsSection :data="sections?.discussions" />
+      <NewsletterSection :data="sections?.newsletter" />
     </main>
     <AppFooter />
   </div>
@@ -27,6 +27,16 @@
 
 <script setup>
 import { Head } from '@inertiajs/vue3'
+
+const props = defineProps({
+  sections:               Object,
+  featuredBlogPost:       Object,
+  latestPosts:            Array,
+  upcomingEvents:         Array,
+  publicationPosts:       Array,
+  publicationCategories:  Array,
+})
+
 import AppHeader from '@/Components/AppHeader.vue'
 import HeroSection from './Components/HeroSection.vue'
 import FeaturedSection from './Components/FeaturedSection.vue'

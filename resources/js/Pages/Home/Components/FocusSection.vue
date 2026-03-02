@@ -37,12 +37,12 @@
         <div class="section-label">
           <div class="section-tag">
             <span class="tag-line"/>
-            What We Work On
+            {{ d.badge_text }}
           </div>
-          <h2 class="section-title">Our Focus Areas</h2>
+          <h2 class="section-title">{{ d.section_title }}</h2>
         </div>
-        <a href="#" class="section-link">
-          Explore All
+        <a :href="d.link_url" class="section-link">
+          {{ d.link_text }}
           <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="link-arrow">
             <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
@@ -51,9 +51,10 @@
 
       <!-- ── Cards Grid ── -->
       <div class="focus-grid">
-        <div
-          v-for="(card, i) in cards"
+        <a
+          v-for="(card, i) in displayCards"
           :key="i"
+          :href="card.link || '#'"
           class="focus-card"
           :class="{ visible: revealed }"
           :style="{ transitionDelay: `${0.1 + i * 0.1}s` }"
@@ -92,7 +93,7 @@
               </svg>
             </span>
           </div>
-        </div>
+        </a>
       </div>
 
     </div>
@@ -100,44 +101,66 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({ data: Object })
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 const hovered   = ref(null)
 
-const cards = [
-  {
-    title: 'Constitutional Governance',
-    desc:  'Federal structure, separation of powers, and the evolving architecture of India\'s democracy.',
-    count: '24 Publications',
-    svg:   '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17.5h7M17.5 14v7"/>',
-  },
-  {
-    title: 'Economic Policy',
-    desc:  'Fiscal federalism, public finance, employment, and inclusive growth frameworks.',
-    count: '38 Publications',
-    svg:   '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>',
-  },
-  {
-    title: 'Foreign Affairs',
-    desc:  'India\'s strategic posture, multilateral institutions, and neighbourhood diplomacy.',
-    count: '19 Publications',
-    svg:   '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/>',
-  },
-  {
-    title: 'Digital Governance',
-    desc:  'DPI, data regulation, AI governance, and technology\'s role in public administration.',
-    count: '31 Publications',
-    svg:   '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
-  },
-  {
-    title: 'Civic Participation',
-    desc:  'Electoral reforms, decentralisation, and strengthening local self-governance.',
-    count: '16 Publications',
-    svg:   '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
-  },
-]
+// ── Defaults ─────────────────────────────────────────────
+const defaults = {
+  badge_text:    'What We Work On',
+  section_title: 'Our Focus Areas',
+  link_text:     'Explore All',
+  link_url:      '#',
+  cards: [
+    {
+      title: 'Constitutional Governance',
+      desc:  'Federal structure, separation of powers, and the evolving architecture of India\'s democracy.',
+      count: '24 Publications',
+      link:  '#',
+      svg:   '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17.5h7M17.5 14v7"/>',
+    },
+    {
+      title: 'Economic Policy',
+      desc:  'Fiscal federalism, public finance, employment, and inclusive growth frameworks.',
+      count: '38 Publications',
+      link:  '#',
+      svg:   '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>',
+    },
+    {
+      title: 'Foreign Affairs',
+      desc:  'India\'s strategic posture, multilateral institutions, and neighbourhood diplomacy.',
+      count: '19 Publications',
+      link:  '#',
+      svg:   '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/>',
+    },
+    {
+      title: 'Digital Governance',
+      desc:  'DPI, data regulation, AI governance, and technology\'s role in public administration.',
+      count: '31 Publications',
+      link:  '#',
+      svg:   '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+    },
+    {
+      title: 'Civic Participation',
+      desc:  'Electoral reforms, decentralisation, and strengthening local self-governance.',
+      count: '16 Publications',
+      link:  '#',
+      svg:   '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+    },
+  ],
+}
+
+const d = computed(() => ({
+  ...defaults,
+  ...(props.data || {}),
+  cards: props.data?.cards?.length ? props.data.cards : defaults.cards,
+}))
+
+const displayCards = computed(() => d.value.cards)
 
 let observer = null
 onMounted(() => {
@@ -237,6 +260,9 @@ onUnmounted(() => observer?.disconnect())
 .focus-card {
   position: relative;
   padding: 40px 28px 32px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
   background: rgba(255,255,255,0.07);
   border: 1px solid rgba(201,168,76,0.18);
   box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);

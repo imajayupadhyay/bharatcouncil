@@ -114,33 +114,32 @@
       <div class="hero-eyebrow" :class="{ visible: revealed }">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span class="eyebrow-text">Bharat Governance Council</span>
-        <span class="eyebrow-tag">Est. 2024</span>
+        <span class="eyebrow-text">{{ d.eyebrow_text }}</span>
+        <span class="eyebrow-tag">{{ d.eyebrow_tag }}</span>
       </div>
 
       <!-- Headline -->
       <h1 class="hero-headline" :class="{ visible: revealed }">
-        <span class="hl-line hl-line-1">A Community for</span><br>
-        <em class="hl-line hl-line-2">Better Governance.</em>
+        <span class="hl-line hl-line-1">{{ d.headline_line1 }}</span><br>
+        <em class="hl-line hl-line-2">{{ d.headline_line2 }}</em>
       </h1>
 
       <!-- Sub -->
       <p class="hero-sub" :class="{ visible: revealed }">
-        Connecting citizens, policy thinkers, and civic leaders to research,
-        debate, and shape the future of India's governance.
+        {{ d.subtext }}
       </p>
 
       <!-- Actions -->
       <div class="hero-actions" :class="{ visible: revealed }">
-        <a href="#" class="btn-primary">
+        <a :href="d.btn_primary_link" class="btn-primary">
           <span class="btn-shimmer"/>
-          Join the Council
+          {{ d.btn_primary_text }}
           <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
             <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </a>
-        <a href="#featured" class="btn-ghost" @click.prevent="scrollTo('featured')">
-          Explore Research
+        <a :href="d.btn_secondary_link" class="btn-ghost" @click.prevent="scrollTo(d.btn_secondary_link?.replace('#', '') || 'featured')">
+          {{ d.btn_secondary_text }}
           <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="arrow-icon">
             <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -179,10 +178,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
+
+const props = defineProps({ data: Object })
 
 const heroEl   = ref(null)
 const revealed = ref(false)
+
+// ── Defaults (used when no DB data exists) ────────────
+const defaults = {
+  eyebrow_text:       'Bharat Governance Council',
+  eyebrow_tag:        'Est. 2024',
+  headline_line1:     'A Community for',
+  headline_line2:     'Better Governance.',
+  subtext:            'Connecting citizens, policy thinkers, and civic leaders to research, debate, and shape the future of India\'s governance.',
+  btn_primary_text:   'Join the Council',
+  btn_primary_link:   '#',
+  btn_secondary_text: 'Explore Research',
+  btn_secondary_link: '#featured',
+  stats: [
+    { label: 'Members',       suffix: 'K+', target: 5,   icon: '◈' },
+    { label: 'Publications',  suffix: '+',  target: 120, icon: '◇' },
+    { label: 'Events Hosted', suffix: '+',  target: 48,  icon: '◆' },
+  ],
+}
+
+// Merge DB data over defaults — fallback field-by-field
+const d = computed(() => ({
+  ...defaults,
+  ...(props.data || {}),
+  stats: props.data?.stats?.length ? props.data.stats : defaults.stats,
+}))
 
 /* ── Constellation data ─────────────────────── */
 const constellationNodes = [
@@ -208,11 +234,16 @@ const particles = Array.from({ length: 36 }, (_, i) => ({
 }))
 
 /* ── Stats with counter animation ──────────── */
-const stats = reactive([
-  { label: 'Members',       suffix: 'K+', prefix: '',  target: 5,   display: 0, icon: '◈' },
-  { label: 'Publications',  suffix: '+',  prefix: '',  target: 120, display: 0, icon: '◇' },
-  { label: 'Events Hosted', suffix: '+',  prefix: '',  target: 48,  display: 0, icon: '◆' },
-])
+const stats = reactive(
+  d.value.stats.map(s => ({
+    label:   s.label,
+    suffix:  s.suffix  || '+',
+    prefix:  s.prefix  || '',
+    target:  Number(s.target) || 0,
+    display: 0,
+    icon:    s.icon || '◈',
+  }))
+)
 
 function animateCounters() {
   stats.forEach((s, idx) => {

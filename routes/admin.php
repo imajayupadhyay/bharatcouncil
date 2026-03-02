@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\InternApplicationController;
 use App\Http\Controllers\Admin\NewsletterController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +45,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/admin-users/{adminUser}/edit',   [AdminUserController::class, 'edit'])->name('admin-users.edit');
         Route::put('/admin-users/{adminUser}',        [AdminUserController::class, 'update'])->name('admin-users.update');
         Route::delete('/admin-users/{adminUser}',     [AdminUserController::class, 'destroy'])->name('admin-users.destroy');
+
+        // Homepage management
+        Route::get('/homepage',                          [HomepageController::class, 'index'])->name('homepage');
+        Route::put('/homepage/{section}',                [HomepageController::class, 'updateSection'])->name('homepage.update');
+
+        // Events
+        Route::get('/events',                       [EventController::class, 'index'])->name('events.index');
+        Route::get('/events/create',                [EventController::class, 'create'])->name('events.create');
+        Route::post('/events',                      [EventController::class, 'store'])->name('events.store');
+        Route::get('/events/{event}/edit',           [EventController::class, 'edit'])->name('events.edit');
+        Route::put('/events/{event}',                [EventController::class, 'update'])->name('events.update');
+        Route::delete('/events/{event}',             [EventController::class, 'destroy'])->name('events.destroy');
 
         // Blog — Categories
         Route::get('/blog/categories',                       [BlogCategoryController::class, 'index'])->name('blog.categories.index');
