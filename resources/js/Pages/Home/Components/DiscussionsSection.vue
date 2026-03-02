@@ -90,20 +90,19 @@
       <div class="disc-eyebrow" :class="{ visible: revealed }">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span class="eyebrow-text">Community Forum</span>
-        <span class="eyebrow-tag">Open to All</span>
+        <span class="eyebrow-text">{{ d.eyebrow_text }}</span>
+        <span class="eyebrow-tag">{{ d.eyebrow_tag }}</span>
       </div>
 
       <!-- Headline -->
       <h2 class="disc-headline" :class="{ visible: revealed }">
-        Shape the<br>
-        <em class="headline-em">conversation.</em>
+        {{ d.headline_line1 }}<br>
+        <em class="headline-em">{{ d.headline_line2 }}</em>
       </h2>
 
       <!-- Sub text -->
       <p class="disc-sub" :class="{ visible: revealed }">
-        Join thousands of citizens, scholars, and civic practitioners debating
-        the policies that shape India's future. Every voice matters.
+        {{ d.subtext }}
       </p>
 
       <!-- Stats row -->
@@ -122,15 +121,15 @@
 
       <!-- CTA buttons -->
       <div class="disc-actions" :class="{ visible: revealed }">
-        <a href="#" class="btn-primary-cta">
+        <a :href="d.btn_primary_link" class="btn-primary-cta">
           <span class="btn-shimmer"/>
-          Join &amp; Participate
+          {{ d.btn_primary_text }}
           <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
             <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </a>
-        <a href="#" class="btn-ghost-cta">
-          Browse Discussions
+        <a :href="d.btn_secondary_link" class="btn-ghost-cta">
+          {{ d.btn_secondary_text }}
           <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="ghost-arrow">
             <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
@@ -139,7 +138,7 @@
 
       <!-- Note -->
       <p class="disc-note" :class="{ visible: revealed }">
-        Free to join &nbsp;·&nbsp; No spam &nbsp;·&nbsp; Cancel anytime
+        {{ d.note }}
       </p>
 
     </div>
@@ -147,18 +146,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({ data: Object })
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 const liveCount = ref(18)
 
-const communityStats = [
-  { num: '5,200+', lbl: 'Members'     },
-  { num: '840+',   lbl: 'Discussions' },
-  { num: '12K+',   lbl: 'Comments'    },
-  { num: '48+',    lbl: 'Topics'      },
-]
+const defaults = {
+  eyebrow_text:       'Community Forum',
+  eyebrow_tag:        'Open to All',
+  headline_line1:     'Shape the',
+  headline_line2:     'conversation.',
+  subtext:            'Join thousands of citizens, scholars, and civic practitioners debating the policies that shape India\u2019s future. Every voice matters.',
+  btn_primary_text:   'Join & Participate',
+  btn_primary_link:   '#',
+  btn_secondary_text: 'Browse Discussions',
+  btn_secondary_link: '#',
+  note:               'Free to join \u00a0·\u00a0 No spam \u00a0·\u00a0 Cancel anytime',
+  stats: [
+    { num: '5,200+', lbl: 'Members'     },
+    { num: '840+',   lbl: 'Discussions' },
+    { num: '12K+',   lbl: 'Comments'    },
+    { num: '48+',    lbl: 'Topics'      },
+  ],
+}
+
+const d = computed(() => ({ ...defaults, ...(props.data || {}) }))
+const communityStats = computed(() => d.value.stats?.length ? d.value.stats : defaults.stats)
 
 const particles = Array.from({ length: 20 }, (_, i) => ({
   x: (i * 137.5) % 1440,

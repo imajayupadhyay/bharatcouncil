@@ -488,18 +488,174 @@
           </Transition>
         </div>
 
-        <!-- Placeholder panels for future sections -->
-        <div class="section-panel section-panel-locked" v-for="s in upcomingSections" :key="s.num">
-          <div class="section-panel-header">
+        <!-- ══════════ DISCUSSIONS SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="discussionsOpen = !discussionsOpen">
             <div class="section-panel-left">
-              <span class="section-num">{{ s.num }}</span>
+              <span class="section-num">07</span>
               <div>
-                <h3 class="section-panel-title">{{ s.title }}</h3>
-                <p class="section-panel-desc">{{ s.desc }}</p>
+                <h3 class="section-panel-title">Discussions Section</h3>
+                <p class="section-panel-desc">Community forum CTA — headline, subtext, stats, and buttons</p>
               </div>
             </div>
-            <span class="coming-soon-badge">Coming Soon</span>
+            <svg class="section-chevron" :class="{ open: discussionsOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
           </div>
+
+          <Transition name="panel-slide">
+            <div v-if="discussionsOpen" class="section-panel-body">
+              <form @submit.prevent="saveDiscussions">
+
+                <div class="form-group-label">Eyebrow</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Eyebrow Text</label>
+                    <input v-model="discussionsData.eyebrow_text" type="text" class="form-input" placeholder="Community Forum" />
+                  </div>
+                  <div class="form-group">
+                    <label>Eyebrow Tag</label>
+                    <input v-model="discussionsData.eyebrow_tag" type="text" class="form-input" placeholder="Open to All" />
+                  </div>
+                </div>
+
+                <div class="form-group-label">Headline</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Line 1 (plain)</label>
+                    <input v-model="discussionsData.headline_line1" type="text" class="form-input" placeholder="Shape the" />
+                  </div>
+                  <div class="form-group">
+                    <label>Line 2 (gold italic)</label>
+                    <input v-model="discussionsData.headline_line2" type="text" class="form-input" placeholder="conversation." />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Subtext</label>
+                  <textarea v-model="discussionsData.subtext" class="form-input form-textarea" rows="2"></textarea>
+                </div>
+
+                <div class="form-group-label">Action Buttons</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Primary Button Text</label>
+                    <input v-model="discussionsData.btn_primary_text" type="text" class="form-input" />
+                  </div>
+                  <div class="form-group">
+                    <label>Primary Button Link</label>
+                    <input v-model="discussionsData.btn_primary_link" type="text" class="form-input" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Secondary Button Text</label>
+                    <input v-model="discussionsData.btn_secondary_text" type="text" class="form-input" />
+                  </div>
+                  <div class="form-group">
+                    <label>Secondary Button Link</label>
+                    <input v-model="discussionsData.btn_secondary_link" type="text" class="form-input" />
+                  </div>
+                </div>
+
+                <div class="form-group-label">Stats</div>
+                <div v-for="(stat, i) in discussionsData.stats" :key="i" class="stat-row">
+                  <span class="stat-row-num">{{ i + 1 }}</span>
+                  <div class="form-group">
+                    <label>Number</label>
+                    <input v-model="stat.num" type="text" class="form-input" />
+                  </div>
+                  <div class="form-group">
+                    <label>Label</label>
+                    <input v-model="stat.lbl" type="text" class="form-input" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Footer Note</label>
+                  <input v-model="discussionsData.note" type="text" class="form-input" />
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetDiscussions">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="discussionsSaving">
+                    {{ discussionsSaving ? 'Saving...' : 'Save Discussions Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
+        <!-- ══════════ NEWSLETTER SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="newsletterOpen = !newsletterOpen">
+            <div class="section-panel-left">
+              <span class="section-num">08</span>
+              <div>
+                <h3 class="section-panel-title">Newsletter Section</h3>
+                <p class="section-panel-desc">Newsletter subscription callout — heading, subtext, and social proof</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: newsletterOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <Transition name="panel-slide">
+            <div v-if="newsletterOpen" class="section-panel-body">
+              <form @submit.prevent="saveNewsletter">
+
+                <div class="form-group-label">Eyebrow &amp; Heading</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Eyebrow Text</label>
+                    <input v-model="newsletterData.eyebrow_text" type="text" class="form-input" placeholder="Weekly Intelligence" />
+                  </div>
+                  <div class="form-group">
+                    <label>Heading Prefix</label>
+                    <input v-model="newsletterData.heading_line1" type="text" class="form-input" placeholder="Join" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Heading Emphasis (gold italic)</label>
+                    <input v-model="newsletterData.heading_em" type="text" class="form-input" placeholder="5,000+ citizens" />
+                  </div>
+                  <div class="form-group">
+                    <label>Heading Line 2</label>
+                    <input v-model="newsletterData.heading_line2" type="text" class="form-input" placeholder="shaping governance." />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Subtext</label>
+                  <input v-model="newsletterData.subtext" type="text" class="form-input" placeholder="Weekly policy digest. No noise. Unsubscribe anytime." />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Note</label>
+                    <input v-model="newsletterData.note" type="text" class="form-input" />
+                  </div>
+                  <div class="form-group">
+                    <label>Social Proof Text</label>
+                    <input v-model="newsletterData.proof_text" type="text" class="form-input" placeholder="Joined by 5,200+ policy thinkers" />
+                  </div>
+                </div>
+
+                <div class="info-box">
+                  <span class="info-icon">i</span>
+                  <p>The subscribe form is already functional. Subscribers are stored and can be viewed from the <a href="/admin/newsletters" style="color:#c9a84c;">Newsletter</a> page.</p>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetNewsletter">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="newsletterSaving">
+                    {{ newsletterSaving ? 'Saving...' : 'Save Newsletter Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
         </div>
 
       </div>
@@ -532,6 +688,10 @@ const voicesOpen         = ref(false)
 const voicesSaving       = ref(false)
 const publicationsOpen   = ref(false)
 const publicationsSaving = ref(false)
+const discussionsOpen    = ref(false)
+const discussionsSaving  = ref(false)
+const newsletterOpen     = ref(false)
+const newsletterSaving   = ref(false)
 
 // ── Hero defaults ────────────────────────────────────────
 const heroDefaults = {
@@ -805,11 +965,79 @@ function resetPublications() {
   Object.assign(publicationsData, { ...publicationsDefaults })
 }
 
-// ── Upcoming sections ────────────────────────────────────
-const upcomingSections = [
-  { num: '07', title: 'Discussions Section',    desc: 'Community discussions and forums' },
-  { num: '08', title: 'Newsletter Section',    desc: 'Newsletter subscription callout' },
-]
+// ── Discussions defaults ─────────────────────────────────
+const discussionsDefaults = {
+  eyebrow_text:       'Community Forum',
+  eyebrow_tag:        'Open to All',
+  headline_line1:     'Shape the',
+  headline_line2:     'conversation.',
+  subtext:            'Join thousands of citizens, scholars, and civic practitioners debating the policies that shape India\u2019s future. Every voice matters.',
+  btn_primary_text:   'Join & Participate',
+  btn_primary_link:   '#',
+  btn_secondary_text: 'Browse Discussions',
+  btn_secondary_link: '#',
+  note:               'Free to join \u00a0·\u00a0 No spam \u00a0·\u00a0 Cancel anytime',
+  stats: [
+    { num: '5,200+', lbl: 'Members' },
+    { num: '840+',   lbl: 'Discussions' },
+    { num: '12K+',   lbl: 'Comments' },
+    { num: '48+',    lbl: 'Topics' },
+  ],
+}
+
+const savedDiscussions = props.sections?.discussions || {}
+const discussionsData = reactive({
+  ...discussionsDefaults,
+  ...savedDiscussions,
+  stats: savedDiscussions.stats?.length
+    ? savedDiscussions.stats.map(s => ({ ...s }))
+    : discussionsDefaults.stats.map(s => ({ ...s })),
+})
+
+function saveDiscussions() {
+  discussionsSaving.value = true
+  router.put('/admin/homepage/discussions', {
+    data: { ...discussionsData, stats: discussionsData.stats },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { discussionsSaving.value = false },
+  })
+}
+
+function resetDiscussions() {
+  Object.assign(discussionsData, {
+    ...discussionsDefaults,
+    stats: discussionsDefaults.stats.map(s => ({ ...s })),
+  })
+}
+
+// ── Newsletter defaults ─────────────────────────────────
+const newsletterDefaults = {
+  eyebrow_text:  'Weekly Intelligence',
+  heading_line1: 'Join',
+  heading_em:    '5,000+ citizens',
+  heading_line2: 'shaping governance.',
+  subtext:       'Weekly policy digest. No noise. Unsubscribe anytime.',
+  note:          'By subscribing you agree to our Privacy Policy. No spam, ever.',
+  proof_text:    'Joined by 5,200+ policy thinkers',
+}
+
+const savedNewsletter = props.sections?.newsletter || {}
+const newsletterData = reactive({ ...newsletterDefaults, ...savedNewsletter })
+
+function saveNewsletter() {
+  newsletterSaving.value = true
+  router.put('/admin/homepage/newsletter', {
+    data: { ...newsletterData },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { newsletterSaving.value = false },
+  })
+}
+
+function resetNewsletter() {
+  Object.assign(newsletterData, { ...newsletterDefaults })
+}
 
 function logout() { router.post('/admin/logout') }
 

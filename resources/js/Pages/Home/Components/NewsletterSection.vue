@@ -43,17 +43,17 @@
       <div class="nl-eyebrow">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span>Weekly Intelligence</span>
+        <span>{{ d.eyebrow_text }}</span>
         <span class="eyebrow-dot"/>
         <span class="eyebrow-line"/>
       </div>
 
       <!-- Heading -->
       <h2 class="nl-heading">
-        Join <em>5,000+ citizens</em><br>shaping governance.
+        {{ d.heading_line1 }} <em>{{ d.heading_em }}</em><br>{{ d.heading_line2 }}
       </h2>
 
-      <p class="nl-sub">Weekly policy digest. No noise. Unsubscribe anytime.</p>
+      <p class="nl-sub">{{ d.subtext }}</p>
 
       <!-- Form -->
       <form class="nl-form" @submit.prevent="handleSubmit">
@@ -89,7 +89,7 @@
         <p v-if="showError" class="nl-error">Please enter a valid email address.</p>
       </Transition>
 
-      <p class="nl-note">By subscribing you agree to our Privacy Policy. No spam, ever.</p>
+      <p class="nl-note">{{ d.note }}</p>
 
       <!-- Social proof row -->
       <div class="nl-social-proof">
@@ -98,7 +98,7 @@
             {{ ['PM','RK','AS','VN','BG'][n-1] }}
           </div>
         </div>
-        <span class="proof-text">Joined by 5,200+ policy thinkers</span>
+        <span class="proof-text">{{ d.proof_text }}</span>
       </div>
 
     </div>
@@ -106,7 +106,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({ data: Object })
 
 const sectionEl   = ref(null)
 const inputEl     = ref(null)
@@ -116,6 +118,18 @@ const inputFocused = ref(false)
 const submitting  = ref(false)
 const submitted   = ref(false)
 const showError   = ref(false)
+
+const defaults = {
+  eyebrow_text:  'Weekly Intelligence',
+  heading_line1: 'Join',
+  heading_em:    '5,000+ citizens',
+  heading_line2: 'shaping governance.',
+  subtext:       'Weekly policy digest. No noise. Unsubscribe anytime.',
+  note:          'By subscribing you agree to our Privacy Policy. No spam, ever.',
+  proof_text:    'Joined by 5,200+ policy thinkers',
+}
+
+const d = computed(() => ({ ...defaults, ...(props.data || {}) }))
 
 const particles = Array.from({ length: 20 }, (_, i) => ({
   x: 80 + (i * 173) % 1280,

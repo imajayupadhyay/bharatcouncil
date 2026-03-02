@@ -18,8 +18,8 @@
       <EventsSection :data="sections?.events" :events="upcomingEvents" />
       <VoicesSection :data="sections?.voices" />
       <PublicationsSection :data="sections?.publications" :posts="publicationPosts" :categories="publicationCategories" />
-      <DiscussionsSection />
-      <NewsletterSection />
+      <DiscussionsSection :data="sections?.discussions" />
+      <NewsletterSection :data="sections?.newsletter" />
     </main>
     <AppFooter />
   </div>
