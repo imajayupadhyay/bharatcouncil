@@ -18,9 +18,9 @@
 
     <AppHeader />
     <main>
-      <ArticleHero />
-      <ArticleBody />
-      <RelatedArticles />
+      <ArticleHero :post="post" />
+      <ArticleBody :post="post" />
+      <RelatedArticles :posts="relatedPosts" />
     </main>
     <AppFooter />
   </div>
@@ -35,18 +35,20 @@ import ArticleBody     from './Components/ArticleBody.vue'
 import RelatedArticles from './Components/RelatedArticles.vue'
 import AppFooter       from '@/Components/AppFooter.vue'
 
-const props = defineProps({ slug: String })
+const props = defineProps({
+  post:         Object,
+  relatedPosts: Array,
+})
 
 const progress = ref(0)
 
 const pageTitle = computed(() => {
-  if (!props.slug) return 'Insights | Bharat Governance Council'
-  const readable = props.slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-  return `${readable} | Bharat Governance Council`
+  if (!props.post) return 'Insights | Bharat Governance Council'
+  return `${props.post.meta_title || props.post.title} | Bharat Governance Council`
 })
 
 const pageDescription = computed(() =>
-  'Read the latest policy analysis and research from the Bharat Governance Council on governance, institutional reform, and public policy in India.'
+  props.post?.meta_description || props.post?.excerpt || 'Read the latest policy analysis and research from the Bharat Governance Council.'
 )
 
 function updateProgress() {

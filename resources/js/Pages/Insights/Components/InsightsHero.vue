@@ -100,7 +100,7 @@
 
       <!-- Stats strip -->
       <div class="ihero-stats" :class="{ visible: revealed }">
-        <div v-for="(s, i) in stats" :key="i" class="ihero-stat">
+        <div v-for="(s, i) in displayStats" :key="i" class="ihero-stat">
           <span class="stat-num">{{ s.num }}</span>
           <span class="stat-lbl">{{ s.lbl }}</span>
         </div>
@@ -117,16 +117,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+
+const props = defineProps({ stats: Object })
 
 const revealed = ref(false)
 
-const stats = [
-  { num: '128', lbl: 'Articles'  },
-  { num: '24',  lbl: 'Authors'   },
-  { num: '8',   lbl: 'Topics'    },
-  { num: '5K+', lbl: 'Readers'   },
-]
+const displayStats = computed(() => [
+  { num: String(props.stats?.articles || 0), lbl: 'Articles' },
+  { num: String(props.stats?.authors  || 0), lbl: 'Authors'  },
+  { num: String(props.stats?.topics   || 0), lbl: 'Topics'   },
+  { num: '5K+',                              lbl: 'Readers'  },
+])
 
 const particles = Array.from({ length: 24 }, (_, i) => ({
   x: (i * 137.5) % 1440,

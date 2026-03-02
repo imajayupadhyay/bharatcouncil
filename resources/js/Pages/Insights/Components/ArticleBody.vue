@@ -19,208 +19,18 @@
         <!-- ═══════════════ ARTICLE PROSE ═══════════════ -->
         <article class="article-prose" :class="{ visible: revealed }">
 
-          <!-- Lead paragraph -->
-          <p class="lead-para">
-            India's federal architecture is undergoing its most consequential stress test since
-            the constitutional reforms of the early 1990s. As the 16th Finance Commission begins
-            its deliberations, it inherits a system where the vertical imbalance between Union
-            and state governments has deepened structurally — and where the principle of
-            cooperative federalism increasingly strains against fiscal realities.
-          </p>
-
-          <!-- Key Findings box -->
-          <div class="key-findings-box">
-            <div class="kf-header">
-              <span class="kf-icon">◈</span>
-              <h4>Key Findings</h4>
-            </div>
-            <ul class="kf-list">
-              <li>States account for over 62% of total government expenditure, yet retain access to only 41% of combined tax revenues before transfers.</li>
-              <li>The post-GST consolidation of indirect taxation has materially reduced states' independent revenue-raising capacity.</li>
-              <li>Tied grants and Centrally Sponsored Schemes constitute nearly 35% of all central transfers, undermining genuine fiscal autonomy.</li>
-              <li>Seven high-burden states — home to 40% of India's population — are systematically under-resourced relative to their developmental needs.</li>
-              <li>The 16th Finance Commission must rethink both the vertical share and the conditionality architecture of central transfers.</li>
-            </ul>
-          </div>
-
-          <!-- Section 1 -->
-          <h2 id="section-context" class="article-h2">
-            <span class="h2-num">01</span>
-            The Historical Context of Fiscal Federalism
-          </h2>
-          <p>
-            India's approach to fiscal federalism has always been a negotiated compromise between
-            centralisation for macroeconomic efficiency and decentralisation for local
-            accountability. The original constitution concentrated fiscal power at the Centre —
-            a deliberate choice reflecting post-independence anxieties about national cohesion
-            and the imperatives of planned industrialisation.
-          </p>
-          <p>
-            The Finance Commission, established under Article 280, was designed as the primary
-            institutional mechanism to correct this vertical imbalance through periodic devolution
-            of central taxes to states. Over fifteen commissions spanning seven decades, this
-            mechanism has broadly functioned — though not without tensions. The 14th Finance
-            Commission's landmark decision to raise the states' share of the divisible pool from
-            32% to 42% was widely celebrated as a move toward genuine fiscal federalism. The 15th
-            Commission subsequently moderated this slightly to 41%, citing national defence needs.
-          </p>
-          <p>
-            What has changed dramatically, however, is the composition and conditionality of
-            transfers. As the Union's expenditure commitments have grown — through national
-            programmes, defence modernisation, and debt servicing — the degree to which central
-            transfers come attached with conditions and earmarks has multiplied. States are
-            increasingly becoming implementing agencies for Union priorities rather than
-            autonomous fiscal actors pursuing local development mandates.
-          </p>
-
-          <!-- Section 2 -->
-          <h2 id="section-gst" class="article-h2">
-            <span class="h2-num">02</span>
-            How GST Reshaped the Fiscal Landscape
-          </h2>
-          <p>
-            No single fiscal event has reshaped the Centre-state financial relationship as
-            fundamentally as the introduction of the Goods and Services Tax in July 2017.
-            While GST was rightly celebrated as India's most ambitious tax reform — eliminating
-            the cascading effect of multiple levies and creating a genuine common market — its
-            design contained embedded tensions for state fiscal autonomy.
-          </p>
-
-          <!-- Pull quote -->
-          <blockquote class="pull-quote">
-            <div class="pq-bar"/>
-            <p>"The architecture of fiscal federalism must evolve from a transactional
-            transfer system into a genuine partnership — one that trusts states as the
-            primary providers of public services."</p>
-            <cite>— 15th Finance Commission Dissent Note, 2021</cite>
-          </blockquote>
-
-          <p>
-            States surrendered their most productive own-tax instrument — VAT on goods — in
-            exchange for guaranteed compensation for five years and a share of GST revenues.
-            When the compensation period ended in June 2022, several states found themselves
-            exposed: GST revenues had underperformed projections, compensation had plugged the
-            gap, and states now faced a structural revenue shortfall without a corresponding
-            reduction in expenditure mandates. The pending compensation backlog remains a source
-            of significant Centre-state friction.
-          </p>
-
-          <!-- Data callout stats -->
-          <div class="data-callout">
-            <div class="dc-header">
-              <span class="dc-label">At a Glance</span>
-              <span class="dc-rule"/>
-            </div>
-            <div class="dc-stats">
-              <div v-for="stat in dataStats" :key="stat.label" class="dc-stat">
-                <span class="dc-num">{{ stat.num }}</span>
-                <span class="dc-desc">{{ stat.desc }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 3 -->
-          <h2 id="section-commission" class="article-h2">
-            <span class="h2-num">03</span>
-            The 16th Finance Commission's Mandate
-          </h2>
-          <p>
-            The 16th Finance Commission, constituted in December 2023 under the chairmanship
-            of Dr. Arvind Panagariya, faces a more complex mandate than its predecessors.
-            It must simultaneously address the post-GST revenue architecture, the consequences
-            of elevated Union borrowing during the pandemic, growing disparities between
-            high-income and low-income states, and the demands of climate-linked public
-            expenditure — all while maintaining macroeconomic stability.
-          </p>
-          <p>
-            The Commission's Terms of Reference are broader than usual. For the first time,
-            the ToR explicitly asks the Commission to consider the fiscal implications of
-            Disaster Risk Management and climate change adaptation — reflecting the growing
-            recognition that environmental shocks are becoming a significant source of state
-            fiscal stress. Cyclone-affected coastal states and drought-prone agricultural states
-            now carry contingent liabilities that formal fiscal frameworks have never adequately
-            addressed.
-          </p>
-
-          <!-- Inline blockquote -->
-          <div class="inline-note">
-            <div class="note-bar"/>
-            <div class="note-content">
-              <span class="note-label">Key Question</span>
-              <p>Can a constitutionally-mandated body with a five-year horizon adequately address structural challenges that have accumulated over decades — and that require sustained institutional reform rather than periodic recalibration?</p>
-            </div>
-          </div>
-
-          <!-- Section 4 -->
-          <h2 id="section-recommendations" class="article-h2">
-            <span class="h2-num">04</span>
-            Recommendations
-          </h2>
-          <p>
-            Based on our analysis of inter-governmental fiscal flows, state fiscal capacity
-            assessments across fifteen states, and review of submissions to the 16th Finance
-            Commission, we propose five structural interventions:
-          </p>
-          <ol class="article-ol">
-            <li>
-              <strong>Raise the vertical devolution share to 45%</strong> of the divisible
-              pool, reversing the marginal reduction introduced by the 15th Commission and
-              aligning with the developmental expenditure reality of states.
-            </li>
-            <li>
-              <strong>Introduce a Development Equity Index</strong> as a horizontal devolution
-              criterion, weighting allocations toward states with lower per-capita public
-              service capacity — moving beyond GDP proxies that entrench existing disparities.
-            </li>
-            <li>
-              <strong>Replace tied Centrally Sponsored Schemes</strong> with formula-based
-              sector block grants, retaining only those schemes where genuine national externalities
-              justify central conditionality. Ministries should be required to justify continued
-              tying beyond each Commission period.
-            </li>
-            <li>
-              <strong>Establish a permanent Centre-State Fiscal Compact</strong> — a standing
-              joint committee of the Finance Ministry and state finance ministers that meets
-              biannually between Commission cycles to address in-year fiscal stress and prevent
-              the accumulation of compensation backlogs.
-            </li>
-            <li>
-              <strong>Create a Climate Fiscal Risk Buffer</strong> for states, funded through
-              a dedicated cess or borrowing headroom enhancement, specifically earmarked for
-              climate adaptation and disaster-related expenditure overruns.
-            </li>
-          </ol>
-
-          <!-- Section 5 / Conclusion -->
-          <h2 id="section-conclusion" class="article-h2">
-            <span class="h2-num">05</span>
-            Conclusion
-          </h2>
-          <p>
-            The 16th Finance Commission has an opportunity to reset the terms of India's
-            fiscal federalism for a generation. But the changes required go beyond incremental
-            adjustments to devolution formulae. What is needed is a philosophical shift —
-            from a system in which states are seen as subordinate beneficiaries of Union
-            largesse, to one in which they are treated as co-sovereign fiscal actors with
-            the resources and autonomy commensurate with their constitutional responsibilities.
-          </p>
-          <p>
-            India's states deliver the bulk of welfare services — schools, hospitals, rural
-            employment, and urban infrastructure. Their fiscal health is not a peripheral
-            concern; it is a central determinant of whether India's development aspirations
-            are realised in the districts and villages where 1.4 billion people live. The
-            Commission must rise to this moment.
-          </p>
+          <!-- Dynamic content from TipTap editor -->
+          <div class="article-content" v-html="post.content"></div>
 
           <!-- Article footer -->
           <div class="article-footer-meta">
             <div class="af-divider"/>
             <div class="af-row">
               <div class="af-author-block">
-                <div class="af-avatar">PM</div>
+                <div class="af-avatar">{{ getInitials(post.author_name) }}</div>
                 <div class="af-author-info">
-                  <span class="af-name">Dr. Priya Menon</span>
-                  <span class="af-bio">Senior Fellow, Economic Policy at the Bharat Governance Council. Former advisor to the 15th Finance Commission. PhD in Public Finance, JNU.</span>
+                  <span class="af-name">{{ post.author_name }}</span>
+                  <span class="af-bio">Bharat Governance Council</span>
                 </div>
               </div>
               <div class="af-share">
@@ -241,46 +51,19 @@
           <div class="sidebar-card">
             <div class="sb-section-label">Author</div>
             <div class="sb-author">
-              <div class="sb-avatar">PM</div>
+              <div class="sb-avatar">{{ getInitials(post.author_name) }}</div>
               <div class="sb-author-details">
-                <h4>Dr. Priya Menon</h4>
-                <p>Senior Fellow, Economic Policy</p>
+                <h4>{{ post.author_name }}</h4>
+                <p>Bharat Governance Council</p>
               </div>
             </div>
-            <p class="sb-author-bio">
-              Former advisor to the 15th Finance Commission. Expert in fiscal federalism
-              and public finance. PhD from JNU.
-            </p>
-            <div class="sb-author-social">
-              <a href="#" class="sb-social-link" title="Twitter">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M16.99 2h-2.77l-3.3 4.17L7.73 2H2l5.93 8.06L2.44 18h2.77l3.55-4.49L12.38 18H18l-6.13-8.27L16.99 2z"/></svg>
-              </a>
-              <a href="#" class="sb-social-link" title="LinkedIn">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M5 3a2 2 0 110 4 2 2 0 010-4zm-2 6h4v8H3V9zm6 0h3.6v1.1h.05c.5-.95 1.73-1.95 3.55-1.95C18.96 8.15 19 10.42 19 13.04V17h-3.8v-3.3c0-1.44-.5-2.42-1.75-2.42-1.29 0-1.75.89-1.75 2.42V17H9V9z"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Table of Contents -->
-          <div class="sidebar-card sidebar-toc">
-            <div class="sb-section-label">Contents</div>
-            <nav>
-              <ul class="toc-list">
-                <li v-for="item in toc" :key="item.id">
-                  <a :href="`#${item.id}`" class="toc-link">
-                    <span class="toc-num">{{ item.num }}</span>
-                    {{ item.title }}
-                  </a>
-                </li>
-              </ul>
-            </nav>
           </div>
 
           <!-- Topics -->
-          <div class="sidebar-card">
-            <div class="sb-section-label">Topics</div>
+          <div v-if="post.category" class="sidebar-card">
+            <div class="sb-section-label">Category</div>
             <div class="sb-tags">
-              <span v-for="tag in tags" :key="tag" class="sb-tag">{{ tag }}</span>
+              <span class="sb-tag">{{ post.category.name }}</span>
             </div>
           </div>
 
@@ -302,21 +85,14 @@
                 <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
                 <path d="M8 4.5v4l2.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
-              <span class="ri-label">14 min read</span>
+              <span class="ri-label">{{ post.read_time || 'Read' }}</span>
             </div>
             <div class="ri-row">
               <svg viewBox="0 0 16 16" fill="none" width="13" height="13" class="ri-icon">
                 <rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/>
                 <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
-              <span class="ri-label">3,200 words</span>
-            </div>
-            <div class="ri-row">
-              <svg viewBox="0 0 16 16" fill="none" width="13" height="13" class="ri-icon">
-                <path d="M14 2.5 L10 6 M6 10 L2 13.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M8 2l6 6-3.5 1.5L9 8l-1.5-1.5L9 3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
-              </svg>
-              <span class="ri-label">Peer reviewed</span>
+              <span class="ri-label">{{ formatDate(post.published_at) }}</span>
             </div>
           </div>
 
@@ -330,28 +106,21 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
+const props = defineProps({ post: Object })
+
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const toc = [
-  { id: 'section-context',         num: '01', title: 'Historical Context'       },
-  { id: 'section-gst',             num: '02', title: 'GST & the Fiscal Landscape'},
-  { id: 'section-commission',      num: '03', title: '16th Finance Commission'   },
-  { id: 'section-recommendations', num: '04', title: 'Recommendations'           },
-  { id: 'section-conclusion',      num: '05', title: 'Conclusion'                },
-]
+function getInitials(name) {
+  if (!name) return '?'
+  return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+}
 
-const tags = [
-  'Fiscal Policy', 'Federalism', 'Finance Commission',
-  'GST', 'State Finances', 'Public Expenditure', 'Devolution',
-]
-
-const dataStats = [
-  { num: '41%',       desc: 'States\' share of the divisible pool' },
-  { num: '62%',       desc: 'States\' share of combined expenditure' },
-  { num: '35%',       desc: 'Tied grants as % of total transfers' },
-  { num: '₹2.69L Cr', desc: 'Pending GST compensation backlog' },
-]
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 const shareLinks = [
   { label: 'Twitter / X',  icon: '<svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12"><path d="M16.99 2h-2.77l-3.3 4.17L7.73 2H2l5.93 8.06L2.44 18h2.77l3.55-4.49L12.38 18H18l-6.13-8.27L16.99 2z"/></svg>' },
@@ -509,13 +278,150 @@ onUnmounted(() => observer?.disconnect())
 }
 
 /* Body paragraphs */
-.article-prose p {
+.article-prose p,
+.article-prose :deep(p) {
   font-family: 'DM Sans', sans-serif;
   font-size: 16px;
   font-weight: 300;
   color: #3a4a62;
   line-height: 1.85;
   margin-bottom: 22px;
+}
+
+/* ── Dynamic content (v-html from TipTap) ── */
+.article-content :deep(h1),
+.article-content :deep(h2),
+.article-content :deep(h3) {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  color: #0b1c38;
+  line-height: 1.15;
+  margin-top: 44px;
+  margin-bottom: 18px;
+}
+.article-content :deep(h1) { font-size: 36px; }
+.article-content :deep(h2) { font-size: 30px; }
+.article-content :deep(h3) { font-size: 24px; }
+
+.article-content :deep(p) {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  color: #3a4a62;
+  line-height: 1.85;
+  margin-bottom: 22px;
+}
+
+.article-content :deep(ul),
+.article-content :deep(ol) {
+  margin: 20px 0;
+  padding-left: 24px;
+}
+.article-content :deep(li) {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: #3a4a62;
+  line-height: 1.75;
+  margin-bottom: 10px;
+}
+
+.article-content :deep(blockquote) {
+  margin: 36px 0;
+  padding: 24px 32px;
+  border-left: 4px solid #c9a84c;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(11,28,56,0.06);
+}
+.article-content :deep(blockquote p) {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 500;
+  font-style: italic;
+  color: #0b1c38;
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+.article-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  margin: 32px 0;
+  border: 1px solid rgba(11,28,56,0.07);
+  box-shadow: 0 4px 20px rgba(11,28,56,0.08);
+}
+
+.article-content :deep(a) {
+  color: #c9a84c;
+  text-decoration: underline;
+  text-decoration-color: rgba(201,168,76,0.3);
+  transition: text-decoration-color 0.2s;
+}
+.article-content :deep(a:hover) {
+  text-decoration-color: #c9a84c;
+}
+
+.article-content :deep(strong) {
+  font-weight: 600;
+  color: #0b1c38;
+}
+
+.article-content :deep(em) {
+  font-style: italic;
+}
+
+.article-content :deep(hr) {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(11,28,56,0.12), transparent);
+  margin: 40px 0;
+}
+
+.article-content :deep(pre) {
+  background: #0b1c38;
+  color: #b8c5d8;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin: 28px 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.article-content :deep(code) {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  background: rgba(11,28,56,0.06);
+  padding: 2px 6px;
+  color: #0b1c38;
+}
+
+.article-content :deep(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.article-content :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 28px 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+}
+.article-content :deep(th),
+.article-content :deep(td) {
+  padding: 10px 14px;
+  border: 1px solid rgba(11,28,56,0.1);
+  text-align: left;
+  color: #3a4a62;
+}
+.article-content :deep(th) {
+  background: #0b1c38;
+  color: #e8cf8a;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* Pull quote */

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\InternApplicationController;
 use App\Http\Controllers\MemberApplicationController;
 use App\Http\Controllers\NewsletterController;
@@ -10,13 +11,8 @@ Route::get('/', function () {
     return Inertia::render('Home/Index');
 });
 
-Route::get('/insights', function () {
-    return Inertia::render('Insights/Index');
-});
-
-Route::get('/insights/{slug}', function (string $slug) {
-    return Inertia::render('Insights/Show', ['slug' => $slug]);
-});
+Route::get('/insights', [InsightsController::class, 'index'])->name('insights.index');
+Route::get('/insights/{slug}', [InsightsController::class, 'show'])->name('insights.show');
 
 Route::get('/work-with-us', function () {
     return Inertia::render('WorkWithUs/Index');

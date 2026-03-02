@@ -43,9 +43,9 @@
       </div>
 
       <!-- Cards grid -->
-      <div class="related-grid">
+      <div v-if="posts && posts.length" class="related-grid">
         <article
-          v-for="(article, i) in relatedArticles"
+          v-for="(article, i) in posts"
           :key="article.id"
           class="related-card"
           :class="{ visible: revealed }"
@@ -64,10 +64,10 @@
 
           <!-- Type + read time -->
           <div class="card-type-row">
-            <span class="card-cat" :class="`cat-${slug(article.category)}`">
-              <span class="cat-dot"/>{{ article.category }}
+            <span class="card-cat" :class="`cat-${slug(article.category?.name || '')}`">
+              <span class="cat-dot"/>{{ article.category?.name }}
             </span>
-            <span class="card-read-time">{{ article.readTime }}</span>
+            <span class="card-read-time">{{ article.read_time || 'Read' }}</span>
           </div>
 
           <h3>{{ article.title }}</h3>
@@ -75,13 +75,13 @@
 
           <div class="card-footer">
             <div class="card-author-row">
-              <div class="card-avatar">{{ article.authorInitials }}</div>
-              <span class="card-author">{{ article.author }}</span>
+              <div class="card-avatar">{{ getInitials(article.author_name) }}</div>
+              <span class="card-author">{{ article.author_name }}</span>
             </div>
-            <span class="card-date">{{ article.date }}</span>
+            <span class="card-date">{{ formatDate(article.published_at) }}</span>
           </div>
 
-          <a href="/insights/reforming-fiscal-federalism" class="card-read-link">
+          <a :href="`/insights/${article.slug}`" class="card-read-link">
             Read Article
             <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
               <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -100,40 +100,26 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
+const props = defineProps({ posts: Array })
+
 const sectionEl = ref(null)
 const revealed  = ref(false)
 const hovered   = ref(null)
 
 function slug(s) {
-  return s.toLowerCase().replace(/[\s/&]+/g, '-').replace(/[^a-z-]/g, '')
+  return (s || '').toLowerCase().replace(/[\s/&]+/g, '-').replace(/[^a-z-]/g, '')
 }
 
-const relatedArticles = [
-  {
-    id: 1,
-    category: 'Op-Ed', readTime: '6 min',
-    title: 'Municipal Finance is India\'s Forgotten Crisis',
-    excerpt: 'Urban local bodies collect less than 1% of GDP in taxes. This structural deficit must change for India\'s cities to grow sustainably.',
-    author: 'Vikram Nair', authorInitials: 'VN',
-    date: 'Feb 8, 2025',
-  },
-  {
-    id: 2,
-    category: 'Analysis', readTime: '12 min',
-    title: 'State of Digital Public Infrastructure: India 2025',
-    excerpt: 'Comprehensive review of DPI adoption, trust scores, and equity gaps across 28 states and 8 union territories.',
-    author: 'Raghav Krishnan', authorInitials: 'RK',
-    date: 'Jan 15, 2025',
-  },
-  {
-    id: 3,
-    category: 'Policy Brief', readTime: '10 min',
-    title: 'Gram Panchayats at 75: Finances, Capacity & Accountability',
-    excerpt: 'A 10-state study of Panchayati Raj institutions — what genuine decentralisation requires in finance, power, and personnel.',
-    author: 'BGC Research Team', authorInitials: 'BG',
-    date: 'Jan 5, 2025',
-  },
-]
+function getInitials(name) {
+  if (!name) return '?'
+  return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 let observer = null
 onMounted(() => {

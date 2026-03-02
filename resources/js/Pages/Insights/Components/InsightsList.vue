@@ -1,7 +1,7 @@
 <template>
 
   <!-- ══ Featured Article ══════════════════════════════════ -->
-  <section class="featured-section">
+  <section v-if="featuredPost" class="featured-section">
     <div class="container">
 
       <!-- Section header -->
@@ -10,7 +10,7 @@
           <div class="section-tag"><span class="tag-line"/>Editor's Pick</div>
           <h2 class="section-title">Featured Analysis</h2>
         </div>
-        <span class="featured-date-meta">{{ featuredPost.date }} · {{ featuredPost.readTime }}</span>
+        <span class="featured-date-meta">{{ formatDate(featuredPost.published_at) }} · {{ featuredPost.read_time || 'Read' }}</span>
       </div>
 
       <!-- Featured card -->
@@ -57,26 +57,22 @@
         <!-- Content -->
         <div class="feat-content">
           <div class="feat-top-row">
-            <span class="feat-cat-badge">{{ featuredPost.category }}</span>
+            <span class="feat-cat-badge">{{ featuredPost.category?.name }}</span>
             <span class="feat-featured-tag">Featured</span>
           </div>
           <h2>{{ featuredPost.title }}</h2>
           <p>{{ featuredPost.excerpt }}</p>
 
-          <div class="feat-tag-row">
-            <span v-for="tag in featuredPost.tags" :key="tag" class="tag-pill">{{ tag }}</span>
-          </div>
-
           <div class="feat-meta-row">
-            <div class="feat-author-avatar">{{ featuredPost.authorInitials }}</div>
-            <span class="feat-author">{{ featuredPost.author }}</span>
+            <div class="feat-author-avatar">{{ getInitials(featuredPost.author_name) }}</div>
+            <span class="feat-author">{{ featuredPost.author_name }}</span>
             <span class="meta-dot"/>
-            <span class="feat-date">{{ featuredPost.date }}</span>
+            <span class="feat-date">{{ formatDate(featuredPost.published_at) }}</span>
             <span class="meta-dot"/>
-            <span class="feat-readtime">{{ featuredPost.readTime }}</span>
+            <span class="feat-readtime">{{ featuredPost.read_time || 'Read' }}</span>
           </div>
 
-          <a href="/insights/reforming-fiscal-federalism" class="feat-read-link">
+          <a :href="`/insights/${featuredPost.slug}`" class="feat-read-link">
             Read Full Analysis
             <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
               <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -111,7 +107,7 @@
           <div class="section-tag"><span class="tag-line"/>All Articles</div>
           <h2 class="section-title">Browse Insights</h2>
         </div>
-        <span class="results-count">{{ filteredPosts.length }} articles</span>
+        <span class="results-count">{{ posts.total }} articles</span>
       </div>
 
       <!-- Filter tabs -->
@@ -134,7 +130,7 @@
       <!-- Cards grid -->
       <TransitionGroup name="cards" tag="div" class="posts-grid">
         <article
-          v-for="post in filteredPosts"
+          v-for="post in displayPosts"
           :key="post.id"
           class="post-card"
           :class="{ visible: revealed }"
@@ -144,31 +140,26 @@
 
           <!-- Type row -->
           <div class="card-type-row">
-            <span class="card-cat" :class="`cat-${slug(post.category)}`">
+            <span class="card-cat" :class="`cat-${slug(post.category?.name || '')}`">
               <span class="cat-dot"/>
-              {{ post.category }}
+              {{ post.category?.name }}
             </span>
-            <span class="card-read-time">{{ post.readTime }}</span>
+            <span class="card-read-time">{{ post.read_time || 'Read' }}</span>
           </div>
 
           <h3>{{ post.title }}</h3>
           <p>{{ post.excerpt }}</p>
 
-          <!-- Tags -->
-          <div class="card-tag-row">
-            <span v-for="tag in post.tags" :key="tag" class="tag-pill">{{ tag }}</span>
-          </div>
-
           <!-- Footer -->
           <div class="card-footer">
             <div class="card-author-row">
-              <div class="card-author-avatar">{{ post.authorInitials }}</div>
-              <span class="card-author-name">{{ post.author }}</span>
+              <div class="card-author-avatar">{{ getInitials(post.author_name) }}</div>
+              <span class="card-author-name">{{ post.author_name }}</span>
             </div>
-            <span class="card-date">{{ post.date }}</span>
+            <span class="card-date">{{ formatDate(post.published_at) }}</span>
           </div>
 
-          <a href="/insights/reforming-fiscal-federalism" class="card-read-link">
+          <a :href="`/insights/${post.slug}`" class="card-read-link">
             Read
             <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
               <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -181,32 +172,48 @@
       </TransitionGroup>
 
       <!-- Empty state -->
-      <div v-if="filteredPosts.length === 0" class="empty-state">
+      <div v-if="displayPosts.length === 0" class="empty-state">
         No articles in this category yet.
       </div>
 
       <!-- Pagination -->
-      <div class="pagination" :class="{ visible: revealed }">
-        <div class="pagination-info">Showing 1–{{ filteredPosts.length }} of 128 articles</div>
+      <div v-if="posts.last_page > 1" class="pagination" :class="{ visible: revealed }">
+        <div class="pagination-info">
+          Showing {{ posts.from }}–{{ posts.to }} of {{ posts.total }} articles
+        </div>
         <div class="pagination-pages">
-          <button class="page-btn prev-btn" disabled aria-label="Previous page">
+          <Link
+            :href="posts.prev_page_url || '#'"
+            class="page-btn prev-btn"
+            :class="{ disabled: !posts.prev_page_url }"
+            :preserve-scroll="true"
+            aria-label="Previous page"
+          >
             <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
               <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-          </button>
-          <button
-            v-for="n in 5"
-            :key="n"
-            class="page-btn"
-            :class="{ active: n === 1 }"
-          >{{ n }}</button>
-          <span class="page-ellipsis">…</span>
-          <button class="page-btn">11</button>
-          <button class="page-btn next-btn" aria-label="Next page">
+          </Link>
+          <template v-for="link in paginationLinks" :key="link.label">
+            <span v-if="link.label === '...'" class="page-ellipsis">…</span>
+            <Link
+              v-else
+              :href="link.url || '#'"
+              class="page-btn"
+              :class="{ active: link.active }"
+              :preserve-scroll="true"
+            >{{ link.label }}</Link>
+          </template>
+          <Link
+            :href="posts.next_page_url || '#'"
+            class="page-btn next-btn"
+            :class="{ disabled: !posts.next_page_url }"
+            :preserve-scroll="true"
+            aria-label="Next page"
+          >
             <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
               <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -217,146 +224,73 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
+
+const props = defineProps({
+  posts:        Object,
+  featuredPost: Object,
+  categories:   Array,
+  filters:      Object,
+})
 
 const sectionEl   = ref(null)
 const filtersEl   = ref(null)
 const featRevealed = ref(false)
 const revealed    = ref(false)
 const featHovered = ref(false)
-const activeTab   = ref('all')
+const activeTab   = ref(props.filters?.category || 'all')
 const inkBarStyle = ref({ left: '0px', width: '0px' })
 
 // ── Helpers ────────────────────────────────────────────────
 function slug(s) {
-  return s.toLowerCase().replace(/[\s/&]+/g, '-').replace(/[^a-z-]/g, '')
+  return (s || '').toLowerCase().replace(/[\s/&]+/g, '-').replace(/[^a-z-]/g, '')
 }
 
-// ── Featured post ──────────────────────────────────────────
-const featuredPost = {
-  category:       'Analysis',
-  title:          'Reforming India\'s Fiscal Federalism: Balancing Centre–State Financial Relations',
-  excerpt:        'An examination of the 16th Finance Commission\'s mandate and what structural fiscal reforms are needed to address growing vertical and horizontal imbalances in India\'s federal architecture. This piece argues for a rethinking of the divisible pool, tied grants, and devolution criteria.',
-  author:         'Dr. Priya Menon',
-  authorInitials: 'PM',
-  date:           'Feb 12, 2025',
-  readTime:       '14 min read',
-  tags:           ['Fiscal Policy', 'Federalism', '16th Finance Commission'],
+function getInitials(name) {
+  if (!name) return '?'
+  return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
 }
 
-// ── Tabs ───────────────────────────────────────────────────
-const tabs = [
-  { key: 'all',          label: 'All'          },
-  { key: 'Analysis',     label: 'Analysis'     },
-  { key: 'Op-Ed',        label: 'Op-Ed'        },
-  { key: 'Explainer',    label: 'Explainer'    },
-  { key: 'Policy Brief', label: 'Policy Brief' },
-  { key: 'Commentary',   label: 'Commentary'   },
-  { key: 'Interview',    label: 'Interview'    },
-]
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
-// ── Posts ──────────────────────────────────────────────────
-const posts = [
-  {
-    id: 1, category: 'Op-Ed', readTime: '6 min',
-    title: 'Municipal Finance is India\'s Forgotten Crisis',
-    excerpt: 'Urban local bodies collect less than 1% of GDP in taxes. This structural deficit must change for India\'s cities to grow sustainably.',
-    author: 'Vikram Nair', authorInitials: 'VN',
-    date: 'Feb 8, 2025', tags: ['Urban Governance', 'Finance'],
-  },
-  {
-    id: 2, category: 'Explainer', readTime: '8 min',
-    title: 'India\'s New Criminal Laws: A Citizen\'s Guide to BNS, BNSS & BSA',
-    excerpt: 'Plain-language breakdown of three landmark laws replacing the IPC, CrPC, and Evidence Act — and what changes in practice.',
-    author: 'Aditi Sharma', authorInitials: 'AS',
-    date: 'Jan 28, 2025', tags: ['Criminal Law', 'Citizens\' Rights'],
-  },
-  {
-    id: 3, category: 'Commentary', readTime: '9 min',
-    title: 'What BRICS Expansion Means for India\'s Strategic Calculus',
-    excerpt: 'Analysing geopolitical and economic implications of a larger BRICS grouping for India\'s multi-alignment foreign policy posture.',
-    author: 'Arjun Krishnamurthy', authorInitials: 'AK',
-    date: 'Jan 20, 2025', tags: ['Foreign Policy', 'BRICS'],
-  },
-  {
-    id: 4, category: 'Analysis', readTime: '12 min',
-    title: 'State of Digital Public Infrastructure: India 2025',
-    excerpt: 'Comprehensive review of DPI adoption, trust scores, and equity gaps across 28 states and 8 union territories.',
-    author: 'Raghav Krishnan', authorInitials: 'RK',
-    date: 'Jan 15, 2025', tags: ['Digital India', 'DPI'],
-  },
-  {
-    id: 5, category: 'Policy Brief', readTime: '10 min',
-    title: 'Gram Panchayats at 75: Finances, Capacity & Accountability',
-    excerpt: 'A 10-state study of Panchayati Raj institutions — what genuine decentralisation requires in terms of finance, power, and personnel.',
-    author: 'BGC Research Team', authorInitials: 'BG',
-    date: 'Jan 5, 2025', tags: ['Panchayati Raj', 'Decentralisation'],
-  },
-  {
-    id: 6, category: 'Explainer', readTime: '7 min',
-    title: 'How India\'s Data Protection Law Will Work in Practice',
-    excerpt: 'The DPDP Act 2023 is being implemented. Here\'s what it means for citizens, companies, and the government.',
-    author: 'Sonal Mehta', authorInitials: 'SM',
-    date: 'Dec 28, 2024', tags: ['Data Protection', 'Digital Rights'],
-  },
-  {
-    id: 7, category: 'Interview', readTime: '11 min',
-    title: '"India\'s Judiciary Needs a Docket Management Revolution"',
-    excerpt: 'Former Law Commission member Dr. Rashmi Sinha on case backlogs, court digitisation, and the road ahead for judicial reform.',
-    author: 'BGC Editorial', authorInitials: 'BE',
-    date: 'Dec 18, 2024', tags: ['Judiciary', 'Legal Reform'],
-  },
-  {
-    id: 8, category: 'Op-Ed', readTime: '5 min',
-    title: 'The MGNREGA Debate We\'re Not Having',
-    excerpt: 'Employment guarantee schemes are dismissed too quickly by technocrats. A more honest reckoning of what works and what doesn\'t.',
-    author: 'Kavya Reddy', authorInitials: 'KR',
-    date: 'Dec 10, 2024', tags: ['Employment', 'Rural Policy'],
-  },
-  {
-    id: 9, category: 'Analysis', readTime: '16 min',
-    title: 'The Centre-State Battle Over GST Compensation',
-    excerpt: 'Five years after GST\'s rollout, outstanding compensation claims are creating a new fault line in cooperative federalism.',
-    author: 'Dr. Priya Menon', authorInitials: 'PM',
-    date: 'Nov 30, 2024', tags: ['GST', 'Fiscal Policy'],
-  },
-  {
-    id: 10, category: 'Commentary', readTime: '8 min',
-    title: 'Regulation by Notification: India\'s Quiet Governance Problem',
-    excerpt: 'Major policy shifts are increasingly made through executive orders and notifications, bypassing legislative scrutiny entirely.',
-    author: 'Arjun Krishnamurthy', authorInitials: 'AK',
-    date: 'Nov 22, 2024', tags: ['Executive Power', 'Legislature'],
-  },
-  {
-    id: 11, category: 'Policy Brief', readTime: '13 min',
-    title: 'Making India\'s Competition Law Fit for the Digital Age',
-    excerpt: 'The Competition Amendment Act 2023 is a start, but digital markets demand a fundamentally different antitrust approach.',
-    author: 'Sonal Mehta', authorInitials: 'SM',
-    date: 'Nov 12, 2024', tags: ['Competition Law', 'Digital Markets'],
-  },
-  {
-    id: 12, category: 'Explainer', readTime: '9 min',
-    title: 'Understanding India\'s New Telecom Act: What Changed?',
-    excerpt: 'The Telecommunications Act 2023 replaces a 138-year-old law. We break down the key changes for citizens and businesses.',
-    author: 'Aditi Sharma', authorInitials: 'AS',
-    date: 'Oct 30, 2024', tags: ['Telecom', 'Regulation'],
-  },
-]
+// ── Display data ──────────────────────────────────────────
+const displayPosts = computed(() => props.posts?.data || [])
 
-// ── Filter logic ───────────────────────────────────────────
-const filteredPosts = computed(() =>
-  activeTab.value === 'all'
-    ? posts
-    : posts.filter(p => p.category === activeTab.value)
-)
+// ── Tabs (built from dynamic categories) ──────────────────
+const tabs = computed(() => {
+  const list = [{ key: 'all', label: 'All', count: props.posts?.total || 0 }]
+  if (props.categories) {
+    props.categories.forEach(cat => {
+      list.push({ key: cat.slug, label: cat.name, count: cat.posts_count || 0 })
+    })
+  }
+  return list
+})
+
+// Pagination links (exclude prev/next labels)
+const paginationLinks = computed(() => {
+  if (!props.posts?.links) return []
+  return props.posts.links.filter(l => l.label !== '&laquo; Previous' && l.label !== 'Next &raquo;')
+})
 
 function getCount(key) {
-  if (key === 'all') return posts.length
-  return posts.filter(p => p.category === key).length
+  const tab = tabs.value.find(t => t.key === key)
+  return tab?.count || 0
 }
 
 function setTab(key) {
   activeTab.value = key
-  nextTick(() => updateInkBar())
+  // Navigate with Inertia to apply server-side category filter
+  router.get('/insights', key === 'all' ? {} : { category: key }, {
+    preserveState: true,
+    preserveScroll: true,
+    only: ['posts'],
+    onFinish: () => nextTick(() => updateInkBar()),
+  })
 }
 
 function updateInkBar() {
@@ -1012,9 +946,11 @@ onUnmounted(() => {
   border-color: #0b1c38;
   color: #c9a84c;
 }
-.page-btn:disabled {
+.page-btn:disabled,
+.page-btn.disabled {
   opacity: 0.28;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .page-ellipsis {

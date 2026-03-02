@@ -12,8 +12,13 @@
   <div class="page-root">
     <AppHeader />
     <main>
-      <InsightsHero />
-      <InsightsList />
+      <InsightsHero :stats="stats" />
+      <InsightsList
+        :posts="posts"
+        :featured-post="featuredPost"
+        :categories="categories"
+        :filters="filters"
+      />
     </main>
     <AppFooter />
   </div>
@@ -25,6 +30,14 @@ import AppHeader    from '@/Components/AppHeader.vue'
 import InsightsHero from './Components/InsightsHero.vue'
 import InsightsList from './Components/InsightsList.vue'
 import AppFooter    from '@/Components/AppFooter.vue'
+
+const props = defineProps({
+  posts:        Object,
+  featuredPost: Object,
+  categories:   Array,
+  filters:      Object,
+  stats:        Object,
+})
 </script>
 
 <style>

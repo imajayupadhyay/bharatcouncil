@@ -73,50 +73,40 @@
         <span class="bc-sep">›</span>
         <a href="/insights" class="bc-link">Insights</a>
         <span class="bc-sep">›</span>
-        <span class="bc-current">Fiscal Federalism</span>
+        <span class="bc-current">{{ post.category?.name || 'Article' }}</span>
       </nav>
 
       <!-- Category + meta row -->
       <div class="ah-meta-row" :class="{ visible: revealed }">
-        <span class="cat-badge">Analysis</span>
+        <span class="cat-badge">{{ post.category?.name }}</span>
         <span class="meta-divider"/>
         <span class="meta-item">
           <svg viewBox="0 0 16 16" fill="none" width="11" height="11" class="meta-icon">
             <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
             <path d="M8 4.5v4l2.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          14 min read
+          {{ post.read_time || 'Read' }}
         </span>
         <span class="meta-divider"/>
-        <span class="meta-item">Feb 12, 2025</span>
-        <span class="meta-divider"/>
-        <span class="meta-item peer-reviewed">
-          <svg viewBox="0 0 14 14" fill="none" width="10" height="10">
-            <path d="M2.5 7l3.5 3.5 5.5-6.5" stroke="#2ecc71" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          Peer Reviewed
-        </span>
+        <span class="meta-item">{{ formatDate(post.published_at) }}</span>
       </div>
 
       <!-- Headline -->
       <h1 class="ah-headline" :class="{ visible: revealed }">
-        Reforming India's Fiscal Federalism:<br>
-        <em class="headline-em">Balancing Centre–State Financial Relations</em>
+        {{ post.title }}
       </h1>
 
       <!-- Excerpt -->
       <p class="ah-excerpt" :class="{ visible: revealed }">
-        An examination of the 16th Finance Commission's mandate and what structural fiscal
-        reforms are needed to address growing vertical and horizontal imbalances in
-        India's federal architecture.
+        {{ post.excerpt }}
       </p>
 
       <!-- Author row -->
       <div class="ah-author-row" :class="{ visible: revealed }">
-        <div class="author-avatar-lg">PM</div>
+        <div class="author-avatar-lg">{{ getInitials(post.author_name) }}</div>
         <div class="author-info">
-          <span class="author-name">Dr. Priya Menon</span>
-          <span class="author-title">Senior Fellow, Economic Policy · BGC</span>
+          <span class="author-name">{{ post.author_name }}</span>
+          <span class="author-title">Bharat Governance Council</span>
         </div>
         <div class="ah-actions">
           <button class="action-btn" title="Bookmark">
@@ -152,7 +142,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+const props = defineProps({ post: Object })
+
 const revealed = ref(false)
+
+function getInitials(name) {
+  if (!name) return '?'
+  return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 const particles = Array.from({ length: 20 }, (_, i) => ({
   x: (i * 137.5) % 1440,
