@@ -150,6 +150,7 @@ const navLinks = [
   { label: 'Events',        href: '/#events'       },
   { label: 'Council',       href: '/#voices'       },
   { label: 'Discussions',   href: '/#discussions'  },
+  { label: 'Insights',      href: '/insights'      },
 ]
 
 const aboutLinks = [
@@ -174,6 +175,11 @@ const aboutLinks = [
 ]
 
 function handleNavClick(link) {
+  // Direct links (not hash-based) — navigate immediately
+  if (!link.href.startsWith('/#')) {
+    window.location.href = link.href
+    return
+  }
   // If on homepage, smooth-scroll to section; otherwise navigate
   if (window.location.pathname === '/') {
     const id = link.href.replace('/#', '')
