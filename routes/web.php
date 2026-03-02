@@ -4,6 +4,7 @@ use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\InternApplicationController;
 use App\Http\Controllers\MemberApplicationController;
 use App\Http\Controllers\NewsletterController;
+use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\Event;
 use App\Models\HomepageSection;
@@ -34,11 +35,26 @@ Route::get('/', function () {
         ->limit(3)
         ->get();
 
+    // Publications section — blog posts with their categories as tabs
+    $pubCategoryNames = ['Policy Brief', 'Report', 'Op-Ed', 'Explainer', 'Commentary'];
+    $pubCategories = BlogCategory::whereIn('name', $pubCategoryNames)
+        ->orderByRaw("FIELD(name, 'Policy Brief','Report','Op-Ed','Explainer','Commentary')")
+        ->get(['id', 'name']);
+
+    $publicationPosts = BlogPost::with('category')
+        ->published()
+        ->whereIn('blog_category_id', $pubCategories->pluck('id'))
+        ->orderByDesc('published_at')
+        ->limit(12)
+        ->get();
+
     return Inertia::render('Home/Index', [
-        'sections'         => $sections,
-        'featuredBlogPost' => $featuredBlogPost,
-        'latestPosts'      => $latestPosts,
-        'upcomingEvents'   => $upcomingEvents,
+        'sections'               => $sections,
+        'featuredBlogPost'       => $featuredBlogPost,
+        'latestPosts'            => $latestPosts,
+        'upcomingEvents'         => $upcomingEvents,
+        'publicationPosts'       => $publicationPosts,
+        'publicationCategories'  => $pubCategories,
     ]);
 });
 

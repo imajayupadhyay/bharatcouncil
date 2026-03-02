@@ -441,6 +441,53 @@
           </Transition>
         </div>
 
+        <!-- ══════════ PUBLICATIONS SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="publicationsOpen = !publicationsOpen">
+            <div class="section-panel-left">
+              <span class="section-num">06</span>
+              <div>
+                <h3 class="section-panel-title">Publications Section</h3>
+                <p class="section-panel-desc">Section heading — posts are pulled automatically from blog categories (Policy Brief, Report, Op-Ed, Explainer, Commentary)</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: publicationsOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <Transition name="panel-slide">
+            <div v-if="publicationsOpen" class="section-panel-body">
+              <form @submit.prevent="savePublications">
+
+                <div class="form-group-label">Section Header</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Badge Text</label>
+                    <input v-model="publicationsData.badge_text" type="text" class="form-input" placeholder="Knowledge Base" />
+                  </div>
+                  <div class="form-group">
+                    <label>Section Title</label>
+                    <input v-model="publicationsData.section_title" type="text" class="form-input" placeholder="Publications & Research" />
+                  </div>
+                </div>
+
+                <div class="info-box">
+                  <span class="info-icon">i</span>
+                  <p>Publication cards and filter tabs are automatically generated from your blog posts in the categories: Policy Brief, Report, Op-Ed, Explainer, and Commentary. Manage posts from the <a href="/admin/blog/posts" style="color:#c9a84c;">Blog Posts</a> page.</p>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetPublications">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="publicationsSaving">
+                    {{ publicationsSaving ? 'Saving...' : 'Save Publications Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
         <!-- Placeholder panels for future sections -->
         <div class="section-panel section-panel-locked" v-for="s in upcomingSections" :key="s.num">
           <div class="section-panel-header">
@@ -481,8 +528,10 @@ const focusOpen        = ref(false)
 const focusSaving      = ref(false)
 const eventsOpen       = ref(false)
 const eventsSaving     = ref(false)
-const voicesOpen       = ref(false)
-const voicesSaving     = ref(false)
+const voicesOpen         = ref(false)
+const voicesSaving       = ref(false)
+const publicationsOpen   = ref(false)
+const publicationsSaving = ref(false)
 
 // ── Hero defaults ────────────────────────────────────────
 const heroDefaults = {
@@ -730,9 +779,34 @@ function resetVoices() {
   })
 }
 
+// ── Publications defaults ────────────────────────────────
+const publicationsDefaults = {
+  badge_text:    'Knowledge Base',
+  section_title: 'Publications & Research',
+}
+
+const savedPublications = props.sections?.publications || {}
+const publicationsData = reactive({ ...publicationsDefaults, ...savedPublications })
+
+function savePublications() {
+  publicationsSaving.value = true
+  router.put('/admin/homepage/publications', {
+    data: {
+      badge_text:    publicationsData.badge_text,
+      section_title: publicationsData.section_title,
+    },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { publicationsSaving.value = false },
+  })
+}
+
+function resetPublications() {
+  Object.assign(publicationsData, { ...publicationsDefaults })
+}
+
 // ── Upcoming sections ────────────────────────────────────
 const upcomingSections = [
-  { num: '06', title: 'Publications Section',  desc: 'Latest publications and reports' },
   { num: '07', title: 'Discussions Section',    desc: 'Community discussions and forums' },
   { num: '08', title: 'Newsletter Section',    desc: 'Newsletter subscription callout' },
 ]

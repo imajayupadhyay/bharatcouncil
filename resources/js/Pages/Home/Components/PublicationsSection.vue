@@ -18,15 +18,9 @@
       <!-- Header -->
       <div class="section-header" :class="{ visible: revealed }">
         <div class="section-label">
-          <div class="section-tag"><span class="tag-line"/>Knowledge Base</div>
-          <h2 class="section-title">Publications &amp; Research</h2>
+          <div class="section-tag"><span class="tag-line"/>{{ headerData.badge_text }}</div>
+          <h2 class="section-title">{{ headerData.section_title }}</h2>
         </div>
-        <a href="#" class="section-link">
-          Full Library
-          <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="link-arrow">
-            <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </a>
       </div>
 
       <!-- ── Filter Tabs ── -->
@@ -84,7 +78,7 @@
           </div>
 
           <!-- Read arrow -->
-          <a href="#" class="pub-read-link">
+          <a :href="`/insights/${pub.slug}`" class="pub-read-link">
             Read
             <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
               <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -105,69 +99,119 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 
+const props = defineProps({
+  data:       Object,
+  posts:      Array,
+  categories: Array,
+})
+
 const sectionEl  = ref(null)
 const filtersEl  = ref(null)
 const revealed   = ref(false)
 const activeTab  = ref('all')
 const inkBarStyle = ref({ left: '0px', width: '0px' })
 
-const tabs = [
-  { key: 'all',          label: 'All'          },
-  { key: 'Policy Brief', label: 'Policy Brief'  },
-  { key: 'Report',       label: 'Report'        },
-  { key: 'Op-Ed',        label: 'Op-Ed'         },
-  { key: 'Explainer',    label: 'Explainer'     },
-  { key: 'Commentary',   label: 'Commentary'    },
-]
+const headerDefaults = {
+  badge_text:    'Knowledge Base',
+  section_title: 'Publications & Research',
+}
 
-const publications = [
+const headerData = computed(() => ({
+  ...headerDefaults,
+  ...(props.data || {}),
+}))
+
+// Build tabs from categories passed as props
+const tabs = computed(() => {
+  const base = [{ key: 'all', label: 'All' }]
+  if (props.categories?.length) {
+    return base.concat(props.categories.map(c => ({ key: c.name, label: c.name })))
+  }
+  return base.concat([
+    { key: 'Policy Brief', label: 'Policy Brief' },
+    { key: 'Report',       label: 'Report' },
+    { key: 'Op-Ed',        label: 'Op-Ed' },
+    { key: 'Explainer',    label: 'Explainer' },
+    { key: 'Commentary',   label: 'Commentary' },
+  ])
+})
+
+const fallbackPubs = [
   {
-    id: 1, type: 'Policy Brief', readTime: '14 min',
+    id: 1, type: 'Policy Brief', readTime: '14 min', slug: '#',
     title: 'Reforming India\'s Fiscal Federalism: The 16th Finance Commission Agenda',
     excerpt: 'Structural recommendations for addressing vertical and horizontal fiscal imbalances between the Centre and states.',
     author: 'Dr. Priya Menon', authorInitials: 'PM', date: 'Feb 2025',
   },
   {
-    id: 2, type: 'Report', readTime: '20 min',
+    id: 2, type: 'Report', readTime: '20 min', slug: '#',
     title: 'State of Digital Public Infrastructure: India 2025',
     excerpt: 'Comprehensive review of DPI adoption, trust scores, and equity gaps across 28 states and 8 UTs.',
     author: 'Raghav Krishnan', authorInitials: 'RK', date: 'Dec 2024',
   },
   {
-    id: 3, type: 'Explainer', readTime: '8 min',
+    id: 3, type: 'Explainer', readTime: '8 min', slug: '#',
     title: 'India\'s New Criminal Laws: A Citizen\'s Guide to BNS, BNSS & BSA',
     excerpt: 'Plain-language breakdown of three landmark laws and what they mean for rights, procedure, and justice delivery.',
     author: 'Aditi Sharma', authorInitials: 'AS', date: 'Jan 2025',
   },
   {
-    id: 4, type: 'Op-Ed', readTime: '6 min',
+    id: 4, type: 'Op-Ed', readTime: '6 min', slug: '#',
     title: 'Municipal Finance is India\'s Forgotten Crisis',
     excerpt: 'Urban local bodies collect less than 1% of GDP in taxes. This must change for India\'s cities to thrive.',
     author: 'Vikram Nair', authorInitials: 'VN', date: 'Jan 2025',
   },
   {
-    id: 5, type: 'Commentary', readTime: '9 min',
+    id: 5, type: 'Commentary', readTime: '9 min', slug: '#',
     title: 'What BRICS Expansion Means for India\'s Strategic Calculus',
     excerpt: 'Analysing the geopolitical and economic implications of a larger BRICS grouping for India\'s foreign policy.',
     author: 'Vikram Nair', authorInitials: 'VN', date: 'Nov 2024',
   },
   {
-    id: 6, type: 'Report', readTime: '18 min',
+    id: 6, type: 'Report', readTime: '18 min', slug: '#',
     title: 'The State of Gram Panchayats: Finances, Capacity & Accountability',
     excerpt: 'A 10-state study of Panchayati Raj institutions and what genuine decentralisation requires.',
     author: 'BGC Research Team', authorInitials: 'BG', date: 'Oct 2024',
   },
 ]
 
+function getInitials(name) {
+  if (!name) return 'BG'
+  return name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+}
+
+function formatMonth(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
+
+const publications = computed(() => {
+  if (props.posts?.length) {
+    return props.posts.map(p => ({
+      id:             p.id,
+      type:           p.category?.name || 'Uncategorised',
+      readTime:       p.read_time || '',
+      title:          p.title,
+      excerpt:        p.excerpt || '',
+      author:         p.author_name || 'BGC Editorial',
+      authorInitials: getInitials(p.author_name),
+      date:           formatMonth(p.published_at || p.created_at),
+      slug:           p.slug,
+    }))
+  }
+  return fallbackPubs
+})
+
 const filteredPubs = computed(() =>
   activeTab.value === 'all'
-    ? publications
-    : publications.filter(p => p.type === activeTab.value)
+    ? publications.value
+    : publications.value.filter(p => p.type === activeTab.value)
 )
 
 function getCount(key) {
-  if (key === 'all') return publications.length
-  return publications.filter(p => p.type === key).length
+  if (key === 'all') return publications.value.length
+  return publications.value.filter(p => p.type === key).length
 }
 
 function setTab(key) {

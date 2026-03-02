@@ -17,7 +17,7 @@
       <FocusSection :data="sections?.focus" />
       <EventsSection :data="sections?.events" :events="upcomingEvents" />
       <VoicesSection :data="sections?.voices" />
-      <PublicationsSection />
+      <PublicationsSection :data="sections?.publications" :posts="publicationPosts" :categories="publicationCategories" />
       <DiscussionsSection />
       <NewsletterSection />
     </main>
@@ -29,10 +29,12 @@
 import { Head } from '@inertiajs/vue3'
 
 const props = defineProps({
-  sections:         Object,
-  featuredBlogPost: Object,
-  latestPosts:      Array,
-  upcomingEvents:   Array,
+  sections:               Object,
+  featuredBlogPost:       Object,
+  latestPosts:            Array,
+  upcomingEvents:         Array,
+  publicationPosts:       Array,
+  publicationCategories:  Array,
 })
 
 import AppHeader from '@/Components/AppHeader.vue'
