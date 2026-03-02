@@ -177,6 +177,65 @@
           </Transition>
         </div>
 
+        <!-- ══════════ FEATURED SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="featuredOpen = !featuredOpen">
+            <div class="section-panel-left">
+              <span class="section-num">02</span>
+              <div>
+                <h3 class="section-panel-title">Featured Section</h3>
+                <p class="section-panel-desc">Section heading and badge — articles are pulled automatically from your latest blog posts</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: featuredOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <Transition name="panel-slide">
+            <div v-if="featuredOpen" class="section-panel-body">
+              <form @submit.prevent="saveFeatured">
+
+                <!-- Header -->
+                <div class="form-group-label">Section Header</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Badge Text</label>
+                    <input v-model="featured.badge_text" type="text" class="form-input" placeholder="Latest" />
+                  </div>
+                  <div class="form-group">
+                    <label>Section Title</label>
+                    <input v-model="featured.section_title" type="text" class="form-input" placeholder="Featured Analysis" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>View All Link Text</label>
+                    <input v-model="featured.link_text" type="text" class="form-input" placeholder="View All" />
+                  </div>
+                  <div class="form-group">
+                    <label>View All Link URL</label>
+                    <input v-model="featured.link_url" type="text" class="form-input" placeholder="/insights" />
+                  </div>
+                </div>
+
+                <!-- Info box -->
+                <div class="info-box">
+                  <span class="info-icon">i</span>
+                  <p>The main featured card and 3 side articles are automatically pulled from your latest published blog posts. The most recent featured post appears as the main card, and the next 3 posts fill the side stack.</p>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetFeatured">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="featuredSaving">
+                    {{ featuredSaving ? 'Saving...' : 'Save Featured Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
         <!-- Placeholder panels for future sections -->
         <div class="section-panel section-panel-locked" v-for="s in upcomingSections" :key="s.num">
           <div class="section-panel-header">
@@ -211,6 +270,8 @@ const mounted          = ref(false)
 const sidebarCollapsed = ref(false)
 const heroOpen         = ref(true)
 const heroSaving       = ref(false)
+const featuredOpen     = ref(false)
+const featuredSaving   = ref(false)
 
 // ── Hero defaults ────────────────────────────────────────
 const heroDefaults = {
@@ -266,9 +327,38 @@ function resetHero() {
   })
 }
 
+// ── Featured defaults ────────────────────────────────────
+const featuredDefaults = {
+  badge_text:    'Latest',
+  section_title: 'Featured Analysis',
+  link_text:     'View All',
+  link_url:      '/insights',
+}
+
+const savedFeatured = props.sections?.featured || {}
+const featured = reactive({ ...featuredDefaults, ...savedFeatured })
+
+function saveFeatured() {
+  featuredSaving.value = true
+  router.put('/admin/homepage/featured', {
+    data: {
+      badge_text:    featured.badge_text,
+      section_title: featured.section_title,
+      link_text:     featured.link_text,
+      link_url:      featured.link_url,
+    },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { featuredSaving.value = false },
+  })
+}
+
+function resetFeatured() {
+  Object.assign(featured, { ...featuredDefaults })
+}
+
 // ── Upcoming sections ────────────────────────────────────
 const upcomingSections = [
-  { num: '02', title: 'Featured Section',      desc: 'Featured research and spotlight content' },
   { num: '03', title: 'Focus Areas',           desc: 'Key governance focus areas and pillars' },
   { num: '04', title: 'Events Section',        desc: 'Upcoming events and programmes' },
   { num: '05', title: 'Voices Section',        desc: 'Council members and their voices' },
@@ -381,4 +471,9 @@ onMounted(() => requestAnimationFrame(() => setTimeout(() => { mounted.value = t
 .section-panel-locked .section-panel-header:hover{background:transparent;}
 .section-panel-locked .section-panel-title{color:#8a9bbf;}
 .coming-soon-badge{font-size:9px;font-weight:700;color:#8a9bbf;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(138,155,191,.25);background:rgba(138,155,191,.06);font-family:'DM Mono',monospace;}
+
+/* ── Info box ── */
+.info-box{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;background:rgba(41,128,185,.06);border:1px solid rgba(41,128,185,.18);margin-top:18px;}
+.info-box .info-icon{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(41,128,185,.15);color:#2980b9;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;margin-top:1px;}
+.info-box p{font-size:12px;color:#5a6a82;line-height:1.6;}
 </style>

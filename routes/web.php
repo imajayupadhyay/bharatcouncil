@@ -4,6 +4,7 @@ use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\InternApplicationController;
 use App\Http\Controllers\MemberApplicationController;
 use App\Http\Controllers\NewsletterController;
+use App\Models\BlogPost;
 use App\Models\HomepageSection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -11,8 +12,24 @@ use Inertia\Inertia;
 Route::get('/', function () {
     $sections = HomepageSection::all()->keyBy('section')->map->data;
 
+    // Featured blog posts for the Featured section
+    $featuredBlogPost = BlogPost::with('category')
+        ->published()
+        ->featured()
+        ->orderByDesc('published_at')
+        ->first();
+
+    $latestPosts = BlogPost::with('category')
+        ->published()
+        ->when($featuredBlogPost, fn ($q) => $q->where('id', '!=', $featuredBlogPost->id))
+        ->orderByDesc('published_at')
+        ->limit(3)
+        ->get();
+
     return Inertia::render('Home/Index', [
-        'sections' => $sections,
+        'sections'         => $sections,
+        'featuredBlogPost' => $featuredBlogPost,
+        'latestPosts'      => $latestPosts,
     ]);
 });
 

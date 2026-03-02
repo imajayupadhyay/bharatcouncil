@@ -13,7 +13,7 @@
     <AppHeader />
     <main>
       <HeroSection :data="sections?.hero" />
-      <FeaturedSection />
+      <FeaturedSection :data="sections?.featured" :featured-post="featuredBlogPost" :latest-posts="latestPosts" />
       <FocusSection />
       <EventsSection />
       <VoicesSection />
@@ -28,7 +28,11 @@
 <script setup>
 import { Head } from '@inertiajs/vue3'
 
-const props = defineProps({ sections: Object })
+const props = defineProps({
+  sections:         Object,
+  featuredBlogPost: Object,
+  latestPosts:      Array,
+})
 
 import AppHeader from '@/Components/AppHeader.vue'
 import HeroSection from './Components/HeroSection.vue'

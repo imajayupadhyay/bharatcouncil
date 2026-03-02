@@ -8,12 +8,12 @@
         <div class="section-label">
           <div class="section-tag">
             <span class="tag-line" />
-            Latest
+            {{ d.badge_text }}
           </div>
-          <h2 class="section-title">Featured Analysis</h2>
+          <h2 class="section-title">{{ d.section_title }}</h2>
         </div>
-        <a href="#" class="section-link">
-          View All
+        <a :href="d.link_url" class="section-link">
+          {{ d.link_text }}
           <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="link-arrow">
             <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
@@ -62,18 +62,18 @@
           <div class="card-glass-overlay" :style="{ opacity: mainHovered ? 1 : 0 }" />
 
           <div class="card-content">
-            <span class="feature-cat">Policy Brief</span>
-            <h2>Reforming India's Fiscal Federalism: Balancing Centre–State Financial Relations</h2>
-            <p>An examination of the 16th Finance Commission's mandate and what structural fiscal reforms are needed to address growing vertical and horizontal imbalances in India's federal architecture.</p>
+            <span class="feature-cat">{{ mainCard.cat }}</span>
+            <h2>{{ mainCard.title }}</h2>
+            <p>{{ mainCard.excerpt }}</p>
             <div class="feature-meta">
-              <div class="author-avatar">PM</div>
-              <span class="feature-author">Dr. Priya Menon</span>
+              <div class="author-avatar">{{ mainCard.initials }}</div>
+              <span class="feature-author">{{ mainCard.author }}</span>
               <div class="feature-dot" />
-              <span class="feature-date">Feb 2025</span>
+              <span class="feature-date">{{ mainCard.date }}</span>
               <div class="feature-dot" />
-              <span class="feature-readtime">14 min read</span>
+              <span class="feature-readtime">{{ mainCard.readTime }}</span>
             </div>
-            <a href="#" class="read-link">
+            <a :href="mainCard.link" class="read-link">
               Read Analysis
               <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
                 <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -102,7 +102,7 @@
             <p>{{ card.excerpt }}</p>
             <div class="fc-bottom">
               <span class="fc-meta">{{ card.date }}</span>
-              <a href="#" class="fc-arrow">
+              <a :href="card.link" class="fc-arrow">
                 <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
                   <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
@@ -122,19 +122,76 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-const sectionEl  = ref(null)
-const revealed   = ref(false)
+const props = defineProps({
+  data:         Object,
+  featuredPost: Object,
+  latestPosts:  Array,
+})
+
+const sectionEl   = ref(null)
+const revealed    = ref(false)
 const mainHovered = ref(false)
 
-const sideCards = [
+// ── Section header defaults ──────────────────────────────
+const defaults = {
+  badge_text:    'Latest',
+  section_title: 'Featured Analysis',
+  link_text:     'View All',
+  link_url:      '/insights',
+}
+
+const d = computed(() => ({ ...defaults, ...(props.data || {}) }))
+
+// ── Helpers ──────────────────────────────────────────────
+function getInitials(name) {
+  if (!name) return '?'
+  return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const dt = new Date(dateStr)
+  return dt.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
+
+// ── Main card (featured post or hardcoded fallback) ──────
+const mainCardDefault = {
+  cat:      'Policy Brief',
+  title:    'Reforming India\'s Fiscal Federalism: Balancing Centre–State Financial Relations',
+  excerpt:  'An examination of the 16th Finance Commission\'s mandate and what structural fiscal reforms are needed to address growing vertical and horizontal imbalances in India\'s federal architecture.',
+  initials: 'PM',
+  author:   'Dr. Priya Menon',
+  date:     'Feb 2025',
+  readTime: '14 min read',
+  link:     '#',
+}
+
+const mainCard = computed(() => {
+  if (!props.featuredPost) return mainCardDefault
+  const p = props.featuredPost
+  return {
+    cat:      p.category?.name || 'Article',
+    title:    p.title,
+    excerpt:  p.excerpt || '',
+    initials: getInitials(p.author_name),
+    author:   p.author_name || '',
+    date:     formatDate(p.published_at),
+    readTime: p.read_time || 'Read',
+    link:     `/insights/${p.slug}`,
+  }
+})
+
+// ── Side cards (latest posts or hardcoded fallback) ──────
+const sideCardsDefault = [
   {
     cat: 'Explainer',
     title: 'What the New Criminal Laws Mean for Citizens',
     excerpt: 'A plain-language breakdown of BNS, BNSS, and BSA — and what changes in practice.',
     date: 'Jan 2025',
     time: '8 min',
+    link: '#',
   },
   {
     cat: 'Op-Ed',
@@ -142,6 +199,7 @@ const sideCards = [
     excerpt: 'Why India\'s fastest-growing cities are structurally starved of funds — and how to fix it.',
     date: 'Jan 2025',
     time: '6 min',
+    link: '#',
   },
   {
     cat: 'Report',
@@ -149,8 +207,21 @@ const sideCards = [
     excerpt: 'Assessing DPI adoption, trust, and equity across India\'s 28 states.',
     date: 'Dec 2024',
     time: '12 min',
+    link: '#',
   },
 ]
+
+const sideCards = computed(() => {
+  if (!props.latestPosts?.length) return sideCardsDefault
+  return props.latestPosts.map(p => ({
+    cat:     p.category?.name || 'Article',
+    title:   p.title,
+    excerpt: p.excerpt || '',
+    date:    formatDate(p.published_at),
+    time:    p.read_time || 'Read',
+    link:    `/insights/${p.slug}`,
+  }))
+})
 
 let observer = null
 
