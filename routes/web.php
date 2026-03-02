@@ -5,6 +5,7 @@ use App\Http\Controllers\InternApplicationController;
 use App\Http\Controllers\MemberApplicationController;
 use App\Http\Controllers\NewsletterController;
 use App\Models\BlogPost;
+use App\Models\Event;
 use App\Models\HomepageSection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,10 +27,18 @@ Route::get('/', function () {
         ->limit(3)
         ->get();
 
+    $upcomingEvents = Event::published()
+        ->upcoming()
+        ->orderBy('sort_order')
+        ->orderBy('event_date')
+        ->limit(3)
+        ->get();
+
     return Inertia::render('Home/Index', [
         'sections'         => $sections,
         'featuredBlogPost' => $featuredBlogPost,
         'latestPosts'      => $latestPosts,
+        'upcomingEvents'   => $upcomingEvents,
     ]);
 });
 

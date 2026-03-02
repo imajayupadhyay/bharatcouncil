@@ -321,6 +321,126 @@
           </Transition>
         </div>
 
+        <!-- ══════════ EVENTS SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="eventsOpen = !eventsOpen">
+            <div class="section-panel-left">
+              <span class="section-num">04</span>
+              <div>
+                <h3 class="section-panel-title">Events Section</h3>
+                <p class="section-panel-desc">Section heading and link — event cards are pulled automatically from your published events</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: eventsOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <Transition name="panel-slide">
+            <div v-if="eventsOpen" class="section-panel-body">
+              <form @submit.prevent="saveEvents">
+
+                <div class="form-group-label">Section Header</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Badge Text</label>
+                    <input v-model="eventsData.badge_text" type="text" class="form-input" placeholder="Upcoming" />
+                  </div>
+                  <div class="form-group">
+                    <label>Section Title</label>
+                    <input v-model="eventsData.section_title" type="text" class="form-input" placeholder="Events & Convenings" />
+                  </div>
+                </div>
+                <div class="info-box">
+                  <span class="info-icon">i</span>
+                  <p>The event cards are automatically pulled from your latest published upcoming events. Manage events from the <a href="/admin/events" style="color:#c9a84c;">Events</a> page.</p>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetEvents">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="eventsSaving">
+                    {{ eventsSaving ? 'Saving...' : 'Save Events Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
+        <!-- ══════════ VOICES SECTION ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="voicesOpen = !voicesOpen">
+            <div class="section-panel-left">
+              <span class="section-num">05</span>
+              <div>
+                <h3 class="section-panel-title">Voices Section</h3>
+                <p class="section-panel-desc">Section heading and featured community member cards</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: voicesOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <Transition name="panel-slide">
+            <div v-if="voicesOpen" class="section-panel-body">
+              <form @submit.prevent="saveVoices">
+
+                <div class="form-group-label">Section Header</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Badge Text</label>
+                    <input v-model="voicesData.badge_text" type="text" class="form-input" placeholder="The Community" />
+                  </div>
+                  <div class="form-group">
+                    <label>Section Title</label>
+                    <input v-model="voicesData.section_title" type="text" class="form-input" placeholder="Featured Voices" />
+                  </div>
+                </div>
+
+                <!-- Voice Cards -->
+                <div class="form-group-label">Voice Cards</div>
+                <div v-for="(voice, i) in voicesData.voices" :key="i" class="card-edit-block">
+                  <div class="card-edit-header">
+                    <span class="card-edit-num">Voice {{ i + 1 }}</span>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input v-model="voice.name" type="text" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                      <label>Initials</label>
+                      <input v-model="voice.initials" type="text" class="form-input" placeholder="PM" maxlength="3" />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Role</label>
+                      <input v-model="voice.role" type="text" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                      <label>Tags (comma-separated)</label>
+                      <input v-model="voice.tagsStr" type="text" class="form-input" placeholder="Federalism, Public Finance" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Bio</label>
+                    <textarea v-model="voice.bio" class="form-input form-textarea" rows="2"></textarea>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetVoices">Reset to Default</button>
+                  <button type="submit" class="btn-save" :disabled="voicesSaving">
+                    {{ voicesSaving ? 'Saving...' : 'Save Voices Section' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
         <!-- Placeholder panels for future sections -->
         <div class="section-panel section-panel-locked" v-for="s in upcomingSections" :key="s.num">
           <div class="section-panel-header">
@@ -359,6 +479,10 @@ const featuredOpen     = ref(false)
 const featuredSaving   = ref(false)
 const focusOpen        = ref(false)
 const focusSaving      = ref(false)
+const eventsOpen       = ref(false)
+const eventsSaving     = ref(false)
+const voicesOpen       = ref(false)
+const voicesSaving     = ref(false)
 
 // ── Hero defaults ────────────────────────────────────────
 const heroDefaults = {
@@ -521,10 +645,93 @@ function resetFocus() {
   })
 }
 
+// ── Events defaults ──────────────────────────────────────
+const eventsDefaults = {
+  badge_text:    'Upcoming',
+  section_title: 'Events & Convenings',
+  link_text:     'All Events',
+  link_url:      '#',
+}
+
+const savedEvents = props.sections?.events || {}
+const eventsData = reactive({ ...eventsDefaults, ...savedEvents })
+
+function saveEvents() {
+  eventsSaving.value = true
+  router.put('/admin/homepage/events', {
+    data: {
+      badge_text:    eventsData.badge_text,
+      section_title: eventsData.section_title,
+      link_text:     eventsData.link_text,
+      link_url:      eventsData.link_url,
+    },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { eventsSaving.value = false },
+  })
+}
+
+function resetEvents() {
+  Object.assign(eventsData, { ...eventsDefaults })
+}
+
+// ── Voices defaults ──────────────────────────────────────
+const voicesDefaults = {
+  badge_text:    'The Community',
+  section_title: 'Featured Voices',
+  voices: [
+    { initials: 'PM', name: 'Dr. Priya Menon', role: 'Senior Fellow, Fiscal Policy', bio: 'Former Deputy Secretary, Ministry of Finance. Specialises in intergovernmental fiscal transfers and Centre-State relations.', tagsStr: 'Federalism, Public Finance' },
+    { initials: 'RK', name: 'Raghav Krishnan', role: 'Research Director, Digital Gov.', bio: 'Technology policy researcher and former IIT Delhi faculty studying India\'s digital public infrastructure stack.', tagsStr: 'DPI, AI Policy' },
+    { initials: 'AS', name: 'Aditi Sharma', role: 'Council Fellow, Constitutional Law', bio: 'Supreme Court advocate and constitutional scholar focusing on judicial review, federalism, and rights jurisprudence.', tagsStr: 'Constitution, Judiciary' },
+    { initials: 'VN', name: 'Vikram Nair', role: 'Associate Fellow, Foreign Policy', bio: 'Retired IFS officer with postings in Washington, Beijing, and Geneva. Expert in India\'s multilateral diplomacy.', tagsStr: 'Diplomacy, Geopolitics' },
+  ],
+}
+
+function voiceFromSaved(v) {
+  return {
+    ...v,
+    tagsStr: Array.isArray(v.tags) ? v.tags.join(', ') : (v.tagsStr || ''),
+  }
+}
+
+const savedVoices = props.sections?.voices || {}
+const voicesData = reactive({
+  badge_text:    savedVoices.badge_text    || voicesDefaults.badge_text,
+  section_title: savedVoices.section_title || voicesDefaults.section_title,
+  voices: savedVoices.voices?.length
+    ? savedVoices.voices.map(v => voiceFromSaved(v))
+    : voicesDefaults.voices.map(v => ({ ...v })),
+})
+
+function saveVoices() {
+  voicesSaving.value = true
+  router.put('/admin/homepage/voices', {
+    data: {
+      badge_text:    voicesData.badge_text,
+      section_title: voicesData.section_title,
+      voices: voicesData.voices.map(v => ({
+        initials: v.initials,
+        name:     v.name,
+        role:     v.role,
+        bio:      v.bio,
+        tags:     v.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
+      })),
+    },
+  }, {
+    preserveScroll: true,
+    onFinish: () => { voicesSaving.value = false },
+  })
+}
+
+function resetVoices() {
+  Object.assign(voicesData, {
+    ...voicesDefaults,
+    voices: voicesDefaults.voices.map(v => ({ ...v })),
+  })
+}
+
 // ── Upcoming sections ────────────────────────────────────
 const upcomingSections = [
-  { num: '04', title: 'Events Section',        desc: 'Upcoming events and programmes' },
-  { num: '05', title: 'Voices Section',        desc: 'Council members and their voices' },
   { num: '06', title: 'Publications Section',  desc: 'Latest publications and reports' },
   { num: '07', title: 'Discussions Section',    desc: 'Community discussions and forums' },
   { num: '08', title: 'Newsletter Section',    desc: 'Newsletter subscription callout' },

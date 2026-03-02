@@ -25,15 +25,9 @@
       <!-- Header -->
       <div class="section-header" :class="{ visible: revealed }">
         <div class="section-label">
-          <div class="section-tag"><span class="tag-line"/>Upcoming</div>
-          <h2 class="section-title">Events &amp; Convenings</h2>
+          <div class="section-tag"><span class="tag-line"/>{{ headerData.badge_text }}</div>
+          <h2 class="section-title">{{ headerData.section_title }}</h2>
         </div>
-        <a href="#" class="section-link">
-          All Events
-          <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="link-arrow">
-            <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </a>
       </div>
 
       <!-- Events Grid -->
@@ -65,12 +59,12 @@
           <!-- Body -->
           <div class="event-body">
             <div class="event-top-row">
-              <span class="event-type">{{ ev.type }}</span>
-              <span class="event-badge" :class="ev.badgeClass">{{ ev.badge }}</span>
+              <span class="event-type">{{ ev.type || ev.event_type }}</span>
+              <span class="event-badge" :class="ev.badgeClass || `badge-${ev.badge_style || 'gold'}`">{{ ev.badge || ev.badge_text }}</span>
             </div>
 
             <h3>{{ ev.title }}</h3>
-            <p>{{ ev.desc }}</p>
+            <p>{{ ev.desc || ev.description }}</p>
 
             <div class="event-footer">
               <div class="event-meta">
@@ -80,7 +74,13 @@
                 </svg>
                 <span class="event-time">{{ ev.time }}</span>
               </div>
-              <button class="btn-register">
+              <a v-if="ev.registration_url" :href="ev.registration_url" target="_blank" class="btn-register">
+                Register
+                <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                  <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </a>
+              <button v-else class="btn-register">
                 Register
                 <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
                   <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -99,13 +99,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  data:   Object,
+  events: Array,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 const hovered   = ref(null)
 
-const events = [
+const headerDefaults = {
+  badge_text:    'Upcoming',
+  section_title: 'Events & Convenings',
+  link_text:     'All Events',
+  link_url:      '#',
+}
+
+const headerData = computed(() => ({
+  ...headerDefaults,
+  ...(props.data || {}),
+}))
+
+const fallbackEvents = [
   {
     day: '14', month: 'Mar', year: '2025',
     type: 'Roundtable',
@@ -131,6 +148,31 @@ const events = [
     time:  'All Day · India Habitat Centre',
   },
 ]
+
+function formatEventDate(dateStr) {
+  const d = new Date(dateStr)
+  return {
+    day:   String(d.getDate()).padStart(2, '0'),
+    month: d.toLocaleString('en-US', { month: 'short' }),
+    year:  String(d.getFullYear()),
+  }
+}
+
+const events = computed(() => {
+  if (props.events && props.events.length > 0) {
+    return props.events.map(ev => {
+      const dt = formatEventDate(ev.event_date)
+      return {
+        ...ev,
+        day:   dt.day,
+        month: dt.month,
+        year:  dt.year,
+        time:  ev.event_time || ev.location || '',
+      }
+    })
+  }
+  return fallbackEvents
+})
 
 let observer = null
 onMounted(() => {
@@ -399,6 +441,9 @@ onUnmounted(() => observer?.disconnect())
   font-family: 'DM Mono', monospace;
 }
 
+a.btn-register {
+  text-decoration: none;
+}
 .btn-register {
   display: inline-flex;
   align-items: center;

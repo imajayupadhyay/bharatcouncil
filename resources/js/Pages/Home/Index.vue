@@ -15,8 +15,8 @@
       <HeroSection :data="sections?.hero" />
       <FeaturedSection :data="sections?.featured" :featured-post="featuredBlogPost" :latest-posts="latestPosts" />
       <FocusSection :data="sections?.focus" />
-      <EventsSection />
-      <VoicesSection />
+      <EventsSection :data="sections?.events" :events="upcomingEvents" />
+      <VoicesSection :data="sections?.voices" />
       <PublicationsSection />
       <DiscussionsSection />
       <NewsletterSection />
@@ -32,6 +32,7 @@ const props = defineProps({
   sections:         Object,
   featuredBlogPost: Object,
   latestPosts:      Array,
+  upcomingEvents:   Array,
 })
 
 import AppHeader from '@/Components/AppHeader.vue'

@@ -40,15 +40,9 @@
       <!-- Header -->
       <div class="section-header" :class="{ visible: revealed }">
         <div class="section-label">
-          <div class="section-tag"><span class="tag-line"/>The Community</div>
-          <h2 class="section-title">Featured Voices</h2>
+          <div class="section-tag"><span class="tag-line"/>{{ headerData.badge_text }}</div>
+          <h2 class="section-title">{{ headerData.section_title }}</h2>
         </div>
-        <a href="#" class="section-link">
-          Meet All Members
-          <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="link-arrow">
-            <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </a>
       </div>
 
       <!-- Voices Grid -->
@@ -125,13 +119,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 const hovered   = ref(null)
 
-const voices = [
+const headerDefaults = {
+  badge_text:    'The Community',
+  section_title: 'Featured Voices',
+}
+
+const headerData = computed(() => ({
+  ...headerDefaults,
+  ...(props.data || {}),
+}))
+
+const fallbackVoices = [
   {
     initials: 'PM',
     name: 'Dr. Priya Menon',
@@ -161,6 +169,17 @@ const voices = [
     tags: ['Diplomacy', 'Geopolitics'],
   },
 ]
+
+const voices = computed(() => {
+  const d = props.data
+  if (d?.voices?.length) {
+    return d.voices.map(v => ({
+      ...v,
+      tags: typeof v.tags === 'string' ? v.tags.split(',').map(t => t.trim()) : (v.tags || []),
+    }))
+  }
+  return fallbackVoices
+})
 
 let observer = null
 onMounted(() => {
