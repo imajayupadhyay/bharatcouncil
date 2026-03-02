@@ -214,6 +214,14 @@ const navItems = [
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M1 4l7 5 7-5M1 4h14v10H1V4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
   },
   {
+    id: 'blog-posts', label: 'Blog Posts', href: '/admin/blog/posts',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  },
+  {
+    id: 'blog-categories', label: 'Blog Categories', href: '/admin/blog/categories',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="13" cy="11" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M13 9.5v1.5l1 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>',
+  },
+  {
     id: 'admin-users', label: 'Admin Users', href: '/admin/admin-users',
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 13.5c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M12 8v4M10 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
   },
