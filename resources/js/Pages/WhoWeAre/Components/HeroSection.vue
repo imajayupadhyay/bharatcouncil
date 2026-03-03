@@ -152,20 +152,17 @@
       <div class="hero-eyebrow" :class="{ visible: revealed }">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span class="eyebrow-text">Who We Are</span>
+        <span class="eyebrow-text">{{ content.eyebrow_text }}</span>
       </div>
 
       <!-- Headline -->
       <h1 class="hero-headline" :class="{ visible: revealed }">
-        <span class="hl-plain">Where </span><em class="hl-gold">Experience</em><br>
-        <span class="hl-plain">Meets </span><em class="hl-gold">Purpose</em>
+        <span class="hl-plain">{{ content.headline_line1 }}</span> <em class="hl-gold">{{ content.headline_line2 }}</em>
       </h1>
 
       <!-- Sub -->
       <p class="hero-sub" :class="{ visible: revealed }">
-        Bharat Governance Council is an independent, non-partisan institution founded in 2023 by
-        distinguished retired officers of India's All India Services — dedicated to strengthening
-        governance, mentoring younger civil servants, and building the intellectual infrastructure for reform.
+        {{ content.subtext }}
       </p>
 
       <!-- Badges -->
@@ -190,8 +187,8 @@
       <div class="hero-quote-card" :class="{ visible: revealed }">
         <div class="quote-shimmer"/>
         <div class="quote-mark">"</div>
-        <blockquote class="quote-text">Decades of service taught us that governance is too important to be left only to those currently in office. Wisdom must be passed on — deliberately, urgently.</blockquote>
-        <cite class="quote-cite">— Dr. Kush Verma, IAS 1979 · Chairman &amp; Co-Founder</cite>
+        <blockquote class="quote-text">{{ content.quote_text }}</blockquote>
+        <cite class="quote-cite">— {{ content.quote_author }} · {{ content.quote_role }}</cite>
       </div>
 
     </div>
@@ -203,9 +200,27 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const revealed = ref(false)
+
+// Default content
+const defaults = {
+  eyebrow_text: 'Who We Are',
+  headline_line1: 'Bridging Decades of',
+  headline_line2: 'Public Service',
+  subtext: 'The Bharat Governance Council (BGC) was founded by a distinguished group of retired civil servants — spanning the IAS, IPS, IFS, IFoS, and IRS — who together bring centuries of combined experience in governance, policy, and public administration.',
+  quote_text: 'Public service does not end with retirement. It evolves into mentorship, institutional memory, and a duty to guide the next generation.',
+  quote_author: 'Dr. Kush Verma',
+  quote_role: 'Founder & Chairman, BGC',
+}
+
+// Merge with saved data
+const content = computed(() => ({ ...defaults, ...props.data }))
 
 /* ── Octagon points at radius r (flat-top orientation) ── */
 function octPts(r) {

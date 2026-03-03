@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\InternApplicationController;
 use App\Http\Controllers\Admin\NewsletterController;
+use App\Http\Controllers\Admin\WhoWeAreController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -49,6 +50,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Homepage management
         Route::get('/homepage',                          [HomepageController::class, 'index'])->name('homepage');
         Route::put('/homepage/{section}',                [HomepageController::class, 'updateSection'])->name('homepage.update');
+
+        // Who We Are page management
+        Route::get('/who-we-are',                        [WhoWeAreController::class, 'index'])->name('who-we-are');
+        Route::put('/who-we-are/{section}',              [WhoWeAreController::class, 'updateSection'])->name('who-we-are.update');
 
         // Events
         Route::get('/events',                       [EventController::class, 'index'])->name('events.index');

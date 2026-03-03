@@ -20,6 +20,10 @@ export const navItems = [
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 8.5l6-6 6 6M3.5 7v5.5a1 1 0 001 1h3V11h1v2.5h3a1 1 0 001-1V7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   },
   {
+    id: 'who-we-are', label: 'Who We Are', href: '/admin/who-we-are',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="8" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 13.5c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  },
+  {
     id: 'events', label: 'Events', href: '/admin/events',
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="3" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/></svg>',
   },

@@ -32,7 +32,7 @@
       </div>
 
       <div class="impact-header" :class="{ visible: revealed }">
-        <h2 class="section-headline">Measuring <em class="headline-em">What Matters</em></h2>
+        <h2 class="section-headline">{{ content.headline_line1 }} <em class="headline-em">{{ content.headline_line2 }}</em></h2>
       </div>
 
       <div class="impact-grid" :class="{ visible: revealed }">
@@ -47,18 +47,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const impactStats = [
-  { num: '100+', label: 'Young Officers Onboarded Per Year' },
-  { num: '15+',  label: 'Founding Members Across 6 Services' },
-  { num: '8',    label: 'Academic Partner Institutions' },
-  { num: '30+',  label: 'Avg. Years Service per Founder' },
-  { num: '6',    label: 'All India Services Represented' },
-]
+// Default content
+const defaults = {
+  headline_line1: 'Measuring',
+  headline_line2: 'What Matters',
+  stats: [
+    { num: '100+', label: 'Young Officers Onboarded Per Year' },
+    { num: '15+',  label: 'Founding Members Across 6 Services' },
+    { num: '8',    label: 'Academic Partner Institutions' },
+    { num: '30+',  label: 'Avg. Years Service per Founder' },
+    { num: '6',    label: 'All India Services Represented' },
+  ],
+}
+
+const content = computed(() => ({ ...defaults, ...props.data }))
+const impactStats = computed(() => content.value.stats)
 
 const particles = Array.from({ length: 12 }, (_, i) => ({
   x: (i * 137.5) % 1440,

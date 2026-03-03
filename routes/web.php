@@ -8,6 +8,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\Event;
 use App\Models\HomepageSection;
+use App\Models\WhoWeAreSection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -69,7 +70,10 @@ Route::post('/work-with-us/intern-apply', [InternApplicationController::class, '
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 Route::get('/who-we-are', function () {
-    return Inertia::render('WhoWeAre/Index');
+    $sections = WhoWeAreSection::all()->keyBy('section')->map->data->toArray();
+    return Inertia::render('WhoWeAre/Index', [
+        'sections' => $sections,
+    ]);
 });
 
 Route::get('/governing-board', function () {

@@ -8,12 +8,12 @@
       </div>
 
       <div class="acad-header" :class="{ visible: revealed }">
-        <h2 class="section-headline">Scholars Who <em class="headline-em">Ground Our Work</em></h2>
-        <p class="section-sub">BGC's practitioner wisdom is complemented by academic associates from India's foremost universities and law schools — ensuring our research is empirically rigorous and theoretically grounded.</p>
+        <h2 class="section-headline">{{ content.headline_line1 }} <em class="headline-em">{{ content.headline_line2 }}</em></h2>
+        <p class="section-sub">{{ content.subtext }}</p>
       </div>
 
       <div class="acad-grid" :class="{ visible: revealed }">
-        <div v-for="(acad, i) in academics" :key="i" class="acad-card" :style="`--delay: ${i * 0.06}s`">
+        <div v-for="(acad, i) in content.academics" :key="i" class="acad-card" :style="`--delay: ${i * 0.06}s`">
           <div class="acad-avatar">
             <span class="acad-initials">{{ acad.initials }}</span>
           </div>
@@ -29,7 +29,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
@@ -44,6 +48,19 @@ const academics = [
   { initials: 'MS', institution: 'JNU · New Delhi', name: 'Dr. Meena Subramaniam', specialisation: 'Centre for the Study of Law & Governance · Social Policy & Welfare State' },
   { initials: 'DN', institution: 'University of Delhi', name: 'Prof. Devraj Narayan', specialisation: 'Dept. of Economics · Public Finance · Fiscal Federalism & Intergovernmental Transfers' },
 ]
+
+const defaults = {
+  headline_line1: 'Scholars Who',
+  headline_line2: 'Ground Our Work',
+  subtext: `BGC's practitioner wisdom is complemented by academic associates from India's foremost universities and law schools — ensuring our research is empirically rigorous and theoretically grounded.`,
+  academics: [...academics]
+}
+
+const content = computed(() => ({
+  ...defaults,
+  ...props.data,
+  academics: props.data?.academics?.length ? props.data.academics : defaults.academics
+}))
 
 let observer = null
 onMounted(() => {

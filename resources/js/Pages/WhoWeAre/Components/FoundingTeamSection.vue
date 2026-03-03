@@ -29,34 +29,34 @@
       </div>
 
       <div class="team-header" :class="{ visible: revealed }">
-        <h2 class="section-headline">The <em class="headline-em">Architects</em> of BGC</h2>
-        <p class="section-sub">Between them, BGC's founders have governed districts, commanded borders, represented India abroad, conserved its forests, and reformed its revenues. This is the council they chose to build after retiring.</p>
+        <h2 class="section-headline">{{ content.headline_line1 }} <em class="headline-em">{{ content.headline_line2 }}</em> {{ content.headline_line3 }}</h2>
+        <p class="section-sub">{{ content.subtext }}</p>
       </div>
 
       <!-- ══ Chairman Card ══ -->
       <div class="chairman-card" :class="{ visible: revealed }">
         <span class="chairman-tag">Chairman &amp; Co-Founder</span>
         <div class="ch-avatar">
-          <div class="ch-initials">KV</div>
-          <div class="ch-service">IAS · 1979 · UP Cadre</div>
+          <div class="ch-initials">{{ content.chairman.initials }}</div>
+          <div class="ch-service">{{ content.chairman.service }}</div>
           <!-- Orbiting rings -->
           <div class="ch-ring ch-ring-1"/>
           <div class="ch-ring ch-ring-2"/>
         </div>
         <div class="ch-content">
-          <div class="ch-batch">IAS 1979 · Uttar Pradesh Cadre</div>
-          <h3 class="ch-name">Dr. Kush Verma</h3>
-          <p class="ch-bio">A retired IAS officer of the 1979 Batch, UP Cadre, Dr. Verma served as the <strong>first Director General of the National Centre for Good Governance (NCGG)</strong>, Government of India — the apex institution for administrative excellence and civil service capacity building. Prior to that, he was Director General of the National Institute of Administrative Research (NIAR) at <strong>Lal Bahadur Shastri National Academy of Administration, Mussoorie</strong>.</p>
-          <p class="ch-bio">He holds a <strong>Doctorate from Jamia Millia Islamia</strong> on 'Redesigning India's Civil Services'. He is the author of <em>A-Z of The Civil Services</em> — a widely read account of bureaucratic India.</p>
+          <div class="ch-batch">{{ content.chairman.batch }}</div>
+          <h3 class="ch-name">{{ content.chairman.name }}</h3>
+          <p class="ch-bio" v-html="content.chairman.bio1"></p>
+          <p class="ch-bio" v-html="content.chairman.bio2"></p>
           <div class="tag-row">
-            <span v-for="tag in chairmanTags" :key="tag" class="chip">{{ tag }}</span>
+            <span v-for="tag in content.chairman.tags" :key="tag" class="chip">{{ tag }}</span>
           </div>
         </div>
       </div>
 
       <!-- ══ Members Grid ══ -->
       <div class="mem-grid" :class="{ visible: revealed }">
-        <div v-for="(m, i) in members" :key="i" class="mem-card" :style="`--delay: ${i * 0.06}s`">
+        <div v-for="(m, i) in content.members" :key="i" class="mem-card" :style="`--delay: ${i * 0.06}s`">
           <span class="role-tag">{{ m.role }}</span>
           <div class="mem-avatar">
             <span class="mem-initials">{{ m.initials }}</span>
@@ -75,7 +75,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
@@ -109,6 +113,34 @@ const members = [
   { initials: 'SSi', name: 'Sh. Sanjay Sinha', service: 'IPS · 1978 (Retd.)', role: 'Member',
     desc: 'Former <strong>Member, Union Public Service Commission (UPSC) Panel</strong>. One of BGC\'s most senior voices on civil services selection, police reform, and constitutional governance.' },
 ]
+
+const defaults = {
+  headline_line1: 'The',
+  headline_line2: 'Architects',
+  headline_line3: 'of BGC',
+  subtext: `Between them, BGC's founders have governed districts, commanded borders, represented India abroad, conserved its forests, and reformed its revenues. This is the council they chose to build after retiring.`,
+  chairman: {
+    initials: 'KV',
+    name: 'Dr. Kush Verma',
+    service: 'IAS · 1979 · UP Cadre',
+    batch: 'IAS 1979 · Uttar Pradesh Cadre',
+    bio1: `A retired IAS officer of the 1979 Batch, UP Cadre, Dr. Verma served as the first Director General of the National Centre for Good Governance (NCGG), Government of India — the apex institution for administrative excellence and civil service capacity building. Prior to that, he was Director General of the National Institute of Administrative Research (NIAR) at Lal Bahadur Shastri National Academy of Administration, Mussoorie.`,
+    bio2: `He holds a Doctorate from Jamia Millia Islamia on 'Redesigning India's Civil Services'. He is the author of A-Z of The Civil Services — a widely read account of bureaucratic India.`,
+    tags: [...chairmanTags]
+  },
+  members: [...members]
+}
+
+const content = computed(() => ({
+  ...defaults,
+  ...props.data,
+  chairman: { 
+    ...defaults.chairman, 
+    ...(props.data?.chairman || {}),
+    tags: props.data?.chairman?.tags?.length ? props.data.chairman.tags : [...chairmanTags]
+  },
+  members: props.data?.members?.length ? props.data.members : defaults.members
+}))
 
 const particles = Array.from({ length: 18 }, (_, i) => ({
   x: (i * 137.5) % 1440,
