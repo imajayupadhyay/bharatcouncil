@@ -11,12 +11,12 @@
         <!-- Left: Headline + Prose -->
         <div class="col-left">
           <h2 class="section-headline">
-            Born from a<br><em class="headline-em">Shared Conviction</em>
+            {{ content.headline_line1 }}<br><em class="headline-em">{{ content.headline_line2 }}</em>
           </h2>
           <div class="prose">
-            <p>Bharat Governance Council was founded in 2023 by a distinguished group of retired officers spanning the Indian Administrative Service, Indian Police Service, Indian Foreign Service, Indian Forest Service, and Indian Revenue Service — officers who, combined, have served in some of the most consequential roles in the Government of India and across its states.</p>
-            <p>The founders shared a conviction: that the institutional memory, policy wisdom, and administrative experience accumulated over their combined centuries of public service should not simply retire with them. India's youngest civil servants — stepping into complex roles in a world shaped by technology, climate change, and rapid social transformation — needed structured guidance from those who had lived these challenges from the inside.</p>
-            <p>BGC was thus conceived not as a conventional think tank issuing reports from a distance, but as a living bridge between seasoned governance experience and emerging administrative talent. Every year, BGC onboards 100+ younger officers into this knowledge network.</p>
+            <p>{{ content.paragraph1 }}</p>
+            <p>{{ content.paragraph2 }}</p>
+            <p>{{ content.paragraph3 }}</p>
           </div>
         </div>
 
@@ -24,16 +24,16 @@
         <div class="col-right">
           <div class="pull-quote">
             <div class="pull-accent"/>
-            <blockquote>"India has millions of rules. What it needs is men and women who understand, beyond the rules, what governance is fundamentally for."</blockquote>
-            <cite>— BGC Founding Charter, 2023</cite>
+            <blockquote>"{{ content.pullquote_text }}"</blockquote>
+            <cite>{{ content.pullquote_cite }}</cite>
           </div>
 
           <div class="onboard-box">
             <div class="ob-shimmer"/>
-            <div class="ob-num">100<span class="ob-plus">+</span></div>
+            <div class="ob-num">{{ content.onboard_number }}<span class="ob-plus">+</span></div>
             <div class="ob-text">
-              <h4>Younger Bureaucrats Onboarded Each Year</h4>
-              <p>BGC's mentorship programme connects younger IAS, IPS, IFS and allied service officers with our founding members — officers who have held the same roles and faced the same dilemmas, decades earlier.</p>
+              <h4>{{ content.onboard_title }}</h4>
+              <p>{{ content.onboard_desc }}</p>
             </div>
           </div>
         </div>
@@ -43,10 +43,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
+
+// Default content
+const defaults = {
+  headline_line1: 'Born from a',
+  headline_line2: 'Shared Conviction',
+  paragraph1: `Bharat Governance Council was founded in 2023 by a distinguished group of retired officers spanning the Indian Administrative Service, Indian Police Service, Indian Foreign Service, Indian Forest Service, and Indian Revenue Service — officers who, combined, have served in some of the most consequential roles in the Government of India and across its states.`,
+  paragraph2: `The founders shared a conviction: that the institutional memory, policy wisdom, and administrative experience accumulated over their combined centuries of public service should not simply retire with them. India's youngest civil servants — stepping into complex roles in a world shaped by technology, climate change, and rapid social transformation — needed structured guidance from those who had lived these challenges from the inside.`,
+  paragraph3: `BGC was thus conceived not as a conventional think tank issuing reports from a distance, but as a living bridge between seasoned governance experience and emerging administrative talent. Every year, BGC onboards 100+ younger officers into this knowledge network.`,
+  pullquote_text: `India has millions of rules. What it needs is men and women who understand, beyond the rules, what governance is fundamentally for.`,
+  pullquote_cite: '— BGC Founding Charter, 2023',
+  onboard_number: '100',
+  onboard_title: 'Younger Bureaucrats Onboarded Each Year',
+  onboard_desc: `BGC's mentorship programme connects younger IAS, IPS, IFS and allied service officers with our founding members — officers who have held the same roles and faced the same dilemmas, decades earlier.`,
+}
+
+const content = computed(() => ({ ...defaults, ...props.data }))
 
 let observer = null
 onMounted(() => {

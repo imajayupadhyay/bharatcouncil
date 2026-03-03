@@ -12,14 +12,14 @@
   <div class="page-root">
     <AppHeader />
     <main>
-      <HeroSection />
-      <StorySection />
-      <FoundingTeamSection />
-      <AcademicsSection />
-      <MandateSection />
-      <ImpactSection />
-      <ValuesSection />
-      <PartnersSection />
+      <HeroSection :data="sections?.hero" />
+      <StorySection :data="sections?.story" />
+      <FoundingTeamSection :data="sections?.founding_team" />
+      <AcademicsSection :data="sections?.academics" />
+      <MandateSection :data="sections?.mandate" />
+      <ImpactSection :data="sections?.impact" />
+      <ValuesSection :data="sections?.values" />
+      <PartnersSection :data="sections?.partners" />
     </main>
     <AppFooter />
   </div>
@@ -37,6 +37,10 @@ import MandateSection from './Components/MandateSection.vue'
 import ImpactSection from './Components/ImpactSection.vue'
 import ValuesSection from './Components/ValuesSection.vue'
 import PartnersSection from './Components/PartnersSection.vue'
+
+defineProps({
+  sections: Object,
+})
 </script>
 
 <style>

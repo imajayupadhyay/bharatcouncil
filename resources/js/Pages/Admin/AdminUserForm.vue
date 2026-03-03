@@ -1,38 +1,11 @@
 <template>
   <div class="admin-root">
 
-    <!-- ══ Sidebar ══ -->
-    <aside class="admin-sidebar" :class="{ collapsed: sidebarCollapsed }">
-      <div class="sidebar-logo">
-        <img :src="'/BGC.png'" alt="BGC" class="sidebar-logo-img" />
-        <span v-if="!sidebarCollapsed" class="sidebar-logo-label">Admin</span>
-      </div>
-      <nav class="sidebar-nav">
-        <div class="nav-group-label" v-if="!sidebarCollapsed">Overview</div>
-        <Link
-          v-for="item in navItems" :key="item.id"
-          :href="item.href" class="nav-item"
-          :class="{ active: item.id === 'admin-users' }"
-          :title="sidebarCollapsed ? item.label : ''"
-        >
-          <span class="nav-icon" v-html="item.icon"/>
-          <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
-        </Link>
-      </nav>
-      <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
-        <svg viewBox="0 0 16 16" fill="none" width="14" height="14" :class="{ flipped: sidebarCollapsed }">
-          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <div class="sidebar-footer">
-        <button type="button" class="btn-logout" @click="logout">
-          <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
-            <path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h3M10 5l3 3-3 3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span v-if="!sidebarCollapsed">Logout</span>
-        </button>
-      </div>
-    </aside>
+    <AdminSidebar
+      active-id="admin-users"
+      :collapsed="sidebarCollapsed"
+      @toggle="sidebarCollapsed = !sidebarCollapsed"
+    />
 
     <!-- ══ Main content ══ -->
     <main class="admin-main">
@@ -212,6 +185,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
+import AdminSidebar from '@/Components/AdminSidebar.vue'
 
 const props = defineProps({
   admin: Object,
@@ -234,37 +208,6 @@ const form = useForm({
 
 const errors    = computed(() => form.errors)
 const processing = computed(() => form.processing)
-
-const navItems = [
-  {
-    id: 'dashboard', label: 'Dashboard', href: '/admin/dashboard',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="5.5" height="5.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/></svg>',
-  },
-  {
-    id: 'applications', label: 'Applications', href: '/admin/applications',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="1.5" width="12" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5h6M5 8h6M5 10.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-  },
-  {
-    id: 'internships', label: 'Internships', href: '/admin/intern-applications',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M4 6V4a4 4 0 118 0v2M2 6h12v8a1 1 0 01-1 1H3a1 1 0 01-1-1V6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8" cy="10" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>',
-  },
-  {
-    id: 'newsletters', label: 'Newsletter', href: '/admin/newsletters',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M1 4l7 5 7-5M1 4h14v10H1V4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
-  },
-  {
-    id: 'blog-posts', label: 'Blog Posts', href: '/admin/blog/posts',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-  },
-  {
-    id: 'blog-categories', label: 'Blog Categories', href: '/admin/blog/categories',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="13" cy="11" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M13 9.5v1.5l1 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>',
-  },
-  {
-    id: 'admin-users', label: 'Admin Users', href: '/admin/admin-users',
-    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 13.5c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M12 8v4M10 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-  },
-]
 
 function submit() {
   if (isEdit.value) {

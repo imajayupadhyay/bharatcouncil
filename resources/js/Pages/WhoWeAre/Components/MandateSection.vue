@@ -8,11 +8,11 @@
       </div>
 
       <div class="mandate-header" :class="{ visible: revealed }">
-        <h2 class="section-headline">Our <em class="headline-em">Mandate</em></h2>
+        <h2 class="section-headline">{{ content.headline_line1 }} <em class="headline-em">{{ content.headline_line2 }}</em></h2>
       </div>
 
       <div class="mandate-grid" :class="{ visible: revealed }">
-        <div v-for="(item, i) in mandates" :key="i" class="mand-card" :style="`--delay: ${i * 0.07}s`">
+        <div v-for="(item, i) in content.mandates" :key="i" class="mand-card" :style="`--delay: ${i * 0.07}s`">
           <div class="mand-num">{{ String(i + 1).padStart(2, '0') }}</div>
           <h3 class="mand-title">{{ item.title }}</h3>
           <p class="mand-body">{{ item.body }}</p>
@@ -25,12 +25,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const mandates = [
+const mandateItems = [
   { title: 'Mentoring Young Civil Servants', body: 'Our flagship programme onboards 100+ younger IAS, IPS, IFS and allied officers each year into structured mentorship with our founding members — veterans who held the same roles and faced the same dilemmas, decades earlier.' },
   { title: 'Governance Research', body: 'BGC produces practitioner-led research on India\'s most urgent governance challenges — state capacity, public finance, federalism, civil service reform — grounded in administrative experience, not just academic theory.' },
   { title: 'Policy Dialogue', body: 'Through curated roundtables, working groups, and deliberative forums, BGC convenes serving and retired officers, academics, and civil society to produce actionable consensus on governance questions that resist political resolution.' },
@@ -38,6 +42,18 @@ const mandates = [
   { title: 'Climate & Environmental Governance', body: 'With a former DG Forests and a UN Climate Parliament advisor among our founders, BGC has a dedicated track on India\'s climate governance architecture, forest rights, and green federalism.' },
   { title: 'Global Engagement', body: 'Our diplomatic founders enable substantive engagement with international governance networks — connecting India\'s domestic governance challenges to comparative experiences from the Global South and multilateral institutions.' },
 ]
+
+const defaults = {
+  headline_line1: 'Our',
+  headline_line2: 'Mandate',
+  mandates: [...mandateItems]
+}
+
+const content = computed(() => ({
+  ...defaults,
+  ...props.data,
+  mandates: props.data?.mandates?.length ? props.data.mandates : defaults.mandates
+}))
 
 let observer = null
 onMounted(() => {

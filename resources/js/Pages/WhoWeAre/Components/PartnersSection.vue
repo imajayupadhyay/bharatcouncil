@@ -9,13 +9,13 @@
 
       <div class="partners-header" :class="{ visible: revealed }">
         <h2 class="section-headline">
-          Supported by <em class="headline-em">Purpose-Aligned</em> Institutions
+          {{ content.headline_line1 }} <em class="headline-em">{{ content.headline_line2 }}</em> {{ content.headline_line3 }}
         </h2>
-        <p class="section-sub">BGC collaborates with institutions that share its commitment to evidence-based governance reform and civil service excellence.</p>
+        <p class="section-sub">{{ content.subtext }}</p>
       </div>
 
       <div class="partner-tags" :class="{ visible: revealed }">
-        <span v-for="(partner, i) in partners" :key="i" class="ptag" :style="`--delay: ${i * 0.04}s`">
+        <span v-for="(partner, i) in content.partners" :key="i" class="ptag" :style="`--delay: ${i * 0.04}s`">
           {{ partner }}
         </span>
       </div>
@@ -25,12 +25,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const partners = [
+const partnerNames = [
   'Lal Bahadur Shastri National Academy of Administration',
   'National Centre for Good Governance',
   'Climate Parliament · United Nations',
@@ -44,6 +48,20 @@ const partners = [
   'Indian Institute of Public Administration',
   'Azim Premji University',
 ]
+
+const defaults = {
+  headline_line1: 'Supported by',
+  headline_line2: 'Purpose-Aligned',
+  headline_line3: 'Institutions',
+  subtext: `BGC collaborates with institutions that share its commitment to evidence-based governance reform and civil service excellence.`,
+  partners: [...partnerNames]
+}
+
+const content = computed(() => ({
+  ...defaults,
+  ...props.data,
+  partners: props.data?.partners?.length ? props.data.partners : defaults.partners
+}))
 
 let observer = null
 onMounted(() => {

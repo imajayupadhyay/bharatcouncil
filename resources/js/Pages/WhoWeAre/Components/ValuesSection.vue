@@ -10,13 +10,13 @@
       <div class="values-grid" :class="{ visible: revealed }">
         <!-- Left -->
         <div class="values-left">
-          <h2 class="section-headline">What BGC <em class="headline-em">Stands For</em></h2>
-          <p class="values-sub">BGC does not take institutional positions on political questions. Our members retain full intellectual independence. But we are not neutral about what good governance demands — and these commitments are non-negotiable.</p>
+          <h2 class="section-headline">{{ content.headline_line1 }} <em class="headline-em">{{ content.headline_line2 }}</em></h2>
+          <p class="values-sub">{{ content.subtext }}</p>
         </div>
 
         <!-- Right: Values list -->
         <ul class="values-list">
-          <li v-for="(val, i) in values" :key="i" class="value-item" :style="`--delay: ${i * 0.08}s`">
+          <li v-for="(val, i) in content.values" :key="i" class="value-item" :style="`--delay: ${i * 0.08}s`">
             <div class="val-num">{{ String(i + 1).padStart(2, '0') }}</div>
             <div class="val-body">
               <h3 class="val-title">{{ val.title }}</h3>
@@ -31,12 +31,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const values = [
+const valueCards = [
   {
     title: 'Service Over Career',
     desc: 'Every founding member retired from a career of public service. BGC continues that service — without tenure anxieties, political calculations, or the distortions of office.',
@@ -54,6 +58,19 @@ const values = [
     desc: 'BGC\'s onboarding programme for younger officers is not a side activity — it is central to our mission. The 100+ officers we mentor each year are the reason this institution exists.',
   },
 ]
+
+const defaults = {
+  headline_line1: 'What BGC',
+  headline_line2: 'Stands For',
+  subtext: `BGC does not take institutional positions on political questions. Our members retain full intellectual independence. But we are not neutral about what good governance demands — and these commitments are non-negotiable.`,
+  values: [...valueCards]
+}
+
+const content = computed(() => ({
+  ...defaults,
+  ...props.data,
+  values: props.data?.values?.length ? props.data.values : defaults.values
+}))
 
 let observer = null
 onMounted(() => {
