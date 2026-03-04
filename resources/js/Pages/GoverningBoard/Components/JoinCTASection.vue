@@ -30,25 +30,25 @@
     </svg>
 
     <!-- Watermark -->
-    <div class="cta-watermark" aria-hidden="true">JOIN</div>
+    <div class="cta-watermark" aria-hidden="true">{{ ctaData.watermark }}</div>
 
     <div class="container">
 
       <div class="sec-label" :class="{ visible: revealed }">
         <span class="sec-label-line"/><span class="sec-label-dot"/>
-        <span class="sec-label-text">Work With Us</span>
+        <span class="sec-label-text">{{ ctaData.section_label }}</span>
       </div>
 
       <div class="cta-header" :class="{ visible: revealed }">
         <h2 class="cta-headline">
-          Join the <em class="cta-em">Council's Work</em>
+          {{ ctaData.headline_before }} <em class="cta-em">{{ ctaData.headline_emphasis }}</em>
         </h2>
-        <p class="cta-intro">BGC is built on the conviction that India's next generation of governance thinkers must be found, nurtured, and put to work. Whether you are a student, a researcher, a practitioner, or a policy voice — there is a place for you here.</p>
+        <p class="cta-intro">{{ ctaData.subtext }}</p>
       </div>
 
       <div class="cta-grid" :class="{ visible: revealed }">
         <a
-          v-for="(card, i) in ctaCards"
+          v-for="(card, i) in ctaData.cards"
           :key="i"
           :href="card.href"
           class="cta-card"
@@ -73,33 +73,53 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const ctaCards = [
-  {
-    type: 'Engage as an', title: 'Intern', href: '/work-with-us',
-    desc: 'Undergraduate and postgraduate students with an interest in public policy, governance, law, or administrative studies. Internships are 8–12 weeks, project-based, and mentored by a BGC board member or senior fellow. Openings across research, communications, and programme support.',
-    cta: 'Apply Now',
-  },
-  {
-    type: 'Engage as a', title: 'Fellow', href: '/work-with-us',
-    desc: 'One-year residential or non-residential fellowships for mid-career professionals — academics, serving or retired officers, lawyers, or policy practitioners — to pursue a focused governance research project under BGC\'s mentorship. Fellowship holders join the BGC network permanently.',
-    cta: 'Learn More',
-  },
-  {
-    type: 'Join as a', title: 'Researcher', href: '/work-with-us',
-    desc: 'Full-time or part-time research positions for doctoral scholars and policy researchers. BGC researchers work on long-horizon projects across our programme areas — state capacity, fiscal federalism, climate governance, civil service reform — with direct access to the Council\'s senior members as interlocutors.',
-    cta: 'View Openings',
-  },
-  {
-    type: 'Write as a', title: 'Contributor', href: '/work-with-us',
-    desc: 'Practitioners, scholars, and informed citizens who wish to contribute essays, analysis, op-eds, or policy commentaries to BGC\'s publications. We welcome voices from across India\'s governance ecosystem — especially those with first-hand administrative or legal experience to share.',
-    cta: 'Submit a Piece',
-  },
-]
+const ctaDefaults = {
+  section_label: 'Work With Us',
+  watermark: 'JOIN',
+  headline_before: 'Join the',
+  headline_emphasis: "Council's Work",
+  subtext: "BGC is built on the conviction that India's next generation of governance thinkers must be found, nurtured, and put to work. Whether you are a student, a researcher, a practitioner, or a policy voice — there is a place for you here.",
+  cards: [
+    {
+      type: 'Engage as an', title: 'Intern', href: '/work-with-us',
+      desc: 'Undergraduate and postgraduate students with an interest in public policy, governance, law, or administrative studies. Internships are 8–12 weeks, project-based, and mentored by a BGC board member or senior fellow. Openings across research, communications, and programme support.',
+      cta: 'Apply Now',
+    },
+    {
+      type: 'Engage as a', title: 'Fellow', href: '/work-with-us',
+      desc: 'One-year residential or non-residential fellowships for mid-career professionals — academics, serving or retired officers, lawyers, or policy practitioners — to pursue a focused governance research project under BGC\'s mentorship. Fellowship holders join the BGC network permanently.',
+      cta: 'Learn More',
+    },
+    {
+      type: 'Join as a', title: 'Researcher', href: '/work-with-us',
+      desc: 'Full-time or part-time research positions for doctoral scholars and policy researchers. BGC researchers work on long-horizon projects across our programme areas — state capacity, fiscal federalism, climate governance, civil service reform — with direct access to the Council\'s senior members as interlocutors.',
+      cta: 'View Openings',
+    },
+    {
+      type: 'Write as a', title: 'Contributor', href: '/work-with-us',
+      desc: 'Practitioners, scholars, and informed citizens who wish to contribute essays, analysis, op-eds, or policy commentaries to BGC\'s publications. We welcome voices from across India\'s governance ecosystem — especially those with first-hand administrative or legal experience to share.',
+      cta: 'Submit a Piece',
+    },
+  ],
+}
+
+const ctaData = computed(() => {
+  const saved = props.data || {}
+  return {
+    ...ctaDefaults,
+    ...saved,
+    cards: saved.cards?.length ? saved.cards.map(card => ({ ...card })) : ctaDefaults.cards.map(card => ({ ...card })),
+  }
+})
 
 const particles = Array.from({ length: 16 }, (_, i) => ({
   x: (i * 137.5) % 1440,

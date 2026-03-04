@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\GoverningBoardController;
 use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\InternApplicationController;
 use App\Http\Controllers\Admin\NewsletterController;
@@ -54,6 +55,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Who We Are page management
         Route::get('/who-we-are',                        [WhoWeAreController::class, 'index'])->name('who-we-are');
         Route::put('/who-we-are/{section}',              [WhoWeAreController::class, 'updateSection'])->name('who-we-are.update');
+
+        // Governing Board page management
+        Route::get('/governing-board',                   [GoverningBoardController::class, 'index'])->name('governing-board');
+        Route::put('/governing-board/{section}',         [GoverningBoardController::class, 'updateSection'])->name('governing-board.update');
 
         // Events
         Route::get('/events',                       [EventController::class, 'index'])->name('events.index');

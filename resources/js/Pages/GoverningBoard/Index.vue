@@ -12,11 +12,11 @@
   <div class="page-root">
     <AppHeader />
     <main>
-      <HeroSection />
-      <ChairmanSection />
-      <ExecutiveOfficersSection />
-      <BoardMembersSection />
-      <JoinCTASection />
+      <HeroSection :data="sections?.hero" />
+      <ChairmanSection :data="sections?.chairman" />
+      <ExecutiveOfficersSection :data="sections?.executive_officers" />
+      <BoardMembersSection :data="sections?.board_members" />
+      <JoinCTASection :data="sections?.join_cta" />
     </main>
     <AppFooter />
   </div>
@@ -31,6 +31,10 @@ import ChairmanSection from './Components/ChairmanSection.vue'
 import ExecutiveOfficersSection from './Components/ExecutiveOfficersSection.vue'
 import BoardMembersSection from './Components/BoardMembersSection.vue'
 import JoinCTASection from './Components/JoinCTASection.vue'
+
+defineProps({
+  sections: Object,
+})
 </script>
 
 <style>

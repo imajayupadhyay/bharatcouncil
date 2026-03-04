@@ -21,7 +21,7 @@
       <!-- Sec Label -->
       <div class="sec-label" :class="{ visible: revealed }">
         <span class="sec-label-line"/><span class="sec-label-dot"/>
-        <span class="sec-label-text">Chairman</span>
+        <span class="sec-label-text">{{ chairmanData.section_label }}</span>
       </div>
 
       <!-- Chairman grid -->
@@ -29,10 +29,10 @@
 
         <!-- Avatar block -->
         <div class="ch-avatar-block">
-          <span class="ch-badge">Chairman</span>
+          <span class="ch-badge">{{ chairmanData.badge_text }}</span>
           <div class="ch-avatar">
-            <div class="ch-initials">KV</div>
-            <div class="ch-svc">IAS · 1979 · UP Cadre</div>
+            <div class="ch-initials">{{ chairmanData.initials }}</div>
+            <div class="ch-svc">{{ chairmanData.avatar_service }}</div>
             <!-- Corner accent -->
             <div class="ch-corner"/>
             <!-- Rotating rings -->
@@ -43,22 +43,18 @@
 
         <!-- Info -->
         <div class="ch-info">
-          <div class="ch-pos">Chairman, Bharat Governance Council</div>
-          <h2 class="ch-name">Dr. Kush Verma</h2>
-          <div class="ch-service">Indian Administrative Service, 1979 Batch · Uttar Pradesh Cadre (Retd.)</div>
+          <div class="ch-pos">{{ chairmanData.position }}</div>
+          <h2 class="ch-name">{{ chairmanData.name }}</h2>
+          <div class="ch-service">{{ chairmanData.service }}</div>
           <div class="ch-divider"/>
 
-          <p class="ch-bio">Dr. Kush Verma is a retired IAS officer of the 1979 Batch, UP Cadre, and the founder-Chairman of Bharat Governance Council. He served as the <strong>first Director General of the National Centre for Good Governance (NCGG)</strong>, Government of India — the apex institution mandated to build administrative excellence and civil service capacity across India and partner nations. Prior to NCGG, he was <strong>Director General of the National Institute of Administrative Research (NIAR)</strong> at Lal Bahadur Shastri National Academy of Administration, Mussoorie.</p>
-
-          <p class="ch-bio">Over a long and distinguished career, Dr. Verma served as Commissioner of the National Capital Region (UP side) and held senior positions in the Governments of India and Uttar Pradesh across rural development, tribal affairs, food security, and law &amp; order. He holds a <strong>Doctorate from Jamia Millia Islamia</strong> on 'Redesigning India's Civil Services', and is the author of <em>A-Z of The Civil Services</em> (Manas Publications, 2019).</p>
-
-          <p class="ch-bio">As Chairman of BGC, Dr. Verma provides overall strategic leadership, sets the Council's research agenda, and personally oversees the flagship mentorship programme for younger civil servants.</p>
+          <p v-for="(bio, index) in chairmanData.bios" :key="index" class="ch-bio" v-html="bio" />
 
           <!-- Responsibilities -->
           <div class="ch-resp">
             <h4 class="ch-resp-title">Responsibilities as Chairman</h4>
             <ul class="resp-list">
-              <li v-for="r in responsibilities" :key="r">
+              <li v-for="r in chairmanData.responsibilities" :key="r">
                 <span class="resp-dash">—</span>
                 <span>{{ r }}</span>
               </li>
@@ -67,7 +63,7 @@
 
           <!-- Tags -->
           <div class="ch-tags">
-            <span v-for="tag in tags" :key="tag" class="ch-tag">{{ tag }}</span>
+            <span v-for="tag in chairmanData.tags" :key="tag" class="ch-tag">{{ tag }}</span>
           </div>
         </div>
       </div>
@@ -77,24 +73,52 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const responsibilities = [
-  'Overall strategic direction and governance of the Council',
-  'Chair, Governing Board meetings and Executive Committee',
-  'Lead convener, Annual Civil Governance Dialogue',
-  'Oversee mentorship programme for younger IAS / IPS / IFS officers',
-  'Institutional partnerships with LBSNAA, NCGG, and academic bodies',
-  'Represent BGC in national and international governance forums',
-]
+const chairmanDefaults = {
+  section_label: 'Chairman',
+  badge_text: 'Chairman',
+  initials: 'KV',
+  avatar_service: 'IAS · 1979 · UP Cadre',
+  position: 'Chairman, Bharat Governance Council',
+  name: 'Dr. Kush Verma',
+  service: 'Indian Administrative Service, 1979 Batch · Uttar Pradesh Cadre (Retd.)',
+  bios: [
+    `Dr. Kush Verma is a retired IAS officer of the 1979 Batch, UP Cadre, and the founder-Chairman of Bharat Governance Council. He served as the <strong>first Director General of the National Centre for Good Governance (NCGG)</strong>, Government of India — the apex institution mandated to build administrative excellence and civil service capacity across India and partner nations. Prior to NCGG, he was <strong>Director General of the National Institute of Administrative Research (NIAR)</strong>, playing a key role in modernising civil service training.`,
+    `Over a long and distinguished career, Dr. Verma served as Commissioner of the National Capital Region (UP side) and held senior positions in the Governments of India and Uttar Pradesh across rural development, tribal affairs, food security, and law & order. He holds a <strong>Doctorate from Jamia Millia Islamia</strong> on 'Redesigning India's Civil Services', and is the author of <em>A-Z of The Civil Services</em> (Manas Publications, 2019).`,
+    `As Chairman of BGC, Dr. Verma provides overall strategic leadership, sets the Council's research agenda, and personally oversees the flagship mentorship programme for younger civil servants.`,
+  ],
+  responsibilities: [
+    'Overall strategic direction and governance of the Council',
+    'Chair, Governing Board meetings and Executive Committee',
+    'Lead convener, Annual Civil Governance Dialogue',
+    'Oversee mentorship programme for younger IAS / IPS / IFS officers',
+    'Institutional partnerships with LBSNAA, NCGG, and academic bodies',
+    'Represent BGC in national and international governance forums',
+  ],
+  tags: [
+    'Civil Service Reform', 'Good Governance', 'Decentralisation',
+    'Administrative Ethics', 'NCGG · LBSNAA', 'Author & Scholar',
+  ],
+}
 
-const tags = [
-  'Civil Service Reform', 'Good Governance', 'Decentralisation',
-  'Administrative Ethics', 'NCGG · LBSNAA', 'Author & Scholar',
-]
+const chairmanData = computed(() => {
+  const saved = props.data || {}
+  return {
+    ...chairmanDefaults,
+    ...saved,
+    bios: saved.bios?.length ? saved.bios : chairmanDefaults.bios,
+    responsibilities: saved.responsibilities?.length ? saved.responsibilities : chairmanDefaults.responsibilities,
+    tags: saved.tags?.length ? saved.tags : chairmanDefaults.tags,
+  }
+})
 
 let observer = null
 onMounted(() => {
