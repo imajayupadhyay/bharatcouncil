@@ -7,6 +7,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\Event;
+use App\Models\GoverningBoardSection;
 use App\Models\HomepageSection;
 use App\Models\WhoWeAreSection;
 use Illuminate\Support\Facades\Route;
@@ -77,5 +78,8 @@ Route::get('/who-we-are', function () {
 });
 
 Route::get('/governing-board', function () {
-    return Inertia::render('GoverningBoard/Index');
+    $sections = GoverningBoardSection::all()->keyBy('section')->map->data->toArray();
+    return Inertia::render('GoverningBoard/Index', [
+        'sections' => $sections,
+    ]);
 });

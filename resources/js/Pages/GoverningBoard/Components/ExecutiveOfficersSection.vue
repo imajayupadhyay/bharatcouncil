@@ -4,16 +4,16 @@
 
       <div class="sec-label" :class="{ visible: revealed }">
         <span class="sec-label-line"/><span class="sec-label-dot"/>
-        <span class="sec-label-text">Executive Officers</span>
+        <span class="sec-label-text">{{ execData.section_label }}</span>
       </div>
 
       <div class="exec-header" :class="{ visible: revealed }">
-        <h2 class="section-headline">Senior <em class="headline-em">Leadership</em></h2>
-        <p class="section-sub">Two founding leaders who carry specific executive portfolios alongside their board responsibilities.</p>
+        <h2 class="section-headline">{{ execData.headline_before }} <em class="headline-em">{{ execData.headline_emphasis }}</em></h2>
+        <p class="section-sub">{{ execData.subtext }}</p>
       </div>
 
       <div class="exec-grid" :class="{ visible: revealed }">
-        <div v-for="(officer, i) in officers" :key="i" class="exec-card" :style="`--delay: ${i * 0.12}s`">
+        <div v-for="(officer, i) in execData.officers" :key="i" class="exec-card" :style="`--delay: ${i * 0.12}s`">
           <!-- Top bar (expands on hover) -->
           <div class="exec-top-bar"/>
 
@@ -45,29 +45,52 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const officers = [
-  {
-    initials: 'SK', svcBadge: 'IFoS · 1984',
-    position: 'Vice Chairman & Chief Advisor — Climate & Environment',
-    name: 'Sh. Sanjay Kumar',
-    service: 'Indian Forest Service, 1984 · Jharkhand Cadre (Retd.) · Founding Trustee',
-    bio: 'Former <strong>Director General of Forests &amp; Special Secretary</strong>, Ministry of Environment, Forest &amp; Climate Change, Government of India — the highest forestry position in the country. Currently serves as <strong>Chief Policy Advisor to the Climate Parliament</strong>, a United Nations–affiliated international network of legislators working on climate and energy transition. As Vice Chairman of BGC, Sh. Kumar leads the Council\'s Climate &amp; Environmental Governance programme and represents BGC in multilateral forums.',
-    tags: ['Climate Governance', 'Forest & Biodiversity Policy', 'Green Federalism', 'UN Climate Parliament', 'Vice Chairman'],
-  },
-  {
-    initials: 'AG', svcBadge: 'Trustee',
-    position: 'Trustee & Director — Outreach, Fellowships & Philanthropy',
-    name: 'Sh. Anmol Goel',
-    service: 'Social Psychologist · Educationist · Philanthropist · Founding Trustee',
-    bio: 'Educationist, Social Psychologist, and Philanthropist, Sh. Anmol Goel is the key architect of <strong>BGC\'s mentorship and outreach model</strong> for younger civil servants. He brings deep expertise in human capital development and behavioural science as applied to governance institutions. As Director of Outreach, he oversees the design and execution of the annual onboarding programme for 100+ young officers, fundraising and philanthropic partnerships, and BGC\'s fellowship and internship schemes.',
-    tags: ['Mentorship Design', 'Fellow & Intern Programme', 'Philanthropic Partnerships', 'Human Capital', 'Outreach Strategy'],
-  },
-]
+const execDefaults = {
+  section_label: 'Executive Officers',
+  headline_before: 'Senior',
+  headline_emphasis: 'Leadership',
+  subtext: 'Two founding leaders who carry specific executive portfolios alongside their board responsibilities.',
+  officers: [
+    {
+      initials: 'SK',
+      svcBadge: 'IFoS · 1984',
+      position: 'Vice Chairman & Chief Advisor — Climate & Environment',
+      name: 'Sh. Sanjay Kumar',
+      service: 'Indian Forest Service, 1984 · Jharkhand Cadre (Retd.) · Founding Trustee',
+      bio: 'Former <strong>Director General of Forests &amp; Special Secretary</strong>, Ministry of Environment, Forest &amp; Climate Change, Government of India — the highest forestry position in the country. Currently serves as <strong>Chief Policy Advisor to the Climate Parliament</strong>, a United Nations–affiliated international network of legislators working on climate and energy transition. As Vice Chairman of BGC, Sh. Kumar leads the Council\'s Climate &amp; Environmental Governance programme and advises on sustainability-focused policy research.',
+      tags: ['Climate Governance', 'Forest & Biodiversity Policy', 'Green Federalism', 'UN Climate Parliament', 'Vice Chairman'],
+    },
+    {
+      initials: 'AG',
+      svcBadge: 'Trustee',
+      position: 'Trustee & Director — Outreach, Fellowships & Philanthropy',
+      name: 'Sh. Anmol Goel',
+      service: 'Social Psychologist · Educationist · Philanthropist · Founding Trustee',
+      bio: 'Educationist, Social Psychologist, and Philanthropist, Sh. Anmol Goel is the key architect of <strong>BGC\'s mentorship and outreach model</strong> for younger civil servants. He brings deep expertise in human capital development and behavioural science as applied to governance institutions. As Director of Outreach, he oversees the design and execution of the annual onboarding programme for 100+ young officers, fundraising and philanthropic partnerships, and BGC\'s fellowship and internship pipeline.',
+      tags: ['Mentorship Design', 'Fellow & Intern Programme', 'Philanthropic Partnerships', 'Human Capital', 'Outreach Strategy'],
+    },
+  ],
+}
+
+const execData = computed(() => {
+  const saved = props.data || {}
+  return {
+    ...execDefaults,
+    ...saved,
+    officers: saved.officers?.length
+      ? saved.officers.map(officer => ({ ...officer, tags: officer.tags ?? [] }))
+      : execDefaults.officers.map(officer => ({ ...officer })),
+  }
+})
 
 let observer = null
 onMounted(() => {

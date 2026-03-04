@@ -165,25 +165,22 @@
       <div class="hero-eyebrow" :class="{ visible: revealed }">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span class="eyebrow-text">About BGC</span>
+        <span class="eyebrow-text">{{ heroData.eyebrow_text }}</span>
       </div>
 
       <!-- Headline -->
       <h1 class="hero-headline" :class="{ visible: revealed }">
-        Governing <em class="hl-em">Board</em>
+        {{ heroData.headline_line1 }} <em class="hl-em">{{ heroData.headline_line2 }}</em>
       </h1>
 
       <!-- Sub -->
       <p class="hero-sub" :class="{ visible: revealed }">
-        The Bharat Governance Council is guided by a Governing Board of distinguished retired officers
-        of India's All India Services and allied cadres — men and women who have, collectively, governed
-        at the highest levels of the Indian state. They bring to BGC not theory, but lived administrative
-        experience across every domain of public governance.
+        {{ heroData.subtext }}
       </p>
 
       <!-- Stats row -->
       <div class="hero-stats" :class="{ visible: revealed }">
-        <div v-for="stat in stats" :key="stat.label" class="hero-stat">
+        <div v-for="stat in heroData.stats" :key="stat.label" class="hero-stat">
           <div class="hs-num">{{ stat.num }}</div>
           <div class="hs-lbl">{{ stat.label }}</div>
         </div>
@@ -198,7 +195,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const revealed = ref(false)
 
@@ -302,13 +303,28 @@ const dashes = Array.from({ length: 22 }, (_, i) => ({
   o: 0.05 + (i % 5) * 0.04,
 }))
 
-/* ── Stats ── */
-const stats = [
-  { num: '15+',  label: 'Board Members' },
-  { num: '6',    label: 'All India Services' },
-  { num: '30+',  label: 'Avg. Years of Service' },
-  { num: '2023', label: 'Year Established' },
-]
+/* ── Hero content ── */
+const heroDefaults = {
+  eyebrow_text: 'About BGC',
+  headline_line1: 'Governing',
+  headline_line2: 'Board',
+  subtext: `The Bharat Governance Council is guided by a Governing Board of distinguished retired officers of India's All India Services and allied cadres — men and women who have, collectively, governed at the highest levels of the Indian state. They bring to BGC not theory, but lived administrative experience across every domain of public governance.`,
+  stats: [
+    { num: '15+', label: 'Board Members' },
+    { num: '6', label: 'All India Services' },
+    { num: '30+', label: 'Avg. Years of Service' },
+    { num: '2023', label: 'Year Established' },
+  ],
+}
+
+const heroData = computed(() => {
+  const saved = props.data || {}
+  return {
+    ...heroDefaults,
+    ...saved,
+    stats: saved.stats?.length ? saved.stats : heroDefaults.stats,
+  }
+})
 
 onMounted(() => {
   requestAnimationFrame(() => setTimeout(() => { revealed.value = true }, 100))

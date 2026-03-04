@@ -4,17 +4,17 @@
 
       <div class="sec-label" :class="{ visible: revealed }">
         <span class="sec-label-line"/><span class="sec-label-dot"/>
-        <span class="sec-label-text">Board Members</span>
+        <span class="sec-label-text">{{ boardData.section_label }}</span>
       </div>
 
       <div class="board-header" :class="{ visible: revealed }">
-        <h2 class="section-headline">The <em class="headline-em">Full Board</em></h2>
-        <p class="section-sub">Each board member holds a specific portfolio aligned with their career expertise — bringing focused, credible leadership to every domain of BGC's work.</p>
+        <h2 class="section-headline">{{ boardData.headline_before }} <em class="headline-em">{{ boardData.headline_emphasis }}</em></h2>
+        <p class="section-sub">{{ boardData.subtext }}</p>
       </div>
 
       <div class="board-grid" :class="{ visible: revealed }">
         <div
-          v-for="(member, i) in members"
+          v-for="(member, i) in boardData.members"
           :key="i"
           class="board-card"
           :style="`--delay: ${i * 0.06}s`"
@@ -51,85 +51,106 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  data: Object,
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const members = [
-  {
-    initials: 'SO',
-    position: 'Director, Civil Services Mentorship & Training',
-    name: 'Sh. Sunil Oberoi',
-    service: 'IAS · 1984 Batch (Retd.)',
-    bio: 'Worked on <strong>Civil Services Reforms with UNDP and DoPT</strong>. Government nominee on UPSC interview boards; induction and in-service trainer at LBSNAA, Mussoorie. Academic Head, 99Notes. As Director of Mentorship &amp; Training, he leads the design of BGC\'s structured learning curriculum for younger IAS and allied service officers.',
-    area: 'Civil Service Reform & Ethics',
-  },
-  {
-    initials: 'SG',
-    position: 'Director, Security Governance & Policing Reform',
-    name: 'Sh. Somesh Goel',
-    service: 'IPS · 1984 Batch (Retd.)',
-    bio: '<strong>Deputy Inspector General of Police, Himachal Pradesh (Retd.)</strong> Extensive experience in law enforcement, intelligence, and internal security in hill-state conditions. As Director of Security Governance, he leads BGC\'s work on policing reform, disaster response frameworks, and the security dimensions of democratic governance.',
-    area: 'Security Governance & Law Enforcement',
-  },
-  {
-    initials: 'MB',
-    position: 'Director, International Engagement & Diplomacy',
-    name: 'Sh. Manoj Kumar Bharti',
-    service: 'IFS · 1988 Batch (Retd.)',
-    bio: 'Former <strong>Ambassador of India to Indonesia, UAE</strong>, and <strong>Myanmar</strong>; previously Special Secretary, Ministry of External Affairs. As Director of International Engagement, he leads BGC\'s outreach to international governance networks, facilitates comparative governance learning from the Global South, and heads diplomatic knowledge-sharing programmes.',
-    area: 'International Affairs & Diplomacy',
-  },
-  {
-    initials: 'NJ',
-    position: 'Director, Land Administration & State Governance',
-    name: 'Sh. Nikhilesh Jha',
-    service: 'IAS · 1984 Batch (Retd.)',
-    bio: '<strong>Director General, Himachal Pradesh; Former Director, LAWDA</strong> (Land Acquisition, Welfare &amp; Development Authority). Deep expertise in land administration and rights, public welfare infrastructure, and hill-state governance. Leads BGC\'s research programme on land governance, federalism in hill states, and subnational administrative capacity.',
-    area: 'Land Governance & Federalism',
-  },
-  {
-    initials: 'SS',
-    position: 'Director, Strategic Operations & Institutional Management',
-    name: 'Sh. Sandeep Silas',
-    service: 'IRTS · 1984 Batch (Retd.)',
-    bio: '<strong>Indian Railway Traffic Service, 1984 Batch (Retd.)</strong> Strategist and Management Expert with decades of experience in large-scale public logistics and institutional reform. As Director of Strategic Operations, he oversees BGC\'s internal governance, programme management, and the operational efficiency of the Council\'s activities.',
-    area: 'Operations & Institutional Management',
-  },
-  {
-    initials: 'AC',
-    position: 'Director, Public Finance & Revenue Policy',
-    name: 'Sh. A.K. Chauhan',
-    service: 'IRS · 1984 Batch (Retd.)',
-    bio: '<strong>Principal Chief Commissioner of Income Tax, Madhya Pradesh (Retd.)</strong> Indian Revenue Service, 1984 Batch. A senior tax administrator with expertise in fiscal administration, revenue reform, and compliance architecture. Leads BGC\'s work on public finance governance, tax administration reform, and fiscal capacity of subnational governments.',
-    area: 'Public Finance & Revenue Administration',
-  },
-  {
-    initials: 'RD',
-    position: 'Director, South Asia Affairs & Neighbourhood Policy',
-    name: 'Smt. Riva Das',
-    service: 'IFS · 1986 Batch (Retd.)',
-    bio: 'Former <strong>High Commissioner of India to Bangladesh</strong>, Indian Foreign Service, 1986 Batch. Seasoned diplomat with deep specialisation in South Asian bilateral relations, sub-regional connectivity, and cultural diplomacy. Leads BGC\'s Neighbourhood Policy track, examining how India\'s foreign policy intersects with subnational governance and border-area administration.',
-    area: 'South Asia & Neighbourhood Policy',
-  },
-  {
-    initials: 'AS',
-    position: 'Director, Rural Development & Cooperative Governance',
-    name: 'Sh. Arvind Singh',
-    service: 'IAS · 1988 Batch (Retd.)',
-    bio: 'Managing Director, <strong>Provincial Co-operative Federation, Lucknow</strong>. IAS, 1988 Batch. Specialist in cooperative governance, agricultural finance, and rural institutional reform in Uttar Pradesh. Leads BGC\'s research on rural governance, cooperative law reform, and the institutional architecture of India\'s agriculture economy.',
-    area: 'Rural Development & Cooperative Law',
-  },
-  {
-    initials: 'SSi',
-    position: 'Senior Advisor & Director, Civil Services Ethics & Selection',
-    name: 'Sh. Sanjay Sinha',
-    service: 'IPS · 1978 Batch (Retd.)',
-    bio: 'Former <strong>Member, Union Public Service Commission (UPSC) Panel</strong>. IPS, 1978 Batch — BGC\'s most senior member by seniority of service. Brings unmatched authority on civil services selection standards, police reform, and constitutional governance. Leads BGC\'s work on civil services ethics, conduct standards, and the reform of selection processes.',
-    area: 'Civil Services Ethics & UPSC Policy',
-  },
-]
+const boardDefaults = {
+  section_label: 'Board Members',
+  headline_before: 'The',
+  headline_emphasis: 'Full Board',
+  subtext: "Each board member holds a specific portfolio aligned with their career expertise — bringing focused, credible leadership to every domain of BGC's work.",
+  members: [
+    {
+      initials: 'SO',
+      position: 'Director, Civil Services Mentorship & Training',
+      name: 'Sh. Sunil Oberoi',
+      service: 'IAS · 1984 Batch (Retd.)',
+      bio: 'Worked on <strong>Civil Services Reforms with UNDP and DoPT</strong>. Government nominee on UPSC interview boards; induction and in-service trainer at LBSNAA, Mussoorie. Academic Head, 99Notes. As Director of Mentorship &amp; Training, he leads the design of BGC\'s structured learning curriculum for younger IAS and allied service officers.',
+      area: 'Civil Service Reform & Ethics',
+    },
+    {
+      initials: 'SG',
+      position: 'Director, Security Governance & Policing Reform',
+      name: 'Sh. Somesh Goel',
+      service: 'IPS · 1984 Batch (Retd.)',
+      bio: '<strong>Deputy Inspector General of Police, Himachal Pradesh (Retd.)</strong> Extensive experience in law enforcement, intelligence, and internal security in hill-state conditions. As Director of Security Governance, he leads BGC\'s work on policing reform, disaster response frameworks, and the security dimensions of democratic governance.',
+      area: 'Security Governance & Law Enforcement',
+    },
+    {
+      initials: 'MB',
+      position: 'Director, International Engagement & Diplomacy',
+      name: 'Sh. Manoj Kumar Bharti',
+      service: 'IFS · 1988 Batch (Retd.)',
+      bio: 'Former <strong>Ambassador of India to Indonesia, UAE</strong>, and <strong>Myanmar</strong>; previously Special Secretary, Ministry of External Affairs. As Director of International Engagement, he leads BGC\'s outreach to international governance networks, facilitates comparative governance learning from the Global South, and heads diplomatic knowledge-sharing programmes.',
+      area: 'International Affairs & Diplomacy',
+    },
+    {
+      initials: 'NJ',
+      position: 'Director, Land Administration & State Governance',
+      name: 'Sh. Nikhilesh Jha',
+      service: 'IAS · 1984 Batch (Retd.)',
+      bio: '<strong>Director General, Himachal Pradesh; Former Director, LAWDA</strong> (Land Acquisition, Welfare &amp; Development Authority). Deep expertise in land administration and rights, public welfare infrastructure, and hill-state governance. Leads BGC\'s research programme on land governance, federalism in hill states, and subnational administrative capacity.',
+      area: 'Land Governance & Federalism',
+    },
+    {
+      initials: 'SS',
+      position: 'Director, Strategic Operations & Institutional Management',
+      name: 'Sh. Sandeep Silas',
+      service: 'IRTS · 1984 Batch (Retd.)',
+      bio: '<strong>Indian Railway Traffic Service, 1984 Batch (Retd.)</strong> Strategist and Management Expert with decades of experience in large-scale public logistics and institutional reform. As Director of Strategic Operations, he oversees BGC\'s internal governance, programme management, and the operational efficiency of the Council\'s activities.',
+      area: 'Operations & Institutional Management',
+    },
+    {
+      initials: 'AC',
+      position: 'Director, Public Finance & Revenue Policy',
+      name: 'Sh. A.K. Chauhan',
+      service: 'IRS · 1984 Batch (Retd.)',
+      bio: '<strong>Principal Chief Commissioner of Income Tax, Madhya Pradesh (Retd.)</strong> Indian Revenue Service, 1984 Batch. A senior tax administrator with expertise in fiscal administration, revenue reform, and compliance architecture. Leads BGC\'s work on public finance governance, tax administration reform, and fiscal capacity of subnational governments.',
+      area: 'Public Finance & Revenue Administration',
+    },
+    {
+      initials: 'RD',
+      position: 'Director, South Asia Affairs & Neighbourhood Policy',
+      name: 'Smt. Riva Das',
+      service: 'IFS · 1986 Batch (Retd.)',
+      bio: 'Former <strong>High Commissioner of India to Bangladesh</strong>, Indian Foreign Service, 1986 Batch. Seasoned diplomat with deep specialisation in South Asian bilateral relations, sub-regional connectivity, and cultural diplomacy. Leads BGC\'s Neighbourhood Policy track, examining how India\'s foreign policy intersects with subnational governance and border-area administration.',
+      area: 'South Asia & Neighbourhood Policy',
+    },
+    {
+      initials: 'AS',
+      position: 'Director, Rural Development & Cooperative Governance',
+      name: 'Sh. Arvind Singh',
+      service: 'IAS · 1988 Batch (Retd.)',
+      bio: 'Managing Director, <strong>Provincial Co-operative Federation, Lucknow</strong>. IAS, 1988 Batch. Specialist in cooperative governance, agricultural finance, and rural institutional reform in Uttar Pradesh. Leads BGC\'s research on rural governance, cooperative law reform, and the institutional architecture of India\'s agriculture economy.',
+      area: 'Rural Development & Cooperative Law',
+    },
+    {
+      initials: 'SSi',
+      position: 'Senior Advisor & Director, Civil Services Ethics & Selection',
+      name: 'Sh. Sanjay Sinha',
+      service: 'IPS · 1978 Batch (Retd.)',
+      bio: 'Former <strong>Member, Union Public Service Commission (UPSC) Panel</strong>. IPS, 1978 Batch — BGC\'s most senior member by seniority of service. Brings unmatched authority on civil services selection standards, police reform, and constitutional governance. Leads BGC\'s work on civil services ethics, conduct standards, and the reform of selection processes.',
+      area: 'Civil Services Ethics & UPSC Policy',
+    },
+  ],
+}
+
+const boardData = computed(() => {
+  const saved = props.data || {}
+  return {
+    ...boardDefaults,
+    ...saved,
+    members: saved.members?.length
+      ? saved.members.map(member => ({ ...member }))
+      : boardDefaults.members.map(member => ({ ...member })),
+  }
+})
 
 let observer = null
 onMounted(() => {
