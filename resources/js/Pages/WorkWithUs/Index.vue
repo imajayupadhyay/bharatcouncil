@@ -12,21 +12,21 @@
   <div class="page-root">
     <AppHeader />
     <main>
-      <HeroSection :activeTab="activeTab" @set-tab="setTab" />
+      <HeroSection :activeTab="activeTab" :heroData="sections?.hero ?? {}" @set-tab="setTab" />
       <div id="wwu-panels">
         <Transition name="panel-fade" mode="out-in">
           <div v-if="activeTab === 'intern'" key="intern">
-            <InternProgrammeSection />
-            <InternEligibilitySection />
+            <InternProgrammeSection :programmeData="sections?.intern_programme ?? {}" />
+            <InternEligibilitySection :eligibilityData="sections?.intern_eligibility ?? {}" />
           </div>
           <div v-else key="member">
-            <MembershipSection />
-            <MemberFormSection />
+            <MembershipSection :membershipData="sections?.membership ?? {}" />
+            <MemberFormSection :memberFormData="sections?.member_form ?? {}" />
           </div>
         </Transition>
       </div>
-      <LifeAtBGCSection />
-      <WorkPoliciesSection />
+      <LifeAtBGCSection :lifeData="sections?.life_at_bgc ?? {}" />
+      <WorkPoliciesSection :policiesData="sections?.work_policies ?? {}" />
     </main>
     <AppFooter />
   </div>
@@ -44,6 +44,10 @@ import MembershipSection from './Components/MembershipSection.vue'
 import MemberFormSection from './Components/MemberFormSection.vue'
 import LifeAtBGCSection from './Components/LifeAtBGCSection.vue'
 import WorkPoliciesSection from './Components/WorkPoliciesSection.vue'
+
+const props = defineProps({
+  sections: { type: Object, default: () => ({}) },
+})
 
 const activeTab = ref('intern')
 

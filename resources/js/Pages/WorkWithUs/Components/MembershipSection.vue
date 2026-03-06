@@ -7,28 +7,28 @@
 
         <div class="sec-label" :class="{ visible: aboutVisible }">
           <span class="sec-label-line"/><span class="sec-label-dot"/>
-          <span class="sec-label-text">BGC Membership</span>
+          <span class="sec-label-text">{{ d.about_label }}</span>
         </div>
 
         <div class="intro-grid" :class="{ visible: aboutVisible }">
           <div class="intro-prose">
             <h2 class="section-headline">
-              Join the Council<br>as a <em class="headline-em">Member</em>
+              {{ d.about_headline_plain }}<br><em class="headline-em">{{ d.about_headline_gold }}</em>
             </h2>
             <div class="prose-body">
-              <p>BGC membership is extended to individuals who bring a meaningful and distinct perspective to India's governance conversation — whether as researchers, practitioners, retired officials, legal experts, educators, or civil society leaders.</p>
-              <p>Becoming a BGC member is not a transactional arrangement. Members are expected to contribute intellectually — through participation in working groups, co-authorship of research outputs, mentorship of younger staff and interns, and attendance at the Council's deliberative forums. In return, BGC offers access to its network of senior practitioners, publishing platforms, and institutional resources.</p>
-              <p>Membership is by invitation or application. All applications are reviewed by the Executive Committee and require endorsement by at least one existing Board or Senior Member. We are particularly eager to hear from women, professionals from smaller cities and states, and those working at the intersection of governance and disciplines underrepresented at Indian think tanks.</p>
+              <p>{{ d.prose_p1 }}</p>
+              <p>{{ d.prose_p2 }}</p>
+              <p>{{ d.prose_p3 }}</p>
             </div>
           </div>
 
           <div class="info-card">
             <div class="info-card-header">
               <span class="info-card-icon">◇</span>
-              <h4 class="info-card-title">Membership at a Glance</h4>
+              <h4 class="info-card-title">{{ d.info_card_title }}</h4>
             </div>
             <div class="info-rows">
-              <div v-for="row in membershipDetails" :key="row.label" class="info-row">
+              <div v-for="row in d.membership_details" :key="row.label" class="info-row">
                 <span class="ir-label">{{ row.label }}</span>
                 <span class="ir-val">{{ row.val }}</span>
               </div>
@@ -44,15 +44,15 @@
 
         <div class="sec-label" :class="{ visible: typesVisible }">
           <span class="sec-label-line"/><span class="sec-label-dot"/>
-          <span class="sec-label-text">Types of Membership</span>
+          <span class="sec-label-text">{{ d.types_label }}</span>
         </div>
 
         <div class="types-header" :class="{ visible: typesVisible }">
-          <h2 class="section-headline">Three Paths to <em class="headline-em">Membership</em></h2>
+          <h2 class="section-headline">{{ d.types_headline_plain }} <em class="headline-em">{{ d.types_headline_gold }}</em></h2>
         </div>
 
         <div class="types-grid" :class="{ visible: typesVisible }">
-          <div v-for="(type, i) in memberTypes" :key="i" class="mtype-card" :style="`--delay: ${i * 0.1}s`">
+          <div v-for="(type, i) in d.member_types" :key="i" class="mtype-card" :style="`--delay: ${i * 0.1}s`">
             <div class="mt-num">{{ String(i + 1).padStart(2, '0') }}</div>
             <h3 class="mt-title">{{ type.title }}</h3>
             <p class="mt-body">{{ type.body }}</p>
@@ -69,15 +69,15 @@
 
         <div class="sec-label" :class="{ visible: offerVisible }">
           <span class="sec-label-line"/><span class="sec-label-dot"/>
-          <span class="sec-label-text">What BGC Offers Members</span>
+          <span class="sec-label-text">{{ d.offer_label }}</span>
         </div>
 
         <div class="offer-header" :class="{ visible: offerVisible }">
-          <h2 class="section-headline">What You <em class="headline-em">Gain</em></h2>
+          <h2 class="section-headline">{{ d.offer_headline_plain }} <em class="headline-em">{{ d.offer_headline_gold }}</em></h2>
         </div>
 
         <div class="offer-grid" :class="{ visible: offerVisible }">
-          <div v-for="(item, i) in offerItems" :key="i" class="offer-item" :style="`--delay: ${i * 0.07}s`">
+          <div v-for="(item, i) in d.offer_items" :key="i" class="offer-item" :style="`--delay: ${i * 0.07}s`">
             <div class="offer-item-top">
               <span class="offer-num">{{ String(i + 1).padStart(2, '0') }}</span>
               <div class="offer-gold-bar"/>
@@ -93,7 +93,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  membershipData: { type: Object, default: () => ({}) },
+})
 
 const aboutEl = ref(null)
 const typesEl = ref(null)
@@ -102,60 +106,44 @@ const aboutVisible = ref(false)
 const typesVisible = ref(false)
 const offerVisible = ref(false)
 
-const membershipDetails = [
-  { label: 'Types',              val: 'Research Fellow · Senior Fellow · Associate Member' },
-  { label: 'Tenure',             val: '1-year, renewable; Senior Fellows 3-year' },
-  { label: 'Mode',               val: 'Residential (Delhi) or non-residential' },
-  { label: 'Min. Commitment',    val: '1 publication + 4 events per year' },
-  { label: 'Remuneration',       val: 'Fellows: Honorarium + project support. Associates: Nominal.' },
-  { label: 'Review Process',     val: 'Application → EC Review → Board Endorsement' },
-  { label: 'Timeline',           val: '4–8 weeks from submission to decision' },
-]
-
-const memberTypes = [
-  {
-    title: 'Research Fellow',
-    body: 'For researchers, academics, and policy practitioners with a defined research project. Fellows receive institutional affiliation, office access, publishing support, and direct access to BGC\'s Board for input and engagement. Expected to produce at least one substantive output per year and participate actively in BGC\'s programme calendar.',
-    tenure: '1-year, renewable · Full institutional support',
-  },
-  {
-    title: 'Senior Fellow',
-    body: 'For highly experienced practitioners — typically retired officers, senior academics, or former constitutional office-holders — who wish to contribute to BGC\'s work in a sustained advisory and intellectual capacity. Senior Fellows chair working groups, co-author flagship publications, and mentor Research Fellows and interns.',
-    tenure: '3-year tenure · Honorarium · Leadership role',
-  },
-  {
-    title: 'Associate Member',
-    body: 'For engaged citizens, professionals, and students who wish to be part of the BGC network without a formal research commitment. Associate Members attend BGC events, receive publications and the Council digest, and are invited to working group sessions in their area of expertise. Nominal annual fee applies.',
-    tenure: 'Annual renewal · Open to all backgrounds',
-  },
-]
-
-const offerItems = [
-  {
-    title: 'Access to Senior Practitioners',
-    body: 'Every BGC member has direct access to the Council\'s founding members — retired IAS, IPS, IFS, and allied service officers with decades of governance experience. This is not a notional benefit; it is the reason BGC exists.',
-  },
-  {
-    title: 'Publishing Platform',
-    body: 'BGC publishes working papers, policy briefs, opinion pieces, and an annual governance review. Fellows are actively supported to place their work in both BGC\'s own publications and in external journals and media outlets.',
-  },
-  {
-    title: 'Peer Network',
-    body: 'BGC\'s membership spans civil servants, lawyers, academics, development practitioners, and public intellectuals. Being part of the network means access to people who matter across every dimension of India\'s governance ecosystem.',
-  },
-  {
-    title: 'Office & Institutional Resources',
-    body: 'Residential Fellows have access to BGC\'s New Delhi office, research library, and institutional databases including PRS Legislative Research, Manupatra, and select international policy databases.',
-  },
-  {
-    title: 'Event Participation',
-    body: 'BGC\'s calendar includes intimate roundtables, working group sessions, public lectures, and the Annual Civil Governance Dialogue. Members are central participants — not peripheral attendees.',
-  },
-  {
-    title: 'Long-term Affiliation',
-    body: 'BGC alumni and former members remain associated with the institution permanently. We actively support former members in their subsequent careers through references, introductions, and continued collaboration.',
-  },
-]
+/* ── Merged data with defaults ── */
+const d = computed(() => ({
+  about_label:          props.membershipData?.about_label          ?? 'BGC Membership',
+  about_headline_plain: props.membershipData?.about_headline_plain ?? 'Join the Council',
+  about_headline_gold:  props.membershipData?.about_headline_gold  ?? 'as a Member',
+  prose_p1:             props.membershipData?.prose_p1             ?? 'BGC membership is extended to individuals who bring a meaningful and distinct perspective to India\'s governance conversation — whether as researchers, practitioners, retired officials, legal experts, educators, or civil society leaders.',
+  prose_p2:             props.membershipData?.prose_p2             ?? 'Becoming a BGC member is not a transactional arrangement. Members are expected to contribute intellectually — through participation in working groups, co-authorship of research outputs, mentorship of younger staff and interns, and attendance at the Council\'s deliberative forums. In return, BGC offers access to its network of senior practitioners, publishing platforms, and institutional resources.',
+  prose_p3:             props.membershipData?.prose_p3             ?? 'Membership is by invitation or application. All applications are reviewed by the Executive Committee and require endorsement by at least one existing Board or Senior Member. We are particularly eager to hear from women, professionals from smaller cities and states, and those working at the intersection of governance and disciplines underrepresented at Indian think tanks.',
+  info_card_title:      props.membershipData?.info_card_title      ?? 'Membership at a Glance',
+  membership_details:   props.membershipData?.membership_details   ?? [
+    { label: 'Types',           val: 'Research Fellow · Senior Fellow · Associate Member' },
+    { label: 'Tenure',          val: '1-year, renewable; Senior Fellows 3-year' },
+    { label: 'Mode',            val: 'Residential (Delhi) or non-residential' },
+    { label: 'Min. Commitment', val: '1 publication + 4 events per year' },
+    { label: 'Remuneration',    val: 'Fellows: Honorarium + project support. Associates: Nominal.' },
+    { label: 'Review Process',  val: 'Application → EC Review → Board Endorsement' },
+    { label: 'Timeline',        val: '4–8 weeks from submission to decision' },
+  ],
+  types_label:          props.membershipData?.types_label          ?? 'Types of Membership',
+  types_headline_plain: props.membershipData?.types_headline_plain ?? 'Three Paths to',
+  types_headline_gold:  props.membershipData?.types_headline_gold  ?? 'Membership',
+  member_types:         props.membershipData?.member_types         ?? [
+    { title: 'Research Fellow',   body: 'For researchers, academics, and policy practitioners with a defined research project. Fellows receive institutional affiliation, office access, publishing support, and direct access to BGC\'s Board for input and engagement. Expected to produce at least one substantive output per year and participate actively in BGC\'s programme calendar.',   tenure: '1-year, renewable · Full institutional support' },
+    { title: 'Senior Fellow',     body: 'For highly experienced practitioners — typically retired officers, senior academics, or former constitutional office-holders — who wish to contribute to BGC\'s work in a sustained advisory and intellectual capacity. Senior Fellows chair working groups, co-author flagship publications, and mentor Research Fellows and interns.',                  tenure: '3-year tenure · Honorarium · Leadership role' },
+    { title: 'Associate Member',  body: 'For engaged citizens, professionals, and students who wish to be part of the BGC network without a formal research commitment. Associate Members attend BGC events, receive publications and the Council digest, and are invited to working group sessions in their area of expertise. Nominal annual fee applies.',                             tenure: 'Annual renewal · Open to all backgrounds' },
+  ],
+  offer_label:          props.membershipData?.offer_label          ?? 'What BGC Offers Members',
+  offer_headline_plain: props.membershipData?.offer_headline_plain ?? 'What You',
+  offer_headline_gold:  props.membershipData?.offer_headline_gold  ?? 'Gain',
+  offer_items:          props.membershipData?.offer_items          ?? [
+    { title: 'Access to Senior Practitioners',   body: 'Every BGC member has direct access to the Council\'s founding members — retired IAS, IPS, IFS, and allied service officers with decades of governance experience. This is not a notional benefit; it is the reason BGC exists.' },
+    { title: 'Publishing Platform',              body: 'BGC publishes working papers, policy briefs, opinion pieces, and an annual governance review. Fellows are actively supported to place their work in both BGC\'s own publications and in external journals and media outlets.' },
+    { title: 'Peer Network',                     body: 'BGC\'s membership spans civil servants, lawyers, academics, development practitioners, and public intellectuals. Being part of the network means access to people who matter across every dimension of India\'s governance ecosystem.' },
+    { title: 'Office & Institutional Resources', body: 'Residential Fellows have access to BGC\'s New Delhi office, research library, and institutional databases including PRS Legislative Research, Manupatra, and select international policy databases.' },
+    { title: 'Event Participation',              body: 'BGC\'s calendar includes intimate roundtables, working group sessions, public lectures, and the Annual Civil Governance Dialogue. Members are central participants — not peripheral attendees.' },
+    { title: 'Long-term Affiliation',            body: 'BGC alumni and former members remain associated with the institution permanently. We actively support former members in their subsequent careers through references, introductions, and continued collaboration.' },
+  ],
+}))
 
 let observers = []
 function observe(el, setter) {

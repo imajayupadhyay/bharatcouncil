@@ -71,11 +71,11 @@
       <div class="bgc-header" :class="{ visible: revealed }">
         <div class="sec-label">
           <span class="sec-label-line"/><span class="sec-label-dot"/>
-          <span class="sec-label-text">Life at BGC</span>
+          <span class="sec-label-text">{{ d.label }}</span>
         </div>
         <h2 class="section-headline">
-          A Place That Respects<br>
-          <em class="headline-em">Your Intelligence</em>
+          {{ d.headline_plain }}<br>
+          <em class="headline-em">{{ d.headline_gold }}</em>
         </h2>
       </div>
 
@@ -84,17 +84,17 @@
         <!-- Left: Prose + Award -->
         <div class="bgc-left">
           <div class="prose-body">
-            <p>BGC is a small institution by design. We do not believe that governance research requires large teams, complex hierarchies, or expensive infrastructure. What it requires is careful thinking, deep reading, good writing, and honest conversation — and we build a culture that enables all four.</p>
-            <p>We work reasonable hours. We do not celebrate busyness. We expect people to read widely, think slowly, and write carefully — not to produce output at volume. Every person at BGC, from intern to Chairman, is treated as a professional with their own intellectual dignity.</p>
-            <p>BGC has a standing Committee Against Discrimination and Harassment, a formal grievance redressal mechanism, and a commitment to equal opportunity that is lived, not stated.</p>
+            <p>{{ d.prose_p1 }}</p>
+            <p>{{ d.prose_p2 }}</p>
+            <p>{{ d.prose_p3 }}</p>
           </div>
 
           <div class="award-card">
             <div class="award-card-shimmer"/>
             <span class="award-trophy">🏆</span>
             <div class="award-detail">
-              <h4 class="award-title">Best Place to Work — Not for Profit</h4>
-              <p class="award-body">Bharat Governance Council was recognised by <em>Economic Times Best Workplaces 2024</em> in the Not-for-Profit category — awarded for its collegial intellectual culture, commitment to staff development, transparent governance, and record of employee wellbeing.</p>
+              <h4 class="award-title">{{ d.award_title }}</h4>
+              <p class="award-body">{{ d.award_body }}</p>
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@
         <!-- Right: Values list -->
         <div class="bgc-right">
           <ul class="values-list">
-            <li v-for="(val, i) in values" :key="i" class="value-item" :style="`--delay: ${i * 0.08}s`">
+            <li v-for="(val, i) in d.values" :key="i" class="value-item" :style="`--delay: ${i * 0.08}s`">
               <span class="val-icon">{{ val.icon }}</span>
               <div class="val-body">
                 <h4 class="val-title">{{ val.title }}</h4>
@@ -119,38 +119,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  lifeData: { type: Object, default: () => ({}) },
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const values = [
-  {
-    icon: '🤝',
-    title: 'Flat, Collegial Culture',
-    desc: 'Everyone is addressed by name. There is no unnecessary deference to rank or seniority. Ideas are evaluated on their merits — regardless of who offers them.',
-  },
-  {
-    icon: '📚',
-    title: 'Intellectual Freedom',
-    desc: 'BGC takes no institutional positions on policy questions. Your analysis and conclusions are yours. We will support them, not shape them.',
-  },
-  {
-    icon: '⏱️',
-    title: 'Reasonable Hours & Flexibility',
-    desc: 'We do not normalise overwork. Core hours are structured; the rest is flexible. Hybrid and remote arrangements are available for fellows and senior associates.',
-  },
-  {
-    icon: '🌱',
-    title: 'Learning & Development',
-    desc: 'BGC actively supports professional development — conference travel, external training, co-authorship with senior board members, and introductions to the wider governance ecosystem.',
-  },
-  {
-    icon: '🛡️',
-    title: 'Safe & Equitable Workspace',
-    desc: 'Formal POSH policy. Grievance redressal committee. Zero tolerance for discrimination on the basis of gender, caste, religion, region, or sexual orientation.',
-  },
-]
+/* ── Merged data with defaults ── */
+const d = computed(() => ({
+  label:          props.lifeData?.label          ?? 'Life at BGC',
+  headline_plain: props.lifeData?.headline_plain ?? 'A Place That Respects',
+  headline_gold:  props.lifeData?.headline_gold  ?? 'Your Intelligence',
+  prose_p1:       props.lifeData?.prose_p1       ?? 'BGC is a small institution by design. We do not believe that governance research requires large teams, complex hierarchies, or expensive infrastructure. What it requires is careful thinking, deep reading, good writing, and honest conversation — and we build a culture that enables all four.',
+  prose_p2:       props.lifeData?.prose_p2       ?? 'We work reasonable hours. We do not celebrate busyness. We expect people to read widely, think slowly, and write carefully — not to produce output at volume. Every person at BGC, from intern to Chairman, is treated as a professional with their own intellectual dignity.',
+  prose_p3:       props.lifeData?.prose_p3       ?? 'BGC has a standing Committee Against Discrimination and Harassment, a formal grievance redressal mechanism, and a commitment to equal opportunity that is lived, not stated.',
+  award_title:    props.lifeData?.award_title    ?? 'Best Place to Work — Not for Profit',
+  award_body:     props.lifeData?.award_body     ?? 'Bharat Governance Council was recognised by Economic Times Best Workplaces 2024 in the Not-for-Profit category — awarded for its collegial intellectual culture, commitment to staff development, transparent governance, and record of employee wellbeing.',
+  values:         props.lifeData?.values         ?? [
+    { icon: '🤝', title: 'Flat, Collegial Culture',        desc: 'Everyone is addressed by name. There is no unnecessary deference to rank or seniority. Ideas are evaluated on their merits — regardless of who offers them.' },
+    { icon: '📚', title: 'Intellectual Freedom',           desc: 'BGC takes no institutional positions on policy questions. Your analysis and conclusions are yours. We will support them, not shape them.' },
+    { icon: '⏱️', title: 'Reasonable Hours & Flexibility', desc: 'We do not normalise overwork. Core hours are structured; the rest is flexible. Hybrid and remote arrangements are available for fellows and senior associates.' },
+    { icon: '🌱', title: 'Learning & Development',         desc: 'BGC actively supports professional development — conference travel, external training, co-authorship with senior board members, and introductions to the wider governance ecosystem.' },
+    { icon: '🛡️', title: 'Safe & Equitable Workspace',    desc: 'Formal POSH policy. Grievance redressal committee. Zero tolerance for discrimination on the basis of gender, caste, religion, region, or sexual orientation.' },
+  ],
+}))
 
 const particles = Array.from({ length: 20 }, (_, i) => ({
   x: (i * 137.5) % 1440,

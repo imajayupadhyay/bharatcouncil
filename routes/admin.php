@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\GoverningBoardController;
 use App\Http\Controllers\Admin\HomepageController;
+use App\Http\Controllers\Admin\WorkWithUsController;
 use App\Http\Controllers\Admin\InternApplicationController;
 use App\Http\Controllers\Admin\NewsletterController;
 use App\Http\Controllers\Admin\WhoWeAreController;
@@ -59,6 +60,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Governing Board page management
         Route::get('/governing-board',                   [GoverningBoardController::class, 'index'])->name('governing-board');
         Route::put('/governing-board/{section}',         [GoverningBoardController::class, 'updateSection'])->name('governing-board.update');
+
+        // Work With Us page management
+        Route::get('/work-with-us',                      [WorkWithUsController::class, 'index'])->name('work-with-us');
+        Route::put('/work-with-us/{section}',            [WorkWithUsController::class, 'updateSection'])->name('work-with-us.update');
 
         // Events
         Route::get('/events',                       [EventController::class, 'index'])->name('events.index');

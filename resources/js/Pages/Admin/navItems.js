@@ -28,6 +28,10 @@ export const navItems = [
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="8" cy="4" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 13.5c0-2.2 2.24-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M1.5 10h13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
   },
   {
+    id: 'work-with-us', label: 'Work With Us', href: '/admin/work-with-us',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="5" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M8 9v2M7 10h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  },
+  {
     id: 'events', label: 'Events', href: '/admin/events',
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="3" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/></svg>',
   },

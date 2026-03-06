@@ -8,21 +8,21 @@
         <div class="sec-label" :class="{ visible: eligVisible }">
           <span class="sec-label-line"/>
           <span class="sec-label-dot"/>
-          <span class="sec-label-text">Eligibility &amp; Expectations</span>
+          <span class="sec-label-text">{{ d.label }}</span>
         </div>
 
         <h2 class="section-headline" :class="{ visible: eligVisible }">
-          Who We're <em class="headline-em">Looking For</em>
+          {{ d.headline }} <em class="headline-em">{{ d.headline_gold }}</em>
         </h2>
 
         <div class="elig-grid" :class="{ visible: eligVisible }">
           <div class="elig-col">
             <h3 class="elig-col-title">
               <span class="elig-col-icon elig-yes">✓</span>
-              You should bring
+              {{ d.should_bring_title }}
             </h3>
             <ul class="elig-list">
-              <li v-for="item in shouldBring" :key="item">
+              <li v-for="item in d.should_bring" :key="item">
                 <span class="check">✓</span>
                 <span>{{ item }}</span>
               </li>
@@ -31,10 +31,10 @@
           <div class="elig-col">
             <h3 class="elig-col-title">
               <span class="elig-col-icon elig-no">—</span>
-              We do not look for
+              {{ d.do_not_need_title }}
             </h3>
             <ul class="elig-list elig-list-no">
-              <li v-for="item in doNotNeed" :key="item">
+              <li v-for="item in d.do_not_need" :key="item">
                 <span class="dash">—</span>
                 <span>{{ item }}</span>
               </li>
@@ -59,7 +59,7 @@
           <h2 class="form-headline">
             Submit Your <em class="form-headline-em">Application</em>
           </h2>
-          <p class="form-sub">Fill in the form below. We review applications on a rolling basis. Strong applications hear from us within 10 working days. All fields marked * are required.</p>
+          <p class="form-sub">{{ d.form_sub }}</p>
         </div>
 
         <!-- Form -->
@@ -220,8 +220,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
+
+const props = defineProps({
+  eligibilityData: { type: Object, default: () => ({}) },
+})
 
 const eligEl    = ref(null)
 const formEl    = ref(null)
@@ -239,21 +243,29 @@ const form = reactive({
   statement: '', governanceProblem: '',
 })
 
-const shouldBring = [
-  'Enrolment in a recognised UG, PG, or doctoral programme in public policy, law, political science, economics, or related fields',
-  'Strong reading habits and the ability to synthesise complex documents',
-  'Clear, structured written English (Hindi-language submissions also accepted)',
-  'Genuine curiosity about how India\'s government actually functions',
-  'Willingness to work independently with minimal supervision',
-  'Prior exposure to governance or civil society is valued but not required',
-]
-
-const doNotNeed = [
-  'Specific CGPA or academic rank — we care more about the quality of your thinking than your grade sheet',
-  'Prior publications or research experience — we are happy to be your first substantive research experience',
-  'Attendance at prestigious institutions — we actively recruit from state universities and lesser-known colleges',
-  'A fixed political or ideological orientation — BGC is non-partisan and welcomes diverse perspectives',
-]
+/* ── Merged data with defaults ── */
+const d = computed(() => ({
+  label:              props.eligibilityData?.label              ?? 'Eligibility & Expectations',
+  headline:           props.eligibilityData?.headline           ?? 'Who We\'re',
+  headline_gold:      props.eligibilityData?.headline_gold      ?? 'Looking For',
+  should_bring_title: props.eligibilityData?.should_bring_title ?? 'You should bring',
+  should_bring:       props.eligibilityData?.should_bring       ?? [
+    'Enrolment in a recognised UG, PG, or doctoral programme in public policy, law, political science, economics, or related fields',
+    'Strong reading habits and the ability to synthesise complex documents',
+    'Clear, structured written English (Hindi-language submissions also accepted)',
+    'Genuine curiosity about how India\'s government actually functions',
+    'Willingness to work independently with minimal supervision',
+    'Prior exposure to governance or civil society is valued but not required',
+  ],
+  do_not_need_title: props.eligibilityData?.do_not_need_title ?? 'We do not look for',
+  do_not_need:       props.eligibilityData?.do_not_need       ?? [
+    'Specific CGPA or academic rank — we care more about the quality of your thinking than your grade sheet',
+    'Prior publications or research experience — we are happy to be your first substantive research experience',
+    'Attendance at prestigious institutions — we actively recruit from state universities and lesser-known colleges',
+    'A fixed political or ideological orientation — BGC is non-partisan and welcomes diverse perspectives',
+  ],
+  form_sub: props.eligibilityData?.form_sub ?? 'Fill in the form below. We review applications on a rolling basis. Strong applications hear from us within 10 working days. All fields marked * are required.',
+}))
 
 function validate() {
   Object.keys(errors).forEach(k => delete errors[k])
