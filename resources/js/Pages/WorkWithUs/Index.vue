@@ -1,13 +1,14 @@
 <template>
   <Head>
-    <title>Work With Us | Bharat Governance Council</title>
-    <meta name="description" content="Join the Bharat Governance Council through our internship programme, fellowship tracks, or membership. Work on meaningful governance research and policy with India's leading thinkers." />
-    <meta property="og:title" content="Work With Us | Bharat Governance Council" />
-    <meta property="og:description" content="Join BGC through internships, fellowships, or membership. Work on meaningful governance research and policy with India's leading thinkers." />
+    <title>{{ seo.meta_title || 'Work With Us | Bharat Governance Council' }}</title>
+    <meta name="description" :content="seo.meta_description || 'Join the Bharat Governance Council through our internship programme, fellowship tracks, or membership. Work on meaningful governance research and policy with India\'s leading thinkers.'" />
+    <meta v-if="seo.meta_keywords" name="keywords" :content="seo.meta_keywords" />
+    <meta property="og:title" :content="seo.meta_title || 'Work With Us | Bharat Governance Council'" />
+    <meta property="og:description" :content="seo.meta_description || 'Join BGC through internships, fellowships, or membership. Work on meaningful governance research and policy with India\'s leading thinkers.'" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Work With Us | Bharat Governance Council" />
-    <meta name="twitter:description" content="Internships, fellowships, and membership opportunities at the Bharat Governance Council." />
+    <meta name="twitter:title" :content="seo.meta_title || 'Work With Us | Bharat Governance Council'" />
+    <meta name="twitter:description" :content="seo.meta_description || 'Internships, fellowships, and membership opportunities at the Bharat Governance Council.'" />
   </Head>
   <div class="page-root">
     <AppHeader />
@@ -33,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import AppHeader from '@/Components/AppHeader.vue'
 import AppFooter from '@/Components/AppFooter.vue'
@@ -48,6 +49,8 @@ import WorkPoliciesSection from './Components/WorkPoliciesSection.vue'
 const props = defineProps({
   sections: { type: Object, default: () => ({}) },
 })
+
+const seo = computed(() => props.sections?.seo ?? {})
 
 const activeTab = ref('intern')
 

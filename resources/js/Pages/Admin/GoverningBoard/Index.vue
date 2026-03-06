@@ -70,6 +70,56 @@
           </div>
         </div>
 
+        <!-- ══════════ SEO SETTINGS ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="seoOpen = !seoOpen">
+            <div class="section-panel-left">
+              <span class="section-num">SEO</span>
+              <div>
+                <h3 class="section-panel-title">SEO Settings</h3>
+                <p class="section-panel-desc">Meta title, description, and keywords for search engines</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: seoOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <Transition name="panel-slide">
+            <div v-if="seoOpen" class="section-panel-body">
+              <form @submit.prevent="saveSeo">
+                <p class="form-group-label">Search Engine Optimisation</p>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Meta Title</label>
+                    <input v-model="seo.meta_title" class="form-input" type="text" placeholder="Page title shown in browser tab and search results" maxlength="70" />
+                    <span class="form-hint">Recommended: 50–60 characters &nbsp;({{ seo.meta_title?.length ?? 0 }}/70)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Meta Description</label>
+                    <textarea v-model="seo.meta_description" class="form-textarea" rows="3" placeholder="Brief description of the page shown in search results" maxlength="160" />
+                    <span class="form-hint">Recommended: 150–160 characters &nbsp;({{ seo.meta_description?.length ?? 0 }}/160)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Keywords</label>
+                    <input v-model="seo.meta_keywords" class="form-input" type="text" placeholder="e.g. governance, policy, India, BGC (comma-separated)" />
+                    <span class="form-hint">Comma-separated keywords for search engine context.</span>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetSeo">Reset</button>
+                  <button type="submit" class="btn-save" :disabled="seoSaving">
+                    {{ seoSaving ? 'Saving…' : 'Save SEO Settings' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
+        </div>
+
         <!-- ══════════ HERO SECTION ══════════ -->
         <div class="section-panel">
           <div class="section-panel-header" @click="heroOpen = !heroOpen">
@@ -960,6 +1010,24 @@ function logout() {
     router.post('/admin/logout')
   }
 }
+
+const seoDefaults = {
+  meta_title:       'Governing Board | Bharat Governance Council',
+  meta_description: 'Meet the Governing Board of the Bharat Governance Council, including our Chairman, Executive Officers, and distinguished Board Members leading India\'s governance reform agenda.',
+  meta_keywords:    'governing board, BGC, Bharat Governance Council, chairman, board members, governance',
+}
+const savedSeo  = props.sections?.seo ?? {}
+const seo       = reactive({ ...seoDefaults, ...savedSeo })
+const seoOpen   = ref(false)
+const seoSaving = ref(false)
+function saveSeo() {
+  seoSaving.value = true
+  router.put('/admin/governing-board/seo', { data: { ...seo } }, {
+    preserveScroll: true,
+    onFinish: () => (seoSaving.value = false),
+  })
+}
+function resetSeo() { Object.assign(seo, { ...seoDefaults }) }
 
 onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
 </script>
