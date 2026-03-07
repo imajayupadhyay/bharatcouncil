@@ -31,8 +31,26 @@
         <div class="ch-avatar-block">
           <span class="ch-badge">{{ chairmanData.badge_text }}</span>
           <div class="ch-avatar">
-            <div class="ch-initials">{{ chairmanData.initials }}</div>
-            <div class="ch-svc">{{ chairmanData.avatar_service }}</div>
+
+            <!-- Full photo (when image uploaded) -->
+            <img
+              v-if="chairmanData.image"
+              :src="chairmanData.image"
+              :alt="chairmanData.name"
+              class="ch-avatar-img"
+            />
+
+            <!-- Fallback: initials (no photo) -->
+            <template v-else>
+              <div class="ch-initials">{{ chairmanData.initials }}</div>
+            </template>
+
+            <!-- Badge overlay at the bottom (always shown) -->
+            <div class="ch-overlay-badge">
+              <span class="ch-overlay-initials">{{ chairmanData.initials }}</span>
+              <span class="ch-overlay-svc">{{ chairmanData.avatar_service }}</span>
+            </div>
+
             <!-- Corner accent -->
             <div class="ch-corner"/>
             <!-- Rotating rings -->
@@ -114,6 +132,7 @@ const chairmanData = computed(() => {
   return {
     ...chairmanDefaults,
     ...saved,
+    image: saved.image || null,
     bios: saved.bios?.length ? saved.bios : chairmanDefaults.bios,
     responsibilities: saved.responsibilities?.length ? saved.responsibilities : chairmanDefaults.responsibilities,
     tags: saved.tags?.length ? saved.tags : chairmanDefaults.tags,
@@ -184,8 +203,8 @@ onUnmounted(() => observer?.disconnect())
 
 .ch-avatar {
   position: relative;
-  width: 260px; height: 300px;
-  background: rgba(255,255,255,0.05);
+  width: 260px; height: 340px;
+  background: linear-gradient(160deg, #162d55 0%, #0b1c38 100%);
   border: 1px solid rgba(255,255,255,0.1);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -193,15 +212,42 @@ onUnmounted(() => observer?.disconnect())
   z-index: 2;
 }
 
+/* Full-bleed photo */
+.ch-avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 1;
+}
+
+/* Fallback initials (no photo) */
 .ch-initials {
+  position: relative; z-index: 2;
   font-family: 'Cormorant Garamond', serif;
   font-size: 6.5rem; font-weight: 600;
   color: #f5f7fa; line-height: 1; letter-spacing: -0.03em;
 }
-.ch-svc {
+
+/* Badge overlay at bottom */
+.ch-overlay-badge {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 3;
+  background: linear-gradient(0deg, rgba(5,14,30,0.92) 0%, rgba(5,14,30,0.6) 70%, transparent 100%);
+  padding: 20px 16px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ch-overlay-initials {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 600;
+  color: #f5f7fa; line-height: 1;
+}
+.ch-overlay-svc {
   font-size: 9px; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  color: #c9a84c; margin-top: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: #c9a84c;
   font-family: 'DM Mono', monospace;
 }
 
@@ -297,7 +343,8 @@ onUnmounted(() => observer?.disconnect())
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 1024px) {
   .chairman-grid { grid-template-columns: 1fr; gap: 40px; }
-  .ch-avatar { width: 100%; height: 160px; flex-direction: row; gap: 24px; }
+  .ch-avatar { width: 100%; height: 220px; flex-direction: row; gap: 24px; }
+  .ch-avatar-img { object-position: center 20%; }
   .ch-initials { font-size: 4rem; }
   .ch-ring-1, .ch-ring-2, .ch-corner { display: none; }
 }

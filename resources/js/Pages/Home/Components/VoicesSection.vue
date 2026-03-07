@@ -68,7 +68,8 @@
             <div class="avatar-ring-outer" :class="{ active: hovered === i }"/>
             <div class="avatar-ring-inner" :class="{ active: hovered === i }"/>
             <div class="voice-avatar">
-              <span>{{ voice.initials }}</span>
+              <img v-if="voice.image" :src="voice.image" class="voice-avatar-img" :alt="voice.name" />
+              <span v-else>{{ voice.initials }}</span>
             </div>
             <!-- Orbiting dot -->
             <div class="avatar-orbit" :class="{ active: hovered === i }">
@@ -99,19 +100,6 @@
             </svg>
           </a>
         </article>
-      </div>
-
-      <!-- CTA -->
-      <div class="voices-cta" :class="{ visible: revealed }">
-        <div class="cta-line"/>
-        <a href="#" class="btn-contributor">
-          <span class="btn-shimmer"/>
-          Join as a Contributor
-          <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
-            <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </a>
-        <div class="cta-line"/>
       </div>
 
     </div>
@@ -496,63 +484,6 @@ onUnmounted(() => observer?.disconnect())
 }
 .voice-card:hover .voice-link { color: #c9a84c; gap: 10px; }
 
-/* ── CTA ────────────────────────────────────── */
-.voices-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 36px;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.7s ease 0.5s, transform 0.7s ease 0.5s;
-}
-.voices-cta.visible { opacity: 1; transform: translateY(0); }
-
-.cta-line {
-  flex: 1;
-  max-width: 200px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.25));
-}
-.cta-line:last-child {
-  background: linear-gradient(90deg, rgba(201,168,76,0.25), transparent);
-}
-
-.btn-contributor {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #c9a84c 0%, #e8cf8a 50%, #c9a84c 100%);
-  background-size: 200% auto;
-  color: #0b1c38;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 16px 40px;
-  text-decoration: none;
-  overflow: hidden;
-  font-family: 'DM Sans', sans-serif;
-  transition: background-position 0.5s ease, transform 0.2s, box-shadow 0.3s;
-  box-shadow: 0 4px 20px rgba(201,168,76,0.25);
-}
-.btn-shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%);
-  transform: translateX(-100%);
-}
-.btn-contributor:hover .btn-shimmer {
-  transform: translateX(100%);
-  transition: transform 0.5s ease;
-}
-.btn-contributor:hover {
-  background-position: right center;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(201,168,76,0.4);
-}
-
 /* ── Responsive ─────────────────────────────── */
 @media (max-width: 1024px) {
   .container { padding: 0 32px; }
@@ -566,5 +497,13 @@ onUnmounted(() => observer?.disconnect())
 }
 @media (max-width: 480px) {
   .voices-grid { grid-template-columns: 1fr; }
+}
+
+/* Photo avatar */
+.voice-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>

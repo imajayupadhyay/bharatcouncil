@@ -8,20 +8,20 @@
         <div class="sec-label" :class="{ visible: aboutVisible }">
           <span class="sec-label-line"/>
           <span class="sec-label-dot"/>
-          <span class="sec-label-text">The Internship Programme</span>
+          <span class="sec-label-text">{{ d.about_label }}</span>
         </div>
 
         <div class="intro-grid" :class="{ visible: aboutVisible }">
           <!-- Prose -->
           <div class="intro-prose">
             <h2 class="section-headline">
-              Learn Governance<br>
-              <em class="headline-em">From Inside It</em>
+              {{ d.about_headline_plain }}<br>
+              <em class="headline-em">{{ d.about_headline_gold }}</em>
             </h2>
             <div class="prose-body">
-              <p>BGC's internship programme is not a shadow programme. Interns here work alongside the Council's senior members — retired IAS, IPS, IFS and allied service officers — on live research, policy documents, and event outputs that are published and used.</p>
-              <p>The programme is deliberately small. We accept only 15–20 interns per cohort, three cohorts a year, so that each intern receives real mentorship and carries genuine responsibility. You will read primary sources, draft policy notes, prepare comparative governance briefs, and — where appropriate — attend roundtables and working group sessions.</p>
-              <p>BGC interns have gone on to the civil services, law schools, public policy programmes at leading universities, and careers in development finance. Many return as fellows. The BGC internship is an entry into a network that lasts a career.</p>
+              <p>{{ d.prose_p1 }}</p>
+              <p>{{ d.prose_p2 }}</p>
+              <p>{{ d.prose_p3 }}</p>
             </div>
           </div>
 
@@ -29,10 +29,10 @@
           <div class="info-card">
             <div class="info-card-header">
               <span class="info-card-icon">◈</span>
-              <h4 class="info-card-title">Programme at a Glance</h4>
+              <h4 class="info-card-title">{{ d.info_card_title }}</h4>
             </div>
             <div class="info-rows">
-              <div v-for="row in programmeDetails" :key="row.label" class="info-row">
+              <div v-for="row in d.programme_details" :key="row.label" class="info-row">
                 <span class="ir-label">{{ row.label }}</span>
                 <span class="ir-val">{{ row.val }}</span>
               </div>
@@ -49,18 +49,18 @@
         <div class="sec-label" :class="{ visible: tasksVisible }">
           <span class="sec-label-line"/>
           <span class="sec-label-dot"/>
-          <span class="sec-label-text">What You'll Do</span>
+          <span class="sec-label-text">{{ d.tasks_label }}</span>
         </div>
 
         <div class="tasks-header" :class="{ visible: tasksVisible }">
           <h2 class="section-headline">
-            Real Work,<br>
-            <em class="headline-em">Real Responsibility</em>
+            {{ d.tasks_headline_plain }}<br>
+            <em class="headline-em">{{ d.tasks_headline_gold }}</em>
           </h2>
         </div>
 
         <div class="tasks-grid" :class="{ visible: tasksVisible }">
-          <div v-for="(task, i) in tasks" :key="i" class="task-card" :style="`--delay: ${i * 0.07}s`">
+          <div v-for="(task, i) in d.tasks" :key="i" class="task-card" :style="`--delay: ${i * 0.07}s`">
             <div class="task-card-top">
               <span class="task-num">{{ String(i + 1).padStart(2, '0') }}</span>
               <span class="task-icon">{{ task.icon }}</span>
@@ -80,16 +80,16 @@
         <div class="sec-label" :class="{ visible: tracksVisible }">
           <span class="sec-label-line"/>
           <span class="sec-label-dot"/>
-          <span class="sec-label-text">Research Tracks</span>
+          <span class="sec-label-text">{{ d.tracks_label }}</span>
         </div>
 
         <div class="tracks-header" :class="{ visible: tracksVisible }">
-          <h2 class="section-headline">Choose Your <em class="headline-em">Track</em></h2>
-          <p class="section-sub">Interns are placed in one primary track based on their academic background and expressed interest. Cross-track work is encouraged.</p>
+          <h2 class="section-headline">{{ d.tracks_headline_plain }} <em class="headline-em">{{ d.tracks_headline_gold }}</em></h2>
+          <p class="section-sub">{{ d.tracks_sub }}</p>
         </div>
 
         <div class="tracks-grid" :class="{ visible: tracksVisible }">
-          <div v-for="(track, i) in tracks" :key="i" class="track-pill" :style="`--delay: ${i * 0.06}s`">
+          <div v-for="(track, i) in d.tracks" :key="i" class="track-pill" :style="`--delay: ${i * 0.06}s`">
             <span class="track-emoji">{{ track.emoji }}</span>
             <span class="track-name">{{ track.name }}</span>
             <div class="track-fill"/>
@@ -102,7 +102,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  programmeData: { type: Object, default: () => ({}) },
+})
 
 const aboutEl      = ref(null)
 const tasksEl      = ref(null)
@@ -111,54 +115,51 @@ const aboutVisible  = ref(false)
 const tasksVisible  = ref(false)
 const tracksVisible = ref(false)
 
-const programmeDetails = [
-  { label: 'Duration',         val: '8–12 weeks (negotiable for working students)' },
-  { label: 'Mode',             val: 'In-office (New Delhi) · Hybrid considered' },
-  { label: 'Cohort Size',      val: '15–20 per cohort' },
-  { label: 'Cohorts per Year', val: 'Three (Jan, May, Sep)' },
-  { label: 'Stipend',          val: '₹8,000–₹12,000 / month based on profile' },
-  { label: 'Eligibility',      val: 'UG 2nd year and above · PG · Doctoral' },
-  { label: 'Certificate',      val: 'Issued on completion · Signed by Chairman' },
-  { label: 'Publication',      val: 'Strong interns invited to co-author work' },
-]
-
-const tasks = [
-  {
-    icon: '📄', title: 'Policy Research & Briefs',
-    body: 'Research, draft and refine policy briefs and working papers on assigned governance themes. Work with primary government documents, judicial records, legislative debates, and secondary literature.',
-  },
-  {
-    icon: '🔍', title: 'Comparative Analysis',
-    body: 'Study how other states or countries have addressed similar governance problems. Prepare structured comparison notes that go into BGC\'s institutional knowledge base and published outputs.',
-  },
-  {
-    icon: '📊', title: 'Data & Evidence Work',
-    body: 'Source, clean, and interpret data from government databases, CAG reports, parliamentary standing committee reports, and NITI Aayog materials. Translate numbers into governance narratives.',
-  },
-  {
-    icon: '🎤', title: 'Event & Dialogue Support',
-    body: 'Assist in the preparation of BGC roundtables, policy dialogues, and public lectures — including pre-event briefing materials, rapporteuring, and post-event summaries.',
-  },
-  {
-    icon: '✍️', title: 'Drafting & Editorial',
-    body: 'Contribute to op-eds, commentary pieces, and BGC\'s public-facing newsletter. Interns with strong writing skills are actively encouraged to develop their voice under editorial mentorship.',
-  },
-  {
-    icon: '🌐', title: 'Programme Research Support',
-    body: 'Support long-running BGC research initiatives — including the Annual Governance Review, the State Capacity Monitor, and the Climate Federalism Programme — by contributing to data gathering and synthesis.',
-  },
-]
-
-const tracks = [
-  { emoji: '🏛️', name: 'State Capacity & Administrative Reform' },
-  { emoji: '⚖️', name: 'Constitutional Law & Judicial Governance' },
-  { emoji: '💰', name: 'Public Finance & Fiscal Federalism' },
-  { emoji: '🌿', name: 'Climate & Environmental Governance' },
-  { emoji: '🤝', name: 'Civil Services Ethics & Reform' },
-  { emoji: '🌏', name: 'International Affairs & South Asia' },
-  { emoji: '🏘️', name: 'Rural Development & Cooperative Law' },
-  { emoji: '💻', name: 'Technology Policy & Digital Governance' },
-]
+/* ── Merged data with defaults ── */
+const d = computed(() => ({
+  about_label:          props.programmeData?.about_label          ?? 'The Internship Programme',
+  about_headline_plain: props.programmeData?.about_headline_plain ?? 'Learn Governance',
+  about_headline_gold:  props.programmeData?.about_headline_gold  ?? 'From Inside It',
+  prose_p1:             props.programmeData?.prose_p1             ?? 'BGC\'s internship programme is not a shadow programme. Interns here work alongside the Council\'s senior members — retired IAS, IPS, IFS and allied service officers — on live research, policy documents, and event outputs that are published and used.',
+  prose_p2:             props.programmeData?.prose_p2             ?? 'The programme is deliberately small. We accept only 15–20 interns per cohort, three cohorts a year, so that each intern receives real mentorship and carries genuine responsibility. You will read primary sources, draft policy notes, prepare comparative governance briefs, and — where appropriate — attend roundtables and working group sessions.',
+  prose_p3:             props.programmeData?.prose_p3             ?? 'BGC interns have gone on to the civil services, law schools, public policy programmes at leading universities, and careers in development finance. Many return as fellows. The BGC internship is an entry into a network that lasts a career.',
+  info_card_title:      props.programmeData?.info_card_title      ?? 'Programme at a Glance',
+  programme_details:    props.programmeData?.programme_details    ?? [
+    { label: 'Duration',         val: '8–12 weeks (negotiable for working students)' },
+    { label: 'Mode',             val: 'In-office (New Delhi) · Hybrid considered' },
+    { label: 'Cohort Size',      val: '15–20 per cohort' },
+    { label: 'Cohorts per Year', val: 'Three (Jan, May, Sep)' },
+    { label: 'Stipend',          val: '₹8,000–₹12,000 / month based on profile' },
+    { label: 'Eligibility',      val: 'UG 2nd year and above · PG · Doctoral' },
+    { label: 'Certificate',      val: 'Issued on completion · Signed by Chairman' },
+    { label: 'Publication',      val: 'Strong interns invited to co-author work' },
+  ],
+  tasks_label:          props.programmeData?.tasks_label          ?? 'What You\'ll Do',
+  tasks_headline_plain: props.programmeData?.tasks_headline_plain ?? 'Real Work,',
+  tasks_headline_gold:  props.programmeData?.tasks_headline_gold  ?? 'Real Responsibility',
+  tasks:                props.programmeData?.tasks                ?? [
+    { icon: '📄', title: 'Policy Research & Briefs',   body: 'Research, draft and refine policy briefs and working papers on assigned governance themes. Work with primary government documents, judicial records, legislative debates, and secondary literature.' },
+    { icon: '🔍', title: 'Comparative Analysis',       body: 'Study how other states or countries have addressed similar governance problems. Prepare structured comparison notes that go into BGC\'s institutional knowledge base and published outputs.' },
+    { icon: '📊', title: 'Data & Evidence Work',       body: 'Source, clean, and interpret data from government databases, CAG reports, parliamentary standing committee reports, and NITI Aayog materials. Translate numbers into governance narratives.' },
+    { icon: '🎤', title: 'Event & Dialogue Support',   body: 'Assist in the preparation of BGC roundtables, policy dialogues, and public lectures — including pre-event briefing materials, rapporteuring, and post-event summaries.' },
+    { icon: '✍️', title: 'Drafting & Editorial',       body: 'Contribute to op-eds, commentary pieces, and BGC\'s public-facing newsletter. Interns with strong writing skills are actively encouraged to develop their voice under editorial mentorship.' },
+    { icon: '🌐', title: 'Programme Research Support', body: 'Support long-running BGC research initiatives — including the Annual Governance Review, the State Capacity Monitor, and the Climate Federalism Programme — by contributing to data gathering and synthesis.' },
+  ],
+  tracks_label:          props.programmeData?.tracks_label          ?? 'Research Tracks',
+  tracks_headline_plain: props.programmeData?.tracks_headline_plain ?? 'Choose Your',
+  tracks_headline_gold:  props.programmeData?.tracks_headline_gold  ?? 'Track',
+  tracks_sub:            props.programmeData?.tracks_sub            ?? 'Interns are placed in one primary track based on their academic background and expressed interest. Cross-track work is encouraged.',
+  tracks:                props.programmeData?.tracks                ?? [
+    { emoji: '🏛️', name: 'State Capacity & Administrative Reform' },
+    { emoji: '⚖️', name: 'Constitutional Law & Judicial Governance' },
+    { emoji: '💰', name: 'Public Finance & Fiscal Federalism' },
+    { emoji: '🌿', name: 'Climate & Environmental Governance' },
+    { emoji: '🤝', name: 'Civil Services Ethics & Reform' },
+    { emoji: '🌏', name: 'International Affairs & South Asia' },
+    { emoji: '🏘️', name: 'Rural Development & Cooperative Law' },
+    { emoji: '💻', name: 'Technology Policy & Digital Governance' },
+  ],
+}))
 
 let observers = []
 

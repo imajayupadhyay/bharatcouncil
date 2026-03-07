@@ -1,13 +1,14 @@
 <template>
   <Head>
-    <title>Bharat Governance Council | Strengthening India's Governance</title>
-    <meta name="description" content="Bharat Governance Council is India's premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform. Explore insights, events, and opportunities to shape India's future." />
-    <meta property="og:title" content="Bharat Governance Council | Strengthening India's Governance" />
-    <meta property="og:description" content="Bharat Governance Council is India's premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform." />
+    <title>{{ seo.meta_title || 'Bharat Governance Council | Strengthening India\'s Governance' }}</title>
+    <meta name="description" :content="seo.meta_description || 'Bharat Governance Council is India\'s premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform.'" />
+    <meta v-if="seo.meta_keywords" name="keywords" :content="seo.meta_keywords" />
+    <meta property="og:title" :content="seo.meta_title || 'Bharat Governance Council | Strengthening India\'s Governance'" />
+    <meta property="og:description" :content="seo.meta_description || 'Bharat Governance Council is India\'s premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform.'" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Bharat Governance Council | Strengthening India's Governance" />
-    <meta name="twitter:description" content="India's premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform." />
+    <meta name="twitter:title" :content="seo.meta_title || 'Bharat Governance Council | Strengthening India\'s Governance'" />
+    <meta name="twitter:description" :content="seo.meta_description || 'India\'s premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform.'" />
   </Head>
   <div class="page-root">
     <AppHeader />
@@ -26,6 +27,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -36,6 +38,8 @@ const props = defineProps({
   publicationPosts:       Array,
   publicationCategories:  Array,
 })
+
+const seo = computed(() => props.sections?.seo ?? {})
 
 import AppHeader from '@/Components/AppHeader.vue'
 import HeroSection from './Components/HeroSection.vue'

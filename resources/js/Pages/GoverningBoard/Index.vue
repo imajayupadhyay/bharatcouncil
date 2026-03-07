@@ -1,13 +1,14 @@
 <template>
   <Head>
-    <title>Governing Board | Bharat Governance Council</title>
-    <meta name="description" content="Meet the Governing Board of the Bharat Governance Council, including our Chairman, Executive Officers, and distinguished Board Members leading India's governance reform agenda." />
-    <meta property="og:title" content="Governing Board | Bharat Governance Council" />
-    <meta property="og:description" content="Chairman, Executive Officers, and distinguished Board Members leading India's governance reform agenda at the Bharat Governance Council." />
+    <title>{{ seo.meta_title || 'Governing Board | Bharat Governance Council' }}</title>
+    <meta name="description" :content="seo.meta_description || 'Meet the Governing Board of the Bharat Governance Council, including our Chairman, Executive Officers, and distinguished Board Members leading India\'s governance reform agenda.'" />
+    <meta v-if="seo.meta_keywords" name="keywords" :content="seo.meta_keywords" />
+    <meta property="og:title" :content="seo.meta_title || 'Governing Board | Bharat Governance Council'" />
+    <meta property="og:description" :content="seo.meta_description || 'Chairman, Executive Officers, and distinguished Board Members leading India\'s governance reform agenda at the Bharat Governance Council.'" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Governing Board | Bharat Governance Council" />
-    <meta name="twitter:description" content="Meet the Chairman, Executive Officers, and Board Members leading India's governance reform at BGC." />
+    <meta name="twitter:title" :content="seo.meta_title || 'Governing Board | Bharat Governance Council'" />
+    <meta name="twitter:description" :content="seo.meta_description || 'Meet the Chairman, Executive Officers, and Board Members leading India\'s governance reform at BGC.'" />
   </Head>
   <div class="page-root">
     <AppHeader />
@@ -23,6 +24,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import AppHeader from '@/Components/AppHeader.vue'
 import AppFooter from '@/Components/AppFooter.vue'
@@ -32,9 +34,11 @@ import ExecutiveOfficersSection from './Components/ExecutiveOfficersSection.vue'
 import BoardMembersSection from './Components/BoardMembersSection.vue'
 import JoinCTASection from './Components/JoinCTASection.vue'
 
-defineProps({
+const props = defineProps({
   sections: Object,
 })
+
+const seo = computed(() => props.sections?.seo ?? {})
 </script>
 
 <style>

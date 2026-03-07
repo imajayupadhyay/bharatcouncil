@@ -31,21 +31,24 @@
     <div class="footer-inner">
 
       <!-- Top grid -->
-      <div class="footer-top">
+      <div class="footer-top" :style="{ gridTemplateColumns: gridTemplate }">
 
         <!-- Brand col -->
         <div class="footer-brand">
-          <!-- Logo emblem -->
           <div class="brand-logo">
-            <img :src="'/BGC.png'" alt="BGC Logo" class="brand-logo-img" />
+            <img :src="logoUrl" alt="BGC Logo" class="brand-logo-img" />
           </div>
 
-          <p class="brand-desc">A community of citizens, scholars, and practitioners committed to evidence-based governance in Bharat.</p>
+          <p class="brand-desc">{{ brandDesc }}</p>
 
           <!-- Social icons -->
           <div class="brand-socials">
-            <a v-for="s in socials" :key="s.label" href="#" class="social-link" :title="s.label">
-              <span v-html="s.icon"/>
+            <a
+              v-for="s in socials" :key="s.label"
+              :href="s.url || '#'" class="social-link" :title="s.label"
+              target="_blank" rel="noopener"
+            >
+              <span v-html="platformIcons[s.platform] || platformIcons.twitter"/>
             </a>
           </div>
         </div>
@@ -54,10 +57,10 @@
         <div v-for="col in footerCols" :key="col.heading" class="footer-col">
           <h5>{{ col.heading }}</h5>
           <ul>
-            <li v-for="link in col.links" :key="link">
-              <a href="#">
+            <li v-for="link in col.links" :key="link.label">
+              <a :href="link.url || '#'">
                 <span class="link-arrow-icon">›</span>
-                {{ link }}
+                {{ link.label }}
               </a>
             </li>
           </ul>
@@ -65,8 +68,8 @@
 
         <!-- Newsletter mini -->
         <div class="footer-col footer-newsletter">
-          <h5>Stay Updated</h5>
-          <p>Get the weekly policy digest in your inbox.</p>
+          <h5>{{ newsletterHeading }}</h5>
+          <p>{{ newsletterSub }}</p>
           <form class="mini-form" @submit.prevent="miniSubmit">
             <input
               v-model="miniEmail"
@@ -97,19 +100,22 @@
       <!-- Bottom bar -->
       <div class="footer-bottom">
         <div class="footer-copy">
-          © {{ year }} Bharat Governance Council
+          © {{ year }} {{ copyrightName }}
           <span class="copy-dot">·</span>
-          <a href="#" class="copy-link">bharatgovernancecouncil.org</a>
+          <a :href="websiteUrl" class="copy-link">{{ websiteLabel }}</a>
         </div>
         <div class="footer-legal">
-          <a href="#">Privacy Policy</a>
-          <span class="copy-dot">·</span>
-          <a href="#">Terms of Use</a>
-          <span class="copy-dot">·</span>
-          <a href="#">Contact</a>
+          <template v-for="(link, i) in legalLinks" :key="link.label">
+            <a :href="link.url || '#'">{{ link.label }}</a>
+            <span v-if="i < legalLinks.length - 1" class="copy-dot">·</span>
+          </template>
         </div>
         <div class="footer-socials">
-          <a v-for="s in socials" :key="s.label" href="#" class="footer-social-text">{{ s.label }}</a>
+          <a
+            v-for="s in socials" :key="s.label"
+            :href="s.url || '#'" class="footer-social-text"
+            target="_blank" rel="noopener"
+          >{{ s.label }}</a>
         </div>
       </div>
 
@@ -119,8 +125,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 
-const year      = computed(() => new Date().getFullYear())
+const page = usePage()
+const year = computed(() => new Date().getFullYear())
+
 const miniEmail = ref('')
 const miniSent  = ref(false)
 const miniError = ref(false)
@@ -140,27 +149,63 @@ async function miniSubmit() {
   }
 }
 
-const footerCols = [
-  {
-    heading: 'Research',
-    links: ['Publications', 'Policy Briefs', 'Explainers', 'Data Library'],
-  },
-  {
-    heading: 'Community',
-    links: ['Discussions', 'Events', 'Council Members', 'Become a Fellow'],
-  },
-  {
-    heading: 'Organisation',
-    links: ['About BGC', 'Our Team', 'Press Kit', 'Contact'],
-  },
-]
+/* ── Platform icons map ─────────────────────────────── */
+const platformIcons = {
+  twitter:   '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M16.99 2h-2.77l-3.3 4.17L7.73 2H2l5.93 8.06L2.44 18h2.77l3.55-4.49L12.38 18H18l-6.13-8.27L16.99 2z"/></svg>',
+  linkedin:  '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M5 3a2 2 0 110 4 2 2 0 010-4zm-2 6h4v8H3V9zm6 0h3.6v1.1h.05c.5-.95 1.73-1.95 3.55-1.95C18.96 8.15 19 10.42 19 13.04V17h-3.8v-3.3c0-1.44-.5-2.42-1.75-2.42-1.29 0-1.75.89-1.75 2.42V17H9V9z"/></svg>',
+  youtube:   '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M17.5 6s-.2-1.4-.83-1.97c-.8-.83-1.7-.84-2.1-.88C12.24 3 10 3 10 3s-2.24 0-4.57.15c-.4.04-1.3.05-2.1.88C2.7 4.6 2.5 6 2.5 6S2.3 7.6 2.3 9.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.83 1.97c.8.83 1.84.8 2.3.89C7 16.9 10 17 10 17s2.24 0 4.57-.16c.4-.04 1.3-.06 2.1-.89.63-.57.83-1.97.83-1.97s.2-1.6.2-3.2V9.2C17.7 7.6 17.5 6 17.5 6zM8.4 12.3V7.7l5 2.3-5 2.3z"/></svg>',
+  telegram:  '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M17.84 3.15L2.47 8.86c-1.02.4-1.01.96-.19 1.21l3.84 1.2 8.88-5.6c.42-.26.8-.12.48.17l-7.17 6.47-.28 4.1c.4 0 .58-.18.8-.4l1.93-1.87 4 2.94c.74.41 1.27.2 1.45-.68l2.62-12.33c.26-1.04-.4-1.51-1.04-1.13z"/></svg>',
+  instagram: '<svg viewBox="0 0 20 20" fill="none" width="14" height="14"><rect x="2" y="2" width="16" height="16" rx="5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"/><circle cx="14.5" cy="5.5" r="1" fill="currentColor"/></svg>',
+  facebook:  '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M18 10a8 8 0 10-9.25 7.9v-5.59H6.72V10h2.03V8.24c0-2 1.19-3.1 3.01-3.1.87 0 1.79.16 1.79.16v1.96h-1c-1 0-1.3.62-1.3 1.25V10h2.22l-.36 2.31H11.25V17.9A8 8 0 0018 10z"/></svg>',
+}
 
-const socials = [
-  { label: 'Twitter / X', icon: '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M16.99 2h-2.77l-3.3 4.17L7.73 2H2l5.93 8.06L2.44 18h2.77l3.55-4.49L12.38 18H18l-6.13-8.27L16.99 2z"/></svg>' },
-  { label: 'LinkedIn',    icon: '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M5 3a2 2 0 110 4 2 2 0 010-4zm-2 6h4v8H3V9zm6 0h3.6v1.1h.05c.5-.95 1.73-1.95 3.55-1.95C18.96 8.15 19 10.42 19 13.04V17h-3.8v-3.3c0-1.44-.5-2.42-1.75-2.42-1.29 0-1.75.89-1.75 2.42V17H9V9z"/></svg>' },
-  { label: 'YouTube',     icon: '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M17.5 6s-.2-1.4-.83-1.97c-.8-.83-1.7-.84-2.1-.88C12.24 3 10 3 10 3s-2.24 0-4.57.15c-.4.04-1.3.05-2.1.88C2.7 4.6 2.5 6 2.5 6S2.3 7.6 2.3 9.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.83 1.97c.8.83 1.84.8 2.3.89C7 16.9 10 17 10 17s2.24 0 4.57-.16c.4-.04 1.3-.06 2.1-.89.63-.57.83-1.97.83-1.97s.2-1.6.2-3.2V9.2C17.7 7.6 17.5 6 17.5 6zM8.4 12.3V7.7l5 2.3-5 2.3z"/></svg>' },
-  { label: 'Telegram',    icon: '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M17.84 3.15L2.47 8.86c-1.02.4-1.01.96-.19 1.21l3.84 1.2 8.88-5.6c.42-.26.8-.12.48.17l-7.17 6.47-.28 4.1c.4 0 .58-.18.8-.4l1.93-1.87 4 2.94c.74.41 1.27.2 1.45-.68l2.62-12.33c.26-1.04-.4-1.51-1.04-1.13z"/></svg>' },
-]
+/* ── Shared footer data with defaults ───────────────── */
+const footerData = computed(() => page.props.footer ?? {})
+const headerData = computed(() => page.props.header ?? {})
+const logoUrl    = computed(() => headerData.value.logo?.url || '/BGC.png')
+
+const brandDesc = computed(() =>
+  footerData.value.brand?.description ||
+  'A community of citizens, scholars, and practitioners committed to evidence-based governance in Bharat.'
+)
+
+const socials = computed(() =>
+  footerData.value.brand?.socials?.length
+    ? footerData.value.brand.socials
+    : [
+        { platform: 'twitter',  label: 'Twitter / X', url: '#' },
+        { platform: 'linkedin', label: 'LinkedIn',     url: '#' },
+        { platform: 'youtube',  label: 'YouTube',      url: '#' },
+        { platform: 'telegram', label: 'Telegram',     url: '#' },
+      ]
+)
+
+const footerCols = computed(() =>
+  footerData.value.columns?.cols?.length
+    ? footerData.value.columns.cols
+    : [
+        { heading: 'Research',     links: [{ label: 'Publications', url: '#' }, { label: 'Policy Briefs', url: '#' }, { label: 'Explainers', url: '#' }, { label: 'Data Library', url: '#' }] },
+        { heading: 'Community',    links: [{ label: 'Discussions', url: '#' },  { label: 'Events', url: '#' },        { label: 'Council Members', url: '#' }, { label: 'Become a Fellow', url: '#' }] },
+        { heading: 'Organisation', links: [{ label: 'About BGC', url: '#' },    { label: 'Our Team', url: '#' },      { label: 'Press Kit', url: '#' }, { label: 'Contact', url: '#' }] },
+      ]
+)
+
+const copyrightName = computed(() => footerData.value.legal?.copyright_name  || 'Bharat Governance Council')
+const websiteLabel  = computed(() => footerData.value.legal?.website_label   || 'bharatgovernancecouncil.org')
+const websiteUrl    = computed(() => footerData.value.legal?.website_url     || '#')
+const legalLinks    = computed(() =>
+  footerData.value.legal?.links?.length
+    ? footerData.value.legal.links
+    : [{ label: 'Privacy Policy', url: '#' }, { label: 'Terms of Use', url: '#' }, { label: 'Contact', url: '#' }]
+)
+
+const newsletterHeading = computed(() => footerData.value.newsletter?.heading || 'Stay Updated')
+const newsletterSub     = computed(() => footerData.value.newsletter?.sub     || 'Get the weekly policy digest in your inbox.')
+
+const gridTemplate = computed(() => {
+  const n = footerCols.value.length
+  return `1.8fr ${Array(n).fill('1fr').join(' ')} 1.2fr`
+})
 </script>
 
 <style scoped>
@@ -191,7 +236,6 @@ footer {
 /* ── Top grid ────────────────────────────── */
 .footer-top {
   display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr 1fr 1.2fr;
   gap: 48px;
   margin-bottom: 52px;
 }
@@ -212,7 +256,6 @@ footer {
   object-fit: contain;
   flex-shrink: 0;
 }
-
 
 .brand-desc {
   font-size: 13px;

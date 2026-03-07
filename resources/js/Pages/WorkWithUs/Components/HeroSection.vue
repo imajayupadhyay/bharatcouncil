@@ -113,30 +113,26 @@
       <div class="hero-eyebrow" :class="{ visible: revealed }">
         <span class="eyebrow-line"/>
         <span class="eyebrow-dot"/>
-        <span class="eyebrow-text">Opportunities at BGC</span>
-        <span class="eyebrow-tag">Join Us</span>
+        <span class="eyebrow-text">{{ hero.eyebrow_text }}</span>
+        <span class="eyebrow-tag">{{ hero.eyebrow_tag }}</span>
       </div>
 
       <!-- Headline -->
       <h1 class="hero-headline" :class="{ visible: revealed }">
-        <span class="hl-plain">Build Your Career at the</span><br>
-        <em class="hl-gold">Heart of Indian Governance</em>
+        <span class="hl-plain">{{ hero.headline_plain }}</span><br>
+        <em class="hl-gold">{{ hero.headline_gold }}</em>
       </h1>
 
       <!-- Sub -->
-      <p class="hero-sub" :class="{ visible: revealed }">
-        BGC is a collegial, intellectually rigorous institution where capable people are trusted with
-        real work that matters. Every person here has direct access to India's most experienced
-        governance practitioners — and is expected to contribute, not observe.
-      </p>
+      <p class="hero-sub" :class="{ visible: revealed }">{{ hero.subtext }}</p>
 
       <!-- Award Badge -->
       <div class="award-badge" :class="{ visible: revealed }">
         <div class="award-shimmer"/>
         <span class="award-icon">🏆</span>
         <div class="award-content">
-          <strong class="award-title">Best Place to Work — Not for Profit Category</strong>
-          <span class="award-sub">Economic Times Best Workplaces · 2024 · Collegial culture, intellectual freedom &amp; staff wellbeing</span>
+          <strong class="award-title">{{ hero.award_title }}</strong>
+          <span class="award-sub">{{ hero.award_sub }}</span>
         </div>
       </div>
 
@@ -151,7 +147,7 @@
           @click="$emit('set-tab', 'intern')"
         >
           <span class="tab-num">01</span>
-          <span class="tab-label">Work as an Intern</span>
+          <span class="tab-label">{{ hero.tab1_label }}</span>
           <svg class="tab-arrow" viewBox="0 0 20 20" fill="none" width="14" height="14">
             <path d="M10 4v12M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -163,7 +159,7 @@
           @click="$emit('set-tab', 'member')"
         >
           <span class="tab-num">02</span>
-          <span class="tab-label">Work as a Member</span>
+          <span class="tab-label">{{ hero.tab2_label }}</span>
           <svg class="tab-arrow" viewBox="0 0 20 20" fill="none" width="14" height="14">
             <path d="M10 4v12M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -178,12 +174,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
-defineProps({
-  activeTab: { type: String, default: 'intern' }
+const props = defineProps({
+  activeTab: { type: String, default: 'intern' },
+  heroData:  { type: Object, default: () => ({}) },
 })
 defineEmits(['set-tab'])
+
+/* ── Merged data with defaults ── */
+const hero = computed(() => ({
+  eyebrow_text:   props.heroData?.eyebrow_text   ?? 'Opportunities at BGC',
+  eyebrow_tag:    props.heroData?.eyebrow_tag    ?? 'Join Us',
+  headline_plain: props.heroData?.headline_plain ?? 'Build Your Career at the',
+  headline_gold:  props.heroData?.headline_gold  ?? 'Heart of Indian Governance',
+  subtext:        props.heroData?.subtext        ?? 'BGC is a collegial, intellectually rigorous institution where capable people are trusted with real work that matters. Every person here has direct access to India\'s most experienced governance practitioners — and is expected to contribute, not observe.',
+  award_title:    props.heroData?.award_title    ?? 'Best Place to Work — Not for Profit Category',
+  award_sub:      props.heroData?.award_sub      ?? 'Economic Times Best Workplaces · 2024 · Collegial culture, intellectual freedom & staff wellbeing',
+  tab1_label:     props.heroData?.tab1_label     ?? 'Work as an Intern',
+  tab2_label:     props.heroData?.tab2_label     ?? 'Work as a Member',
+}))
 
 const revealed = ref(false)
 

@@ -6,21 +6,21 @@
       <div class="policies-header" :class="{ visible: revealed }">
         <div class="sec-label">
           <span class="sec-label-line"/><span class="sec-label-dot"/>
-          <span class="sec-label-text">Work Policies</span>
+          <span class="sec-label-text">{{ d.label }}</span>
         </div>
         <div class="header-row">
           <div class="header-left">
             <h2 class="section-headline">
-              How We <em class="headline-em">Work</em>
+              {{ d.headline_plain }} <em class="headline-em">{{ d.headline_gold }}</em>
             </h2>
-            <p class="section-sub">BGC's work policies are designed to attract and retain people who value substance over form.</p>
+            <p class="section-sub">{{ d.sub }}</p>
           </div>
         </div>
       </div>
 
       <!-- Policies Grid -->
       <div class="policies-grid" :class="{ visible: revealed }">
-        <div v-for="(policy, i) in policies" :key="i" class="policy-card" :style="`--delay: ${i * 0.07}s`">
+        <div v-for="(policy, i) in d.items" :key="i" class="policy-card" :style="`--delay: ${i * 0.07}s`">
           <div class="policy-card-top">
             <span class="policy-icon">{{ policy.icon }}</span>
             <span class="policy-num">{{ String(i + 1).padStart(2, '0') }}</span>
@@ -36,43 +36,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  policiesData: { type: Object, default: () => ({}) },
+})
 
 const sectionEl = ref(null)
 const revealed  = ref(false)
 
-const policies = [
-  {
-    icon: '📋',
-    title: 'Equal Opportunity Policy',
-    body: 'BGC is an equal opportunity institution. Selection and evaluation are based solely on merit, demonstrated capability, and fit. No discrimination on the basis of gender, caste, religion, region, language, disability, or sexual orientation is tolerated.',
-  },
-  {
-    icon: '🔒',
-    title: 'Confidentiality & Data Policy',
-    body: 'All staff and fellows sign confidentiality agreements covering policy deliberations and internal working documents. Personal data collected during applications is processed under BGC\'s Privacy Policy and is never shared with third parties.',
-  },
-  {
-    icon: '💸',
-    title: 'Transparent Remuneration',
-    body: 'BGC publishes its remuneration bands for all categories of staff and fellows annually. We pay fairly relative to the not-for-profit sector and do not discriminate in pay on grounds of gender or background.',
-  },
-  {
-    icon: '🛡️',
-    title: 'POSH & Anti-Harassment Policy',
-    body: 'BGC has a formal Prevention of Sexual Harassment (POSH) policy, a constituted Internal Complaints Committee, and a documented grievance redressal process. All complaints are investigated promptly and confidentially.',
-  },
-  {
-    icon: '✍️',
-    title: 'Intellectual Property & Publication',
-    body: 'Research produced at BGC is attributed to the individual author(s). BGC retains institutional rights for republication and use. Fellows and researchers retain the right to publish independently — subject to standard notification to BGC\'s communications team.',
-  },
-  {
-    icon: '🌿',
-    title: 'Leave & Wellbeing',
-    body: 'Full-time staff receive 24 days earned leave, 12 casual leave days, and 12 public holidays annually. BGC provides medical insurance for all full-time employees and fellows. Maternity and paternity leave policies exceed statutory requirements.',
-  },
-]
+/* ── Merged data with defaults ── */
+const d = computed(() => ({
+  label:          props.policiesData?.label          ?? 'Work Policies',
+  headline_plain: props.policiesData?.headline_plain ?? 'How We',
+  headline_gold:  props.policiesData?.headline_gold  ?? 'Work',
+  sub:            props.policiesData?.sub            ?? 'BGC\'s work policies are designed to attract and retain people who value substance over form.',
+  items:          props.policiesData?.items          ?? [
+    { icon: '📋', title: 'Equal Opportunity Policy',            body: 'BGC is an equal opportunity institution. Selection and evaluation are based solely on merit, demonstrated capability, and fit. No discrimination on the basis of gender, caste, religion, region, language, disability, or sexual orientation is tolerated.' },
+    { icon: '🔒', title: 'Confidentiality & Data Policy',       body: 'All staff and fellows sign confidentiality agreements covering policy deliberations and internal working documents. Personal data collected during applications is processed under BGC\'s Privacy Policy and is never shared with third parties.' },
+    { icon: '💸', title: 'Transparent Remuneration',            body: 'BGC publishes its remuneration bands for all categories of staff and fellows annually. We pay fairly relative to the not-for-profit sector and do not discriminate in pay on grounds of gender or background.' },
+    { icon: '🛡️', title: 'POSH & Anti-Harassment Policy',      body: 'BGC has a formal Prevention of Sexual Harassment (POSH) policy, a constituted Internal Complaints Committee, and a documented grievance redressal process. All complaints are investigated promptly and confidentially.' },
+    { icon: '✍️', title: 'Intellectual Property & Publication', body: 'Research produced at BGC is attributed to the individual author(s). BGC retains institutional rights for republication and use. Fellows and researchers retain the right to publish independently — subject to standard notification to BGC\'s communications team.' },
+    { icon: '🌿', title: 'Leave & Wellbeing',                   body: 'Full-time staff receive 24 days earned leave, 12 casual leave days, and 12 public holidays annually. BGC provides medical insurance for all full-time employees and fellows. Maternity and paternity leave policies exceed statutory requirements.' },
+  ],
+}))
 
 let observer = null
 onMounted(() => {

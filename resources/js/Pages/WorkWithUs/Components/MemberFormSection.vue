@@ -6,12 +6,12 @@
       <div class="form-header" :class="{ visible: revealed }">
         <div class="sec-label">
           <span class="sec-label-line"/><span class="sec-label-dot"/>
-          <span class="sec-label-text">Member Application</span>
+          <span class="sec-label-text">{{ d.form_label }}</span>
         </div>
         <h2 class="form-headline">
-          Tell Us About <em class="form-headline-em">Yourself</em>
+          {{ d.headline_plain }} <em class="form-headline-em">{{ d.headline_gold }}</em>
         </h2>
-        <p class="form-sub">A three-step application. Be thorough — our Executive Committee reads every application in full. There are no shortcuts, and there is no right or wrong answer to the reflective questions.</p>
+        <p class="form-sub">{{ d.form_sub }}</p>
       </div>
 
       <!-- Progress Steps -->
@@ -134,11 +134,11 @@
       <!-- STEP 2 — REFLECTIVE QUESTIONS -->
       <Transition name="step-fade" mode="out-in">
         <div v-if="currentStep === 2" key="step2" class="step-panel" :class="{ visible: revealed }">
-          <div class="step-title">Your Thinking</div>
-          <div class="step-sub">Four questions. There are no right answers — only honest or generic ones. Be specific. Draw on your actual experience. We read these carefully and weight them heavily.</div>
+          <div class="step-title">{{ d.step2_label }}</div>
+          <div class="step-sub">{{ d.step2_sub }}</div>
 
           <div class="q-cards">
-            <div v-for="(q, i) in questions" :key="i" class="q-card">
+            <div v-for="(q, i) in d.questions" :key="i" class="q-card">
               <div class="q-label">
                 <span class="q-num">{{ String(i + 1).padStart(2, '0') }}</span>
                 <span class="q-category">{{ q.category }}</span>
@@ -215,7 +215,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  memberFormData: { type: Object, default: () => ({}) },
+})
 
 const formEl  = ref(null)
 const revealed = ref(false)
@@ -223,8 +227,6 @@ const currentStep = ref(1)
 const submitting  = ref(false)
 const submitted   = ref(false)
 const errors      = reactive({})
-
-const steps = ['Profile', 'Your Thinking', 'Final Details']
 
 const form = reactive({
   fullName: '', email: '', phone: '', city: '',
@@ -235,28 +237,25 @@ const form = reactive({
   referees: '', additionalNotes: '',
 })
 
-const questions = [
-  {
-    category: 'Governance Challenge',
-    text: '"Describe one governance problem in India that you believe is misunderstood — where conventional wisdom or popular diagnosis is, in your view, wrong or incomplete. What is actually going on?"',
-    hint: 'Be specific. Name the problem, describe what is usually said about it, explain why you think that is inadequate, and offer your own framing. Aim for 300–400 words.',
-  },
-  {
-    category: 'Your Contribution',
-    text: '"What specific knowledge, experience, or perspective do you bring to BGC that is difficult to find elsewhere? Why are you the right person to work on the problem or theme you have described?"',
-    hint: 'Do not be modest, but also do not be vague. Tell us something concrete — a district you governed, a case you argued, a dataset you built. 200–300 words.',
-  },
-  {
-    category: 'On Reform',
-    text: '"BGC believes that institutional change in India requires patience. Describe a governance reform or institutional change that you think has worked — at any level, in any domain — and explain why it succeeded where others failed."',
-    hint: 'This can be a national policy, a state-level initiative, a local administrative innovation, or a quiet procedural reform you observed or participated in. 200–300 words.',
-  },
-  {
-    category: 'Working at BGC',
-    text: '"BGC is a small institution with senior practitioners and fewer resources than large think tanks. What do you expect from BGC? And what should BGC expect from you?"',
-    hint: 'Be candid. We are not looking for flattery or ambition — we are looking for fit and honesty. 150–250 words.',
-  },
-]
+/* ── Merged data with defaults ── */
+const d = computed(() => ({
+  form_label:     props.memberFormData?.form_label     ?? 'Member Application',
+  headline_plain: props.memberFormData?.headline_plain ?? 'Tell Us About',
+  headline_gold:  props.memberFormData?.headline_gold  ?? 'Yourself',
+  form_sub:       props.memberFormData?.form_sub       ?? 'A three-step application. Be thorough — our Executive Committee reads every application in full. There are no shortcuts, and there is no right or wrong answer to the reflective questions.',
+  step1_label:    props.memberFormData?.step1_label    ?? 'Profile',
+  step2_label:    props.memberFormData?.step2_label    ?? 'Your Thinking',
+  step3_label:    props.memberFormData?.step3_label    ?? 'Final Details',
+  step2_sub:      props.memberFormData?.step2_sub      ?? 'Four questions. There are no right answers — only honest or generic ones. Be specific. Draw on your actual experience. We read these carefully and weight them heavily.',
+  questions:      props.memberFormData?.questions      ?? [
+    { category: 'Governance Challenge', text: '"Describe one governance problem in India that you believe is misunderstood — where conventional wisdom or popular diagnosis is, in your view, wrong or incomplete. What is actually going on?"',                                                                                                                                                   hint: 'Be specific. Name the problem, describe what is usually said about it, explain why you think that is inadequate, and offer your own framing. Aim for 300–400 words.' },
+    { category: 'Your Contribution',    text: '"What specific knowledge, experience, or perspective do you bring to BGC that is difficult to find elsewhere? Why are you the right person to work on the problem or theme you have described?"',                                                                                                                                        hint: 'Do not be modest, but also do not be vague. Tell us something concrete — a district you governed, a case you argued, a dataset you built. 200–300 words.' },
+    { category: 'On Reform',            text: '"BGC believes that institutional change in India requires patience. Describe a governance reform or institutional change that you think has worked — at any level, in any domain — and explain why it succeeded where others failed."',                                                                                                  hint: 'This can be a national policy, a state-level initiative, a local administrative innovation, or a quiet procedural reform you observed or participated in. 200–300 words.' },
+    { category: 'Working at BGC',       text: '"BGC is a small institution with senior practitioners and fewer resources than large think tanks. What do you expect from BGC? And what should BGC expect from you?"',                                                                                                                                                                hint: 'Be candid. We are not looking for flattery or ambition — we are looking for fit and honesty. 150–250 words.' },
+  ],
+}))
+
+const steps = computed(() => [d.value.step1_label, d.value.step2_label, d.value.step3_label])
 
 function validate() {
   Object.keys(errors).forEach(k => delete errors[k])

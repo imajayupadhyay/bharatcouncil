@@ -8,16 +8,18 @@
         <span v-if="!sidebarCollapsed" class="sidebar-logo-label">Admin</span>
       </div>
       <nav class="sidebar-nav">
-        <div class="nav-group-label" v-if="!sidebarCollapsed">Overview</div>
-        <Link
-          v-for="item in navItems" :key="item.id"
-          :href="item.href" class="nav-item"
-          :class="{ active: item.id === 'governing-board' }"
-          :title="sidebarCollapsed ? item.label : ''"
-        >
-          <span class="nav-icon" v-html="item.icon"/>
-          <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
-        </Link>
+        <template v-for="group in navGroups" :key="group.label">
+          <div class="nav-group-label" v-if="!sidebarCollapsed">{{ group.label }}</div>
+          <Link
+            v-for="item in group.items" :key="item.id"
+            :href="item.href" class="nav-item"
+            :class="{ active: item.id === 'governing-board' }"
+            :title="sidebarCollapsed ? item.label : ''"
+          >
+            <span class="nav-icon" v-html="item.icon"/>
+            <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
+          </Link>
+        </template>
       </nav>
       <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
         <svg viewBox="0 0 16 16" fill="none" width="14" height="14" :class="{ flipped: sidebarCollapsed }">
@@ -68,6 +70,56 @@
             <h1 class="page-title">Governing Board Sections</h1>
             <p class="page-sub">Manage the content displayed on the Governing Board page. Edit each section below.</p>
           </div>
+        </div>
+
+        <!-- ══════════ SEO SETTINGS ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="seoOpen = !seoOpen">
+            <div class="section-panel-left">
+              <span class="section-num">SEO</span>
+              <div>
+                <h3 class="section-panel-title">SEO Settings</h3>
+                <p class="section-panel-desc">Meta title, description, and keywords for search engines</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: seoOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <Transition name="panel-slide">
+            <div v-if="seoOpen" class="section-panel-body">
+              <form @submit.prevent="saveSeo">
+                <p class="form-group-label">Search Engine Optimisation</p>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Meta Title</label>
+                    <input v-model="seo.meta_title" class="form-input" type="text" placeholder="Page title shown in browser tab and search results" maxlength="70" />
+                    <span class="form-hint">Recommended: 50–60 characters &nbsp;({{ seo.meta_title?.length ?? 0 }}/70)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Meta Description</label>
+                    <textarea v-model="seo.meta_description" class="form-textarea" rows="3" placeholder="Brief description of the page shown in search results" maxlength="160" />
+                    <span class="form-hint">Recommended: 150–160 characters &nbsp;({{ seo.meta_description?.length ?? 0 }}/160)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Keywords</label>
+                    <input v-model="seo.meta_keywords" class="form-input" type="text" placeholder="e.g. governance, policy, India, BGC (comma-separated)" />
+                    <span class="form-hint">Comma-separated keywords for search engine context.</span>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetSeo">Reset</button>
+                  <button type="submit" class="btn-save" :disabled="seoSaving">
+                    {{ seoSaving ? 'Saving…' : 'Save SEO Settings' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
         </div>
 
         <!-- ══════════ HERO SECTION ══════════ -->
@@ -166,14 +218,57 @@
                   </div>
                 </div>
 
-                <div class="form-group-label">Avatar Details</div>
+                <div class="form-group-label">Photo</div>
+                <!-- Chairman photo upload -->
+                <div class="ch-photo-row">
+                  <div class="ch-photo-preview">
+                    <img v-if="chairman.image" :src="chairman.image" class="ch-photo-img" alt="Chairman" />
+                    <div v-else class="ch-photo-placeholder">
+                      <span>{{ chairman.initials || 'KV' }}</span>
+                    </div>
+                  </div>
+                  <div class="ch-photo-right">
+                    <p class="ch-photo-label">Chairman Photo</p>
+                    <p class="ch-photo-hint">Fills the full card rectangle. Portrait orientation (e.g. 3:4) works best. PNG/JPG/WebP, max 4 MB.</p>
+                    <div class="ch-photo-btns">
+                      <label class="btn-upload-voice" :class="{ 'btn-uploading': chairmanUploading }">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          style="display:none"
+                          :disabled="chairmanUploading"
+                          @change="uploadChairmanImage"
+                        />
+                        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                          <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                        {{ chairmanUploading ? 'Uploading…' : (chairman.image ? 'Change Photo' : 'Upload Photo') }}
+                      </label>
+                      <button
+                        v-if="chairman.image"
+                        type="button"
+                        class="btn-remove-voice-img"
+                        :disabled="chairmanRemoving"
+                        @click="removeChairmanImage"
+                      >
+                        <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        {{ chairmanRemoving ? 'Removing…' : 'Remove Photo' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group-label" style="margin-top:20px">Badge Overlay (shown on photo)</div>
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Initials</label>
+                    <label>Initials (shown in badge)</label>
                     <input v-model="chairman.initials" type="text" class="form-input" placeholder="KV" />
                   </div>
                   <div class="form-group">
-                    <label>Avatar Service Line</label>
+                    <label>Service Line (shown in badge)</label>
                     <input v-model="chairman.avatar_service" type="text" class="form-input" placeholder="IAS · 1979 · UP Cadre" />
                   </div>
                 </div>
@@ -305,6 +400,48 @@
                     <textarea v-model="officer.bio" class="form-input form-textarea" rows="3"></textarea>
                   </div>
 
+                  <div class="form-group-label" style="margin-top:12px">Photo</div>
+                  <div class="ch-photo-row">
+                    <div class="ch-photo-preview" style="width:72px;height:90px">
+                      <img v-if="officer.image" :src="officer.image" class="ch-photo-img" alt="Officer" />
+                      <div v-else class="ch-photo-placeholder">
+                        <span>{{ officer.initials || '?' }}</span>
+                      </div>
+                    </div>
+                    <div class="ch-photo-right">
+                      <p class="ch-photo-label">Officer Photo</p>
+                      <p class="ch-photo-hint">Portrait orientation recommended (e.g. 3:4). PNG/JPG/WebP, max 4 MB.</p>
+                      <div class="ch-photo-btns">
+                        <label class="btn-upload-voice" :class="{ 'btn-uploading': officerUploading[index] }">
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            style="display:none"
+                            :disabled="officerUploading[index]"
+                            @change="uploadOfficerImage(index, $event)"
+                          />
+                          <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                            <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                          </svg>
+                          {{ officerUploading[index] ? 'Uploading…' : (officer.image ? 'Change Photo' : 'Upload Photo') }}
+                        </label>
+                        <button
+                          v-if="officer.image"
+                          type="button"
+                          class="btn-remove-voice-img"
+                          :disabled="officerRemoving[index]"
+                          @click="removeOfficerImage(index)"
+                        >
+                          <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                          {{ officerRemoving[index] ? 'Removing…' : 'Remove Photo' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="form-group">
                     <label>Tags</label>
                     <div v-for="(tag, tagIndex) in officer.tags" :key="tagIndex" class="form-row">
@@ -398,6 +535,48 @@
                   <div class="form-group">
                     <label>Bio (HTML allowed)</label>
                     <textarea v-model="member.bio" class="form-input form-textarea" rows="3"></textarea>
+                  </div>
+
+                  <div class="form-group-label" style="margin-top:12px">Photo</div>
+                  <div class="ch-photo-row">
+                    <div class="ch-photo-preview" style="width:60px;height:60px;border-radius:50%">
+                      <img v-if="member.image" :src="member.image" class="ch-photo-img" style="border-radius:50%" alt="Member" />
+                      <div v-else class="ch-photo-placeholder">
+                        <span>{{ member.initials || '?' }}</span>
+                      </div>
+                    </div>
+                    <div class="ch-photo-right">
+                      <p class="ch-photo-label">Member Photo</p>
+                      <p class="ch-photo-hint">Square or portrait image. PNG/JPG/WebP, max 4 MB.</p>
+                      <div class="ch-photo-btns">
+                        <label class="btn-upload-voice" :class="{ 'btn-uploading': memberUploading[index] }">
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            style="display:none"
+                            :disabled="memberUploading[index]"
+                            @change="uploadMemberImage(index, $event)"
+                          />
+                          <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                            <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                          </svg>
+                          {{ memberUploading[index] ? 'Uploading…' : (member.image ? 'Change Photo' : 'Upload Photo') }}
+                        </label>
+                        <button
+                          v-if="member.image"
+                          type="button"
+                          class="btn-remove-voice-img"
+                          :disabled="memberRemoving[index]"
+                          @click="removeMemberImage(index)"
+                        >
+                          <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                          {{ memberRemoving[index] ? 'Removing…' : 'Remove Photo' }}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <button type="button" class="btn-add" @click="addBoardMember">+ Add Board Member</button>
@@ -508,7 +687,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
-import { navItems } from '../navItems.js'
+import { navGroups } from '../navItems.js'
 
 const props = defineProps({
   admin: Object,
@@ -579,6 +758,8 @@ const savedChairman = props.sections?.chairman || {}
 const chairman = reactive({
   ...chairmanDefaults,
   ...savedChairman,
+  image:       savedChairman.image       || null,
+  stored_path: savedChairman.stored_path || null,
   bios: savedChairman.bios?.length ? savedChairman.bios.map(bio => bio) : chairmanDefaults.bios.map(bio => bio),
   responsibilities: savedChairman.responsibilities?.length
     ? savedChairman.responsibilities.map(item => item)
@@ -782,20 +963,127 @@ function resetHero() {
   })
 }
 
+const chairmanUploading = ref(false)
+const chairmanRemoving  = ref(false)
+const officerUploading  = reactive({})
+const officerRemoving   = reactive({})
+const memberUploading   = reactive({})
+const memberRemoving    = reactive({})
+
+function uploadChairmanImage(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  chairmanUploading.value = true
+  const formData = new FormData()
+  formData.append('image', file)
+  router.post('/admin/governing-board/chairman/upload-image', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      const updated = props.sections?.chairman
+      if (updated) {
+        chairman.image       = updated.image       || null
+        chairman.stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { chairmanUploading.value = false },
+  })
+}
+
+function removeChairmanImage() {
+  chairmanRemoving.value = true
+  router.post('/admin/governing-board/chairman/remove-image', {}, {
+    preserveScroll: true,
+    onSuccess: () => {
+      chairman.image       = null
+      chairman.stored_path = null
+    },
+    onFinish: () => { chairmanRemoving.value = false },
+  })
+}
+
+function uploadOfficerImage(index, e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  officerUploading[index] = true
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('index', index)
+  router.post('/admin/governing-board/officers/upload-image', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      const updated = props.sections?.executive_officers?.officers?.[index]
+      if (updated) {
+        executiveOfficers.officers[index].image       = updated.image       || null
+        executiveOfficers.officers[index].stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { officerUploading[index] = false },
+  })
+}
+
+function removeOfficerImage(index) {
+  officerRemoving[index] = true
+  router.post('/admin/governing-board/officers/remove-image', { index }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      executiveOfficers.officers[index].image       = null
+      executiveOfficers.officers[index].stored_path = null
+    },
+    onFinish: () => { officerRemoving[index] = false },
+  })
+}
+
+function uploadMemberImage(index, e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  memberUploading[index] = true
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('index', index)
+  router.post('/admin/governing-board/members/upload-image', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      const updated = props.sections?.board_members?.members?.[index]
+      if (updated) {
+        boardMembers.members[index].image       = updated.image       || null
+        boardMembers.members[index].stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { memberUploading[index] = false },
+  })
+}
+
+function removeMemberImage(index) {
+  memberRemoving[index] = true
+  router.post('/admin/governing-board/members/remove-image', { index }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      boardMembers.members[index].image       = null
+      boardMembers.members[index].stored_path = null
+    },
+    onFinish: () => { memberRemoving[index] = false },
+  })
+}
+
 function saveChairman() {
   chairmanSaving.value = true
   router.put('/admin/governing-board/chairman', {
     data: {
       section_label: chairman.section_label,
-      badge_text: chairman.badge_text,
-      initials: chairman.initials,
-      avatar_service: chairman.avatar_service,
-      position: chairman.position,
-      name: chairman.name,
-      service: chairman.service,
-      bios: chairman.bios,
+      badge_text:    chairman.badge_text,
+      initials:      chairman.initials,
+      avatar_service:chairman.avatar_service,
+      image:         chairman.image        || null,
+      stored_path:   chairman.stored_path  || null,
+      position:      chairman.position,
+      name:          chairman.name,
+      service:       chairman.service,
+      bios:          chairman.bios,
       responsibilities: chairman.responsibilities,
-      tags: chairman.tags,
+      tags:          chairman.tags,
     },
   }, {
     preserveScroll: true,
@@ -840,7 +1128,11 @@ function saveExecutiveOfficers() {
       headline_before: executiveOfficers.headline_before,
       headline_emphasis: executiveOfficers.headline_emphasis,
       subtext: executiveOfficers.subtext,
-      officers: executiveOfficers.officers,
+      officers: executiveOfficers.officers.map(o => ({
+        ...o,
+        image:       o.image       || null,
+        stored_path: o.stored_path || null,
+      })),
     },
   }, {
     preserveScroll: true,
@@ -864,6 +1156,8 @@ function addExecutiveOfficer() {
     service: '',
     bio: '',
     tags: [],
+    image: null,
+    stored_path: null,
   })
 }
 
@@ -887,7 +1181,11 @@ function saveBoardMembers() {
       headline_before: boardMembers.headline_before,
       headline_emphasis: boardMembers.headline_emphasis,
       subtext: boardMembers.subtext,
-      members: boardMembers.members,
+      members: boardMembers.members.map(m => ({
+        ...m,
+        image:       m.image       || null,
+        stored_path: m.stored_path || null,
+      })),
     },
   }, {
     preserveScroll: true,
@@ -910,6 +1208,8 @@ function addBoardMember() {
     service: '',
     bio: '',
     area: '',
+    image: null,
+    stored_path: null,
   })
 }
 
@@ -960,6 +1260,24 @@ function logout() {
     router.post('/admin/logout')
   }
 }
+
+const seoDefaults = {
+  meta_title:       'Governing Board | Bharat Governance Council',
+  meta_description: 'Meet the Governing Board of the Bharat Governance Council, including our Chairman, Executive Officers, and distinguished Board Members leading India\'s governance reform agenda.',
+  meta_keywords:    'governing board, BGC, Bharat Governance Council, chairman, board members, governance',
+}
+const savedSeo  = props.sections?.seo ?? {}
+const seo       = reactive({ ...seoDefaults, ...savedSeo })
+const seoOpen   = ref(false)
+const seoSaving = ref(false)
+function saveSeo() {
+  seoSaving.value = true
+  router.put('/admin/governing-board/seo', { data: { ...seo } }, {
+    preserveScroll: true,
+    onFinish: () => (seoSaving.value = false),
+  })
+}
+function resetSeo() { Object.assign(seo, { ...seoDefaults }) }
 
 onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
 </script>
@@ -1049,4 +1367,21 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
   .sidebar-nav{flex-direction:row;flex-wrap:wrap;}
   .admin-main{padding:20px;}
 }
+
+/* ── Chairman photo upload ───────────────────── */
+.ch-photo-row{display:flex;gap:20px;padding:16px;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:8px;margin-bottom:4px;align-items:flex-start;}
+.ch-photo-preview{width:80px;height:100px;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#162d55,#0b1c38);border:1px solid rgba(201,168,76,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;}
+.ch-photo-img{width:100%;height:100%;object-fit:cover;}
+.ch-photo-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+.ch-photo-placeholder span{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#c9a84c;}
+.ch-photo-right{flex:1;display:flex;flex-direction:column;gap:6px;}
+.ch-photo-label{font-size:12px;font-weight:600;color:#e8eaf0;}
+.ch-photo-hint{font-size:11px;color:rgba(138,155,191,0.4);line-height:1.5;}
+.ch-photo-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.btn-upload-voice{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:6px;color:rgba(201,168,76,0.8);font-size:12px;font-weight:500;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif;}
+.btn-upload-voice:hover{background:rgba(201,168,76,0.13);color:#c9a84c;}
+.btn-upload-voice.btn-uploading{opacity:0.6;cursor:not-allowed;}
+.btn-remove-voice-img{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.18);border-radius:6px;color:rgba(231,76,60,0.65);font-size:12px;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif;}
+.btn-remove-voice-img:hover{background:rgba(231,76,60,0.14);color:#e74c3c;}
+.btn-remove-voice-img:disabled{opacity:0.5;cursor:not-allowed;}
 </style>

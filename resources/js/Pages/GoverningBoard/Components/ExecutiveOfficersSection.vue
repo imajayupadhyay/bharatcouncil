@@ -20,8 +20,14 @@
           <div class="exec-card-inner">
             <!-- Avatar -->
             <div class="exec-avatar">
-              <span class="exec-initials">{{ officer.initials }}</span>
-              <span class="exec-svc-badge">{{ officer.svcBadge }}</span>
+              <img v-if="officer.image" :src="officer.image" class="exec-avatar-img" :alt="officer.name" />
+              <template v-else>
+                <span class="exec-initials">{{ officer.initials }}</span>
+              </template>
+              <div class="exec-overlay-badge">
+                <span class="exec-overlay-initials">{{ officer.initials }}</span>
+                <span class="exec-overlay-svc">{{ officer.svcBadge }}</span>
+              </div>
               <!-- Orbiting dot -->
               <div class="exec-orbit-dot"/>
             </div>
@@ -185,7 +191,7 @@ onUnmounted(() => observer?.disconnect())
 }
 
 .exec-card-inner {
-  display: grid; grid-template-columns: 100px 1fr;
+  display: grid; grid-template-columns: 90px 1fr;
   gap: 28px; align-items: start;
   padding: 36px 32px;
 }
@@ -193,37 +199,61 @@ onUnmounted(() => observer?.disconnect())
 /* ── Avatar ──────────────────────────────────── */
 .exec-avatar {
   position: relative;
-  width: 90px; height: 90px;
+  width: 90px; height: 120px;
   border-radius: 3px;
   background: #e8eaf0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
   transition: background 0.28s;
 }
 .exec-card:hover .exec-avatar { background: #0b1c38; }
+
+.exec-avatar-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  z-index: 1;
+}
 
 .exec-initials {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.9rem; font-weight: 700;
   color: #0b1c38; line-height: 1;
   transition: color 0.28s;
+  z-index: 2;
 }
 .exec-card:hover .exec-initials { color: #c9a84c; }
 
-.exec-svc-badge {
-  font-size: 8px; font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: #8a9bbf; margin-top: 5px;
-  font-family: 'DM Mono', monospace;
-  transition: color 0.28s;
+.exec-overlay-badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 3;
+  background: linear-gradient(0deg, rgba(5,14,30,0.88) 0%, rgba(5,14,30,0.5) 70%, transparent 100%);
+  padding: 10px 6px 6px;
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transition: opacity 0.28s;
 }
-.exec-card:hover .exec-svc-badge { color: rgba(201,168,76,0.6); }
+.exec-avatar-img ~ .exec-overlay-badge { opacity: 1; }
+
+.exec-overlay-initials {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem; font-weight: 700;
+  color: #c9a84c; line-height: 1;
+}
+.exec-overlay-svc {
+  font-size: 7px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(232,207,138,0.7);
+  font-family: 'DM Mono', monospace;
+  margin-top: 2px;
+}
 
 .exec-orbit-dot {
   position: absolute; inset: -8px; border-radius: 50%;
   border: 1px solid transparent;
   transition: border-color 0.3s;
+  z-index: 4;
 }
 .exec-card:hover .exec-orbit-dot {
   border-color: rgba(201,168,76,0.2);

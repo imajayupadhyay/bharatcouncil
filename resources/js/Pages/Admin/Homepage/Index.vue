@@ -8,16 +8,18 @@
         <span v-if="!sidebarCollapsed" class="sidebar-logo-label">Admin</span>
       </div>
       <nav class="sidebar-nav">
-        <div class="nav-group-label" v-if="!sidebarCollapsed">Overview</div>
-        <Link
-          v-for="item in navItems" :key="item.id"
-          :href="item.href" class="nav-item"
-          :class="{ active: item.id === 'homepage' }"
-          :title="sidebarCollapsed ? item.label : ''"
-        >
-          <span class="nav-icon" v-html="item.icon"/>
-          <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
-        </Link>
+        <template v-for="group in navGroups" :key="group.label">
+          <div class="nav-group-label" v-if="!sidebarCollapsed">{{ group.label }}</div>
+          <Link
+            v-for="item in group.items" :key="item.id"
+            :href="item.href" class="nav-item"
+            :class="{ active: item.id === 'homepage' }"
+            :title="sidebarCollapsed ? item.label : ''"
+          >
+            <span class="nav-icon" v-html="item.icon"/>
+            <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
+          </Link>
+        </template>
       </nav>
       <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
         <svg viewBox="0 0 16 16" fill="none" width="14" height="14" :class="{ flipped: sidebarCollapsed }">
@@ -68,6 +70,56 @@
             <h1 class="page-title">Homepage Sections</h1>
             <p class="page-sub">Manage the content displayed on your public homepage. Edit each section below.</p>
           </div>
+        </div>
+
+        <!-- ══════════ SEO SETTINGS ══════════ -->
+        <div class="section-panel">
+          <div class="section-panel-header" @click="seoOpen = !seoOpen">
+            <div class="section-panel-left">
+              <span class="section-num">SEO</span>
+              <div>
+                <h3 class="section-panel-title">SEO Settings</h3>
+                <p class="section-panel-desc">Meta title, description, and keywords for search engines</p>
+              </div>
+            </div>
+            <svg class="section-chevron" :class="{ open: seoOpen }" viewBox="0 0 16 16" fill="none" width="16" height="16">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <Transition name="panel-slide">
+            <div v-if="seoOpen" class="section-panel-body">
+              <form @submit.prevent="saveSeo">
+                <p class="form-group-label">Search Engine Optimisation</p>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Meta Title</label>
+                    <input v-model="seo.meta_title" class="form-input" type="text" placeholder="Page title shown in browser tab and search results" maxlength="70" />
+                    <span class="form-hint">Recommended: 50–60 characters &nbsp;({{ seo.meta_title?.length ?? 0 }}/70)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Meta Description</label>
+                    <textarea v-model="seo.meta_description" class="form-textarea" rows="3" placeholder="Brief description of the page shown in search results" maxlength="160" />
+                    <span class="form-hint">Recommended: 150–160 characters &nbsp;({{ seo.meta_description?.length ?? 0 }}/160)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Keywords</label>
+                    <input v-model="seo.meta_keywords" class="form-input" type="text" placeholder="e.g. governance, policy, India, BGC (comma-separated)" />
+                    <span class="form-hint">Comma-separated keywords for search engine context.</span>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn-reset" @click="resetSeo">Reset</button>
+                  <button type="submit" class="btn-save" :disabled="seoSaving">
+                    {{ seoSaving ? 'Saving…' : 'Save SEO Settings' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition>
         </div>
 
         <!-- ══════════ HERO SECTION ══════════ -->
@@ -404,13 +456,53 @@
                   <div class="card-edit-header">
                     <span class="card-edit-num">Voice {{ i + 1 }}</span>
                   </div>
+
+                  <!-- Photo row -->
+                  <div class="voice-photo-row">
+                    <div class="voice-photo-preview">
+                      <img v-if="voice.image" :src="voice.image" class="voice-photo-img" alt="" />
+                      <div v-else class="voice-photo-placeholder">
+                        <span>{{ voice.initials || '?' }}</span>
+                      </div>
+                    </div>
+                    <div class="voice-photo-actions">
+                      <label class="btn-upload-voice" :class="{ 'btn-uploading': voiceUploading[i] }">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          style="display:none"
+                          :disabled="voiceUploading[i]"
+                          @change="uploadVoiceImage(i, $event)"
+                        />
+                        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                          <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                        {{ voiceUploading[i] ? 'Uploading…' : (voice.image ? 'Change Photo' : 'Upload Photo') }}
+                      </label>
+                      <button
+                        v-if="voice.image"
+                        type="button"
+                        class="btn-remove-voice-img"
+                        :disabled="voiceRemoving[i]"
+                        @click="removeVoiceImage(i)"
+                      >
+                        <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        {{ voiceRemoving[i] ? 'Removing…' : 'Remove' }}
+                      </button>
+                    </div>
+                    <p class="voice-photo-hint">Shown as circular avatar. Square images work best. PNG/JPG/WebP, max 3 MB.</p>
+                  </div>
+
                   <div class="form-row">
                     <div class="form-group">
                       <label>Name</label>
                       <input v-model="voice.name" type="text" class="form-input" />
                     </div>
                     <div class="form-group">
-                      <label>Initials</label>
+                      <label>Initials (fallback if no photo)</label>
                       <input v-model="voice.initials" type="text" class="form-input" placeholder="PM" maxlength="3" />
                     </div>
                   </div>
@@ -667,7 +759,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
-import { navItems } from '../navItems.js'
+import { navGroups } from '../navItems.js'
 
 const props = defineProps({
   admin:    Object,
@@ -899,8 +991,47 @@ const voicesDefaults = {
 function voiceFromSaved(v) {
   return {
     ...v,
-    tagsStr: Array.isArray(v.tags) ? v.tags.join(', ') : (v.tagsStr || ''),
+    tagsStr:     Array.isArray(v.tags) ? v.tags.join(', ') : (v.tagsStr || ''),
+    image:       v.image       || null,
+    stored_path: v.stored_path || null,
   }
+}
+
+const voiceUploading = reactive({})
+const voiceRemoving  = reactive({})
+
+function uploadVoiceImage(i, e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  voiceUploading[i] = true
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('index', i)
+  router.post('/admin/homepage/voices/upload-image', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      // Sync the reactive voicesData with the updated props from the server
+      const updated = props.sections?.voices?.voices?.[i]
+      if (updated) {
+        voicesData.voices[i].image       = updated.image       || null
+        voicesData.voices[i].stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { voiceUploading[i] = false },
+  })
+}
+
+function removeVoiceImage(i) {
+  voiceRemoving[i] = true
+  router.post('/admin/homepage/voices/remove-image', { index: i }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      voicesData.voices[i].image       = null
+      voicesData.voices[i].stored_path = null
+    },
+    onFinish: () => { voiceRemoving[i] = false },
+  })
 }
 
 const savedVoices = props.sections?.voices || {}
@@ -919,11 +1050,13 @@ function saveVoices() {
       badge_text:    voicesData.badge_text,
       section_title: voicesData.section_title,
       voices: voicesData.voices.map(v => ({
-        initials: v.initials,
-        name:     v.name,
-        role:     v.role,
-        bio:      v.bio,
-        tags:     v.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
+        initials:    v.initials,
+        name:        v.name,
+        role:        v.role,
+        bio:         v.bio,
+        image:       v.image       || null,
+        stored_path: v.stored_path || null,
+        tags:        v.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
       })),
     },
   }, {
@@ -1041,6 +1174,24 @@ function resetNewsletter() {
 
 function logout() { router.post('/admin/logout') }
 
+const seoDefaults = {
+  meta_title:       'Bharat Governance Council | Strengthening India\'s Governance',
+  meta_description: 'Bharat Governance Council is India\'s premier governance think tank fostering evidence-based policy, civic engagement, and institutional reform.',
+  meta_keywords:    'governance, policy, India, BGC, think tank, civic engagement',
+}
+const savedSeo  = props.sections?.seo ?? {}
+const seo       = reactive({ ...seoDefaults, ...savedSeo })
+const seoOpen   = ref(false)
+const seoSaving = ref(false)
+function saveSeo() {
+  seoSaving.value = true
+  router.put('/admin/homepage/seo', { data: { ...seo } }, {
+    preserveScroll: true,
+    onFinish: () => (seoSaving.value = false),
+  })
+}
+function resetSeo() { Object.assign(seo, { ...seoDefaults }) }
+
 onMounted(() => requestAnimationFrame(() => setTimeout(() => { mounted.value = true }, 60)))
 </script>
 
@@ -1155,4 +1306,19 @@ onMounted(() => requestAnimationFrame(() => setTimeout(() => { mounted.value = t
 .info-box{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;background:rgba(41,128,185,.06);border:1px solid rgba(41,128,185,.18);margin-top:18px;}
 .info-box .info-icon{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(41,128,185,.15);color:#2980b9;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;margin-top:1px;}
 .info-box p{font-size:12px;color:#5a6a82;line-height:1.6;}
+
+/* ── Voice photo upload ──────────────────────── */
+.voice-photo-row{display:flex;align-items:center;gap:16px;padding:14px 16px;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:8px;margin-bottom:14px;flex-wrap:wrap;}
+.voice-photo-preview{width:64px;height:64px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#162d55,#0b1c38);border:2px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;}
+.voice-photo-img{width:100%;height:100%;object-fit:cover;}
+.voice-photo-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+.voice-photo-placeholder span{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#c9a84c;}
+.voice-photo-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.btn-upload-voice{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:6px;color:rgba(201,168,76,0.8);font-size:12px;font-weight:500;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif;}
+.btn-upload-voice:hover{background:rgba(201,168,76,0.13);color:#c9a84c;}
+.btn-upload-voice.btn-uploading{opacity:0.6;cursor:not-allowed;}
+.btn-remove-voice-img{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.18);border-radius:6px;color:rgba(231,76,60,0.65);font-size:12px;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif;}
+.btn-remove-voice-img:hover{background:rgba(231,76,60,0.14);color:#e74c3c;}
+.btn-remove-voice-img:disabled{opacity:0.5;cursor:not-allowed;}
+.voice-photo-hint{font-size:10px;color:rgba(138,155,191,0.35);width:100%;margin:0;font-family:'DM Sans',sans-serif;}
 </style>

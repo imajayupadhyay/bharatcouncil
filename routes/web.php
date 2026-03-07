@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\GoverningBoardSection;
 use App\Models\HomepageSection;
 use App\Models\WhoWeAreSection;
+use App\Models\WorkWithUsSection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -64,7 +65,10 @@ Route::get('/insights', [InsightsController::class, 'index'])->name('insights.in
 Route::get('/insights/{slug}', [InsightsController::class, 'show'])->name('insights.show');
 
 Route::get('/work-with-us', function () {
-    return Inertia::render('WorkWithUs/Index');
+    $sections = WorkWithUsSection::all()->keyBy('section')->map->data->toArray();
+    return Inertia::render('WorkWithUs/Index', [
+        'sections' => $sections,
+    ]);
 });
 Route::post('/work-with-us/apply', [MemberApplicationController::class, 'store'])->name('application.store');
 Route::post('/work-with-us/intern-apply', [InternApplicationController::class, 'store'])->name('intern-application.store');
