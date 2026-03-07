@@ -68,7 +68,8 @@
             <div class="avatar-ring-outer" :class="{ active: hovered === i }"/>
             <div class="avatar-ring-inner" :class="{ active: hovered === i }"/>
             <div class="voice-avatar">
-              <span>{{ voice.initials }}</span>
+              <img v-if="voice.image" :src="voice.image" class="voice-avatar-img" :alt="voice.name" />
+              <span v-else>{{ voice.initials }}</span>
             </div>
             <!-- Orbiting dot -->
             <div class="avatar-orbit" :class="{ active: hovered === i }">
@@ -566,5 +567,13 @@ onUnmounted(() => observer?.disconnect())
 }
 @media (max-width: 480px) {
   .voices-grid { grid-template-columns: 1fr; }
+}
+
+/* Photo avatar */
+.voice-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>

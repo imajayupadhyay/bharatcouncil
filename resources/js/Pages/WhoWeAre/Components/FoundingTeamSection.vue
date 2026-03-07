@@ -37,8 +37,15 @@
       <div class="chairman-card" :class="{ visible: revealed }">
         <span class="chairman-tag">Chairman &amp; Co-Founder</span>
         <div class="ch-avatar">
-          <div class="ch-initials">{{ content.chairman.initials }}</div>
-          <div class="ch-service">{{ content.chairman.service }}</div>
+          <img v-if="content.chairman.image" :src="content.chairman.image" class="ch-avatar-img" :alt="content.chairman.name" />
+          <template v-else>
+            <div class="ch-initials">{{ content.chairman.initials }}</div>
+            <div class="ch-service">{{ content.chairman.service }}</div>
+          </template>
+          <div class="ch-overlay-badge">
+            <div class="ch-initials">{{ content.chairman.initials }}</div>
+            <div class="ch-service">{{ content.chairman.service }}</div>
+          </div>
           <!-- Orbiting rings -->
           <div class="ch-ring ch-ring-1"/>
           <div class="ch-ring ch-ring-2"/>
@@ -59,7 +66,8 @@
         <div v-for="(m, i) in content.members" :key="i" class="mem-card" :style="`--delay: ${i * 0.06}s`">
           <span class="role-tag">{{ m.role }}</span>
           <div class="mem-avatar">
-            <span class="mem-initials">{{ m.initials }}</span>
+            <img v-if="m.image" :src="m.image" class="mem-avatar-img" :alt="m.name" />
+            <span v-else class="mem-initials">{{ m.initials }}</span>
             <div class="avatar-ring"/>
           </div>
           <div class="mem-info">
@@ -249,24 +257,48 @@ onUnmounted(() => observer?.disconnect())
 
 .ch-avatar {
   position: relative;
-  width: 200px; height: 200px;
+  width: 200px; height: 260px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 4px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
+.ch-avatar-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  z-index: 1;
+}
+.ch-overlay-badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 3;
+  background: linear-gradient(0deg, rgba(5,14,30,0.92) 0%, rgba(5,14,30,0.6) 70%, transparent 100%);
+  padding: 20px 12px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transition: opacity 0.28s;
+}
+.ch-avatar-img ~ .ch-overlay-badge { opacity: 1; }
 .ch-initials {
   font-family: 'Cormorant Garamond', serif;
   font-size: 4rem; font-weight: 600;
   color: #f5f7fa; line-height: 1;
+  z-index: 2;
 }
 .ch-service {
   font-size: 9px; font-weight: 700;
   letter-spacing: 0.2em; text-transform: uppercase;
   color: #c9a84c; margin-top: 8px;
   font-family: 'DM Mono', monospace;
+  z-index: 2;
+}
+.ch-overlay-badge .ch-initials {
+  font-size: 1.1rem; color: #c9a84c; line-height: 1;
+}
+.ch-overlay-badge .ch-service {
+  margin-top: 3px; color: rgba(232,207,138,0.7);
 }
 .ch-ring {
   position: absolute; border-radius: 50%;
@@ -349,6 +381,14 @@ onUnmounted(() => observer?.disconnect())
   border: 1px solid rgba(255,255,255,0.1);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+.mem-avatar-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover; object-position: center top;
+  z-index: 1;
 }
 .mem-initials {
   font-family: 'Cormorant Garamond', serif;
@@ -361,6 +401,7 @@ onUnmounted(() => observer?.disconnect())
   border: 1px solid rgba(201,168,76,0.08);
   opacity: 0;
   transition: opacity 0.3s, transform 0.3s;
+  z-index: 2;
 }
 .mem-card:hover .avatar-ring {
   opacity: 1;
@@ -393,7 +434,7 @@ onUnmounted(() => observer?.disconnect())
 }
 @media (max-width: 1024px) {
   .chairman-card { grid-template-columns: 1fr; gap: 28px; }
-  .ch-avatar { width: 140px; height: 140px; }
+  .ch-avatar { width: 140px; height: 180px; }
   .ch-initials { font-size: 3rem; }
   .ch-ring-1, .ch-ring-2 { display: none; }
 }

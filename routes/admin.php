@@ -53,15 +53,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Homepage management
         Route::get('/homepage',                          [HomepageController::class, 'index'])->name('homepage');
+        Route::post('/homepage/voices/upload-image',     [HomepageController::class, 'uploadVoiceImage'])->name('homepage.voices.upload-image');
+        Route::post('/homepage/voices/remove-image',     [HomepageController::class, 'removeVoiceImage'])->name('homepage.voices.remove-image');
         Route::put('/homepage/{section}',                [HomepageController::class, 'updateSection'])->name('homepage.update');
 
         // Who We Are page management
-        Route::get('/who-we-are',                        [WhoWeAreController::class, 'index'])->name('who-we-are');
-        Route::put('/who-we-are/{section}',              [WhoWeAreController::class, 'updateSection'])->name('who-we-are.update');
+        Route::get('/who-we-are',                                  [WhoWeAreController::class, 'index'])->name('who-we-are');
+        Route::post('/who-we-are/chairman/upload-photo',           [WhoWeAreController::class, 'uploadChairmanPhoto'])->name('who-we-are.chairman.upload-photo');
+        Route::post('/who-we-are/chairman/remove-photo',           [WhoWeAreController::class, 'removeChairmanPhoto'])->name('who-we-are.chairman.remove-photo');
+        Route::post('/who-we-are/members/upload-photo',            [WhoWeAreController::class, 'uploadMemberPhoto'])->name('who-we-are.members.upload-photo');
+        Route::post('/who-we-are/members/remove-photo',            [WhoWeAreController::class, 'removeMemberPhoto'])->name('who-we-are.members.remove-photo');
+        Route::put('/who-we-are/{section}',                        [WhoWeAreController::class, 'updateSection'])->name('who-we-are.update');
 
         // Governing Board page management
-        Route::get('/governing-board',                   [GoverningBoardController::class, 'index'])->name('governing-board');
-        Route::put('/governing-board/{section}',         [GoverningBoardController::class, 'updateSection'])->name('governing-board.update');
+        Route::get('/governing-board',                        [GoverningBoardController::class, 'index'])->name('governing-board');
+        Route::post('/governing-board/chairman/upload-image',[GoverningBoardController::class, 'uploadChairmanImage'])->name('governing-board.chairman.upload-image');
+        Route::post('/governing-board/chairman/remove-image',[GoverningBoardController::class, 'removeChairmanImage'])->name('governing-board.chairman.remove-image');
+        Route::post('/governing-board/officers/upload-image',[GoverningBoardController::class, 'uploadOfficerImage'])->name('governing-board.officers.upload-image');
+        Route::post('/governing-board/officers/remove-image',[GoverningBoardController::class, 'removeOfficerImage'])->name('governing-board.officers.remove-image');
+        Route::post('/governing-board/members/upload-image',[GoverningBoardController::class, 'uploadMemberImage'])->name('governing-board.members.upload-image');
+        Route::post('/governing-board/members/remove-image',[GoverningBoardController::class, 'removeMemberImage'])->name('governing-board.members.remove-image');
+        Route::put('/governing-board/{section}',              [GoverningBoardController::class, 'updateSection'])->name('governing-board.update');
 
         // Work With Us page management
         Route::get('/work-with-us',                      [WorkWithUsController::class, 'index'])->name('work-with-us');

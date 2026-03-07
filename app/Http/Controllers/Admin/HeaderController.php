@@ -44,7 +44,7 @@ class HeaderController extends Controller
         }
 
         $path = $request->file('logo')->store('header', 'public');
-        $url  = asset('storage/' . $path);
+        $url  = '/storage/' . $path;
 
         HeaderSection::updateOrCreate(
             ['section' => 'logo'],

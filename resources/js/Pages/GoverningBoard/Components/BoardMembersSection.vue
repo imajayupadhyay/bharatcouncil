@@ -25,7 +25,8 @@
           <!-- Card top: avatar + name/pos -->
           <div class="bc-top">
             <div class="bc-avatar">
-              <span class="bc-initials">{{ member.initials }}</span>
+              <img v-if="member.image" :src="member.image" class="bc-avatar-img" :alt="member.name" />
+              <span v-else class="bc-initials">{{ member.initials }}</span>
               <div class="bc-avatar-glow"/>
             </div>
             <div class="bc-id">
@@ -260,9 +261,18 @@ onUnmounted(() => observer?.disconnect())
   background: #e8eaf0;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
   transition: background 0.28s;
 }
 .board-card:hover .bc-avatar { background: #0b1c38; }
+
+.bc-avatar-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover; object-position: center top;
+  z-index: 1;
+}
 
 .bc-initials {
   font-family: 'Cormorant Garamond', serif;
@@ -276,6 +286,7 @@ onUnmounted(() => observer?.disconnect())
   position: absolute; inset: -4px; border-radius: 50%;
   border: 1px solid transparent;
   transition: border-color 0.28s;
+  z-index: 2;
 }
 .board-card:hover .bc-avatar-glow { border-color: rgba(201,168,76,0.25); }
 

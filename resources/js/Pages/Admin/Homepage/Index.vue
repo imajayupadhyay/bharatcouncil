@@ -454,13 +454,53 @@
                   <div class="card-edit-header">
                     <span class="card-edit-num">Voice {{ i + 1 }}</span>
                   </div>
+
+                  <!-- Photo row -->
+                  <div class="voice-photo-row">
+                    <div class="voice-photo-preview">
+                      <img v-if="voice.image" :src="voice.image" class="voice-photo-img" alt="" />
+                      <div v-else class="voice-photo-placeholder">
+                        <span>{{ voice.initials || '?' }}</span>
+                      </div>
+                    </div>
+                    <div class="voice-photo-actions">
+                      <label class="btn-upload-voice" :class="{ 'btn-uploading': voiceUploading[i] }">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          style="display:none"
+                          :disabled="voiceUploading[i]"
+                          @change="uploadVoiceImage(i, $event)"
+                        />
+                        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                          <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                        {{ voiceUploading[i] ? 'Uploading…' : (voice.image ? 'Change Photo' : 'Upload Photo') }}
+                      </label>
+                      <button
+                        v-if="voice.image"
+                        type="button"
+                        class="btn-remove-voice-img"
+                        :disabled="voiceRemoving[i]"
+                        @click="removeVoiceImage(i)"
+                      >
+                        <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        {{ voiceRemoving[i] ? 'Removing…' : 'Remove' }}
+                      </button>
+                    </div>
+                    <p class="voice-photo-hint">Shown as circular avatar. Square images work best. PNG/JPG/WebP, max 3 MB.</p>
+                  </div>
+
                   <div class="form-row">
                     <div class="form-group">
                       <label>Name</label>
                       <input v-model="voice.name" type="text" class="form-input" />
                     </div>
                     <div class="form-group">
-                      <label>Initials</label>
+                      <label>Initials (fallback if no photo)</label>
                       <input v-model="voice.initials" type="text" class="form-input" placeholder="PM" maxlength="3" />
                     </div>
                   </div>
@@ -949,8 +989,47 @@ const voicesDefaults = {
 function voiceFromSaved(v) {
   return {
     ...v,
-    tagsStr: Array.isArray(v.tags) ? v.tags.join(', ') : (v.tagsStr || ''),
+    tagsStr:     Array.isArray(v.tags) ? v.tags.join(', ') : (v.tagsStr || ''),
+    image:       v.image       || null,
+    stored_path: v.stored_path || null,
   }
+}
+
+const voiceUploading = reactive({})
+const voiceRemoving  = reactive({})
+
+function uploadVoiceImage(i, e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  voiceUploading[i] = true
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('index', i)
+  router.post('/admin/homepage/voices/upload-image', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      // Sync the reactive voicesData with the updated props from the server
+      const updated = props.sections?.voices?.voices?.[i]
+      if (updated) {
+        voicesData.voices[i].image       = updated.image       || null
+        voicesData.voices[i].stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { voiceUploading[i] = false },
+  })
+}
+
+function removeVoiceImage(i) {
+  voiceRemoving[i] = true
+  router.post('/admin/homepage/voices/remove-image', { index: i }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      voicesData.voices[i].image       = null
+      voicesData.voices[i].stored_path = null
+    },
+    onFinish: () => { voiceRemoving[i] = false },
+  })
 }
 
 const savedVoices = props.sections?.voices || {}
@@ -969,11 +1048,13 @@ function saveVoices() {
       badge_text:    voicesData.badge_text,
       section_title: voicesData.section_title,
       voices: voicesData.voices.map(v => ({
-        initials: v.initials,
-        name:     v.name,
-        role:     v.role,
-        bio:      v.bio,
-        tags:     v.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
+        initials:    v.initials,
+        name:        v.name,
+        role:        v.role,
+        bio:         v.bio,
+        image:       v.image       || null,
+        stored_path: v.stored_path || null,
+        tags:        v.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
       })),
     },
   }, {
@@ -1223,4 +1304,19 @@ onMounted(() => requestAnimationFrame(() => setTimeout(() => { mounted.value = t
 .info-box{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;background:rgba(41,128,185,.06);border:1px solid rgba(41,128,185,.18);margin-top:18px;}
 .info-box .info-icon{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(41,128,185,.15);color:#2980b9;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;margin-top:1px;}
 .info-box p{font-size:12px;color:#5a6a82;line-height:1.6;}
+
+/* ── Voice photo upload ──────────────────────── */
+.voice-photo-row{display:flex;align-items:center;gap:16px;padding:14px 16px;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:8px;margin-bottom:14px;flex-wrap:wrap;}
+.voice-photo-preview{width:64px;height:64px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#162d55,#0b1c38);border:2px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;}
+.voice-photo-img{width:100%;height:100%;object-fit:cover;}
+.voice-photo-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+.voice-photo-placeholder span{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#c9a84c;}
+.voice-photo-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.btn-upload-voice{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:6px;color:rgba(201,168,76,0.8);font-size:12px;font-weight:500;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif;}
+.btn-upload-voice:hover{background:rgba(201,168,76,0.13);color:#c9a84c;}
+.btn-upload-voice.btn-uploading{opacity:0.6;cursor:not-allowed;}
+.btn-remove-voice-img{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.18);border-radius:6px;color:rgba(231,76,60,0.65);font-size:12px;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif;}
+.btn-remove-voice-img:hover{background:rgba(231,76,60,0.14);color:#e74c3c;}
+.btn-remove-voice-img:disabled{opacity:0.5;cursor:not-allowed;}
+.voice-photo-hint{font-size:10px;color:rgba(138,155,191,0.35);width:100%;margin:0;font-family:'DM Sans',sans-serif;}
 </style>

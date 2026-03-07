@@ -345,6 +345,48 @@
                   <button type="button" @click="addChairmanTag" class="btn-add">+ Add Tag</button>
                 </div>
 
+                <div class="form-group-label">Chairman Photo</div>
+                <div class="ch-photo-row">
+                  <div class="ch-photo-preview">
+                    <img v-if="team.chairman.image" :src="team.chairman.image" class="ch-photo-img" alt="Chairman" />
+                    <div v-else class="ch-photo-placeholder">
+                      <span>{{ team.chairman.initials || 'KV' }}</span>
+                    </div>
+                  </div>
+                  <div class="ch-photo-right">
+                    <p class="ch-photo-label">Chairman Photo</p>
+                    <p class="ch-photo-hint">Portrait orientation recommended (3:4). PNG/JPG/WebP, max 4 MB.</p>
+                    <div class="ch-photo-btns">
+                      <label class="btn-upload-voice" :class="{ 'btn-uploading': chairmanPhotoUploading }">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          style="display:none"
+                          :disabled="chairmanPhotoUploading"
+                          @change="uploadChairmanPhoto"
+                        />
+                        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                          <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                        {{ chairmanPhotoUploading ? 'Uploading…' : (team.chairman.image ? 'Change Photo' : 'Upload Photo') }}
+                      </label>
+                      <button
+                        v-if="team.chairman.image"
+                        type="button"
+                        class="btn-remove-voice-img"
+                        :disabled="chairmanPhotoRemoving"
+                        @click="removeChairmanPhoto"
+                      >
+                        <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        {{ chairmanPhotoRemoving ? 'Removing…' : 'Remove Photo' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Members Section -->
                 <div class="form-group-label">Team Members</div>
                 <div v-for="(member, idx) in team.members" :key="idx" class="member-card">
@@ -375,6 +417,48 @@
                   <div class="form-group">
                     <label>Description (HTML allowed)</label>
                     <textarea v-model="member.desc" class="form-input form-textarea" rows="2"></textarea>
+                  </div>
+
+                  <div class="form-group-label" style="margin-top:12px">Photo</div>
+                  <div class="ch-photo-row">
+                    <div class="ch-photo-preview" style="width:60px;height:60px;border-radius:50%">
+                      <img v-if="member.image" :src="member.image" class="ch-photo-img" style="border-radius:50%" alt="Member" />
+                      <div v-else class="ch-photo-placeholder">
+                        <span>{{ member.initials || '?' }}</span>
+                      </div>
+                    </div>
+                    <div class="ch-photo-right">
+                      <p class="ch-photo-label">Member Photo</p>
+                      <p class="ch-photo-hint">Square or portrait image. PNG/JPG/WebP, max 4 MB.</p>
+                      <div class="ch-photo-btns">
+                        <label class="btn-upload-voice" :class="{ 'btn-uploading': memberPhotoUploading[idx] }">
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            style="display:none"
+                            :disabled="memberPhotoUploading[idx]"
+                            @change="uploadMemberPhoto(idx, $event)"
+                          />
+                          <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                            <path d="M8 3v8M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                          </svg>
+                          {{ memberPhotoUploading[idx] ? 'Uploading…' : (member.image ? 'Change Photo' : 'Upload Photo') }}
+                        </label>
+                        <button
+                          v-if="member.image"
+                          type="button"
+                          class="btn-remove-voice-img"
+                          :disabled="memberPhotoRemoving[idx]"
+                          @click="removeMemberPhoto(idx)"
+                        >
+                          <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+                            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                          {{ memberPhotoRemoving[idx] ? 'Removing…' : 'Remove Photo' }}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <button type="button" @click="addMember" class="btn-add-card">+ Add Member</button>
@@ -730,8 +814,12 @@ const heroOpen         = ref(true)
 const heroSaving       = ref(false)
 const storyOpen        = ref(false)
 const storySaving      = ref(false)
-const teamOpen         = ref(false)
-const teamSaving       = ref(false)
+const teamOpen              = ref(false)
+const teamSaving            = ref(false)
+const chairmanPhotoUploading = ref(false)
+const chairmanPhotoRemoving  = ref(false)
+const memberPhotoUploading   = reactive({})
+const memberPhotoRemoving    = reactive({})
 const academicsOpen    = ref(false)
 const academicsSaving  = ref(false)
 const mandateOpen      = ref(false)
@@ -856,8 +944,73 @@ function resetTeam() {
   })
 }
 
+function uploadChairmanPhoto(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  chairmanPhotoUploading.value = true
+  const formData = new FormData()
+  formData.append('image', file)
+  router.post('/admin/who-we-are/chairman/upload-photo', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      const updated = props.sections?.founding_team?.chairman
+      if (updated) {
+        team.chairman.image       = updated.image       || null
+        team.chairman.stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { chairmanPhotoUploading.value = false },
+  })
+}
+
+function removeChairmanPhoto() {
+  chairmanPhotoRemoving.value = true
+  router.post('/admin/who-we-are/chairman/remove-photo', {}, {
+    preserveScroll: true,
+    onSuccess: () => {
+      team.chairman.image       = null
+      team.chairman.stored_path = null
+    },
+    onFinish: () => { chairmanPhotoRemoving.value = false },
+  })
+}
+
+function uploadMemberPhoto(index, e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  memberPhotoUploading[index] = true
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('index', index)
+  router.post('/admin/who-we-are/members/upload-photo', formData, {
+    forceFormData:  true,
+    preserveScroll: true,
+    onSuccess: () => {
+      const updated = props.sections?.founding_team?.members?.[index]
+      if (updated) {
+        team.members[index].image       = updated.image       || null
+        team.members[index].stored_path = updated.stored_path || null
+      }
+    },
+    onFinish: () => { memberPhotoUploading[index] = false },
+  })
+}
+
+function removeMemberPhoto(index) {
+  memberPhotoRemoving[index] = true
+  router.post('/admin/who-we-are/members/remove-photo', { index }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      team.members[index].image       = null
+      team.members[index].stored_path = null
+    },
+    onFinish: () => { memberPhotoRemoving[index] = false },
+  })
+}
+
 function addMember() {
-  team.members.push({ initials: '', name: '', service: '', role: '', desc: '' })
+  team.members.push({ initials: '', name: '', service: '', role: '', desc: '', image: null, stored_path: null })
 }
 
 function removeMember(index) {
@@ -1263,4 +1416,61 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
 .btn-remove-card:hover{background:#dc2626;}
 .btn-add-card{padding:10px 20px;background:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;margin-bottom:20px;transition:all 0.2s;display:inline-block;}
 .btn-add-card:hover{background:#2563eb;transform:translateY(-2px);}
+
+/* ── Photo upload UI ──────────────────────────── */
+.ch-photo-row {
+  display: flex; gap: 20px; align-items: flex-start;
+  padding: 16px; background: #f8f9fc;
+  border: 1px solid #e2e6f0; border-radius: 8px;
+  margin-bottom: 16px;
+}
+.ch-photo-preview {
+  width: 80px; height: 100px; border-radius: 4px;
+  background: #e8eaf0; flex-shrink: 0;
+  overflow: hidden; position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.ch-photo-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+}
+.ch-photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8eaf0;
+}
+.ch-photo-placeholder span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 700; color: #8a9bbf;
+}
+.ch-photo-right { flex: 1; }
+.ch-photo-label {
+  font-size: 13px; font-weight: 600; color: #0b1c38;
+  margin-bottom: 4px; font-family: 'DM Sans', sans-serif;
+}
+.ch-photo-hint {
+  font-size: 11px; color: #8a9bbf; margin-bottom: 12px;
+  font-family: 'DM Sans', sans-serif; line-height: 1.5;
+}
+.ch-photo-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-upload-voice {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 5px; cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  background: #0b1c38; color: #fff;
+  border: none; transition: background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-upload-voice:hover { background: #162d54; }
+.btn-upload-voice.btn-uploading { opacity: 0.6; cursor: not-allowed; }
+.btn-remove-voice-img {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px; border-radius: 5px; cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  background: transparent; color: #ef4444;
+  border: 1px solid #ef4444; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-remove-voice-img:hover { background: #ef4444; color: #fff; }
+.btn-remove-voice-img:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
