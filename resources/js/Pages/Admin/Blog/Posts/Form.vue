@@ -8,16 +8,18 @@
         <span v-if="!sidebarCollapsed" class="sidebar-logo-label">Admin</span>
       </div>
       <nav class="sidebar-nav">
-        <div class="nav-group-label" v-if="!sidebarCollapsed">Overview</div>
-        <Link
-          v-for="item in navItems" :key="item.id"
-          :href="item.href" class="nav-item"
-          :class="{ active: item.id === 'blog-posts' }"
-          :title="sidebarCollapsed ? item.label : ''"
-        >
-          <span class="nav-icon" v-html="item.icon"/>
-          <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
-        </Link>
+        <template v-for="group in navGroups" :key="group.label">
+          <div class="nav-group-label" v-if="!sidebarCollapsed">{{ group.label }}</div>
+          <Link
+            v-for="item in group.items" :key="item.id"
+            :href="item.href" class="nav-item"
+            :class="{ active: item.id === 'blog-posts' }"
+            :title="sidebarCollapsed ? item.label : ''"
+          >
+            <span class="nav-icon" v-html="item.icon"/>
+            <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
+          </Link>
+        </template>
       </nav>
       <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
         <svg viewBox="0 0 16 16" fill="none" width="14" height="14" :class="{ flipped: sidebarCollapsed }">
@@ -404,7 +406,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
-import { navItems } from '../../navItems.js'
+import { navGroups } from '../../navItems.js'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'

@@ -6,17 +6,19 @@
     </div>
 
     <nav class="sidebar-nav">
-      <div class="nav-group-label" v-if="!collapsed">Overview</div>
-      <Link
-        v-for="item in navItems" :key="item.id"
-        :href="item.href" class="nav-item"
-        :class="{ active: item.id === activeId }"
-        :title="collapsed ? item.label : ''"
-      >
-        <span class="nav-icon" v-html="item.icon"/>
-        <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
-        <span v-if="!collapsed && item.badge" class="nav-badge">{{ item.badge }}</span>
-      </Link>
+      <template v-for="group in navGroups" :key="group.label">
+        <div class="nav-group-label" v-if="!collapsed">{{ group.label }}</div>
+        <Link
+          v-for="item in group.items" :key="item.id"
+          :href="item.href" class="nav-item"
+          :class="{ active: item.id === activeId }"
+          :title="collapsed ? item.label : ''"
+        >
+          <span class="nav-icon" v-html="item.icon"/>
+          <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
+          <span v-if="!collapsed && item.badge" class="nav-badge">{{ item.badge }}</span>
+        </Link>
+      </template>
     </nav>
 
     <button class="sidebar-toggle" @click="$emit('toggle')" title="Toggle sidebar">
@@ -38,7 +40,7 @@
 
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
-import { navItems } from '@/Pages/Admin/navItems'
+import { navGroups } from '@/Pages/Admin/navItems'
 
 defineProps({
   activeId: { type: String, required: true },
