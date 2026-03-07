@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\GoverningBoardController;
 use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\WorkWithUsController;
@@ -64,6 +65,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Work With Us page management
         Route::get('/work-with-us',                      [WorkWithUsController::class, 'index'])->name('work-with-us');
         Route::put('/work-with-us/{section}',            [WorkWithUsController::class, 'updateSection'])->name('work-with-us.update');
+
+        // Footer management
+        Route::get('/footer',                            [FooterController::class, 'index'])->name('footer');
+        Route::put('/footer/{section}',                  [FooterController::class, 'updateSection'])->name('footer.update');
 
         // Events
         Route::get('/events',                       [EventController::class, 'index'])->name('events.index');
