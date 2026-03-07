@@ -32,6 +32,10 @@ export const navItems = [
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="5" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M8 9v2M7 10h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
   },
   {
+    id: 'header', label: 'Header / Nav', href: '/admin/header',
+    icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="1.5" y="1.5" width="13" height="4" rx="0.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 9h13M1.5 12h13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  },
+  {
     id: 'footer', label: 'Footer', href: '/admin/footer',
     icon: '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="1.5" y="10.5" width="13" height="4" rx="0.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 7h13M1.5 4h13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
   },

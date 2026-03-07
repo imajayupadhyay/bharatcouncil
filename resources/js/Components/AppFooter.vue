@@ -36,7 +36,7 @@
         <!-- Brand col -->
         <div class="footer-brand">
           <div class="brand-logo">
-            <img :src="'/BGC.png'" alt="BGC Logo" class="brand-logo-img" />
+            <img :src="logoUrl" alt="BGC Logo" class="brand-logo-img" />
           </div>
 
           <p class="brand-desc">{{ brandDesc }}</p>
@@ -161,6 +161,8 @@ const platformIcons = {
 
 /* ── Shared footer data with defaults ───────────────── */
 const footerData = computed(() => page.props.footer ?? {})
+const headerData = computed(() => page.props.header ?? {})
+const logoUrl    = computed(() => headerData.value.logo?.url || '/BGC.png')
 
 const brandDesc = computed(() =>
   footerData.value.brand?.description ||

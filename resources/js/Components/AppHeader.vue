@@ -7,72 +7,77 @@
     <!-- Logo -->
     <a href="/" class="nav-logo">
       <div class="logo-emblem">
-        <img :src="'/BGC.png'" alt="BGC Logo" class="logo-img"/>
+        <img :src="logoUrl" alt="BGC Logo" class="logo-img"/>
       </div>
     </a>
 
     <!-- Desktop nav links -->
     <ul class="nav-links">
-      <li v-for="link in navLinks" :key="link.label">
-        <a :href="link.href" class="nav-link" @click.prevent="handleNavClick(link)">
-          {{ link.label }}
-          <span class="nav-link-bar"/>
-        </a>
-      </li>
+      <template v-for="item in navItems" :key="item.id">
 
-      <!-- About dropdown -->
-      <li
-        class="nav-item-about"
-        @mouseenter="aboutOpen = true"
-        @mouseleave="aboutOpen = false"
-      >
-        <button
-          class="nav-link nav-link-btn"
-          :class="{ 'link-active': aboutOpen }"
+        <!-- Simple link -->
+        <li v-if="item.type === 'link'">
+          <a :href="item.href" class="nav-link" @click.prevent="handleNavClick(item)">
+            {{ item.label }}
+            <span class="nav-link-bar"/>
+          </a>
+        </li>
+
+        <!-- Dropdown -->
+        <li
+          v-else-if="item.type === 'dropdown'"
+          class="nav-item-dropdown"
+          @mouseenter="openDropdown = item.id"
+          @mouseleave="openDropdown = null"
         >
-          About
-          <svg
-            class="chevron"
-            :class="{ 'chevron-open': aboutOpen }"
-            viewBox="0 0 10 6"
-            fill="none"
-            width="9" height="9"
+          <button
+            class="nav-link nav-link-btn"
+            :class="{ 'link-active': openDropdown === item.id }"
           >
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="nav-link-bar"/>
-        </button>
+            {{ item.label }}
+            <svg
+              class="chevron"
+              :class="{ 'chevron-open': openDropdown === item.id }"
+              viewBox="0 0 10 6"
+              fill="none"
+              width="9" height="9"
+            >
+              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="nav-link-bar"/>
+          </button>
 
-        <!-- Dropdown panel -->
-        <Transition name="dropdown">
-          <div v-show="aboutOpen" class="dropdown-panel">
-            <div class="dropdown-gold-bar"/>
-            <div class="dropdown-inner">
-              <a
-                v-for="item in aboutLinks"
-                :key="item.href"
-                :href="item.href"
-                class="dropdown-item"
-              >
-                <div class="di-num">{{ item.num }}</div>
-                <div class="di-body">
-                  <span class="di-title">{{ item.label }}</span>
-                  <span class="di-desc">{{ item.desc }}</span>
-                </div>
-                <svg class="di-arrow" viewBox="0 0 16 16" fill="none" width="13" height="13">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
+          <!-- Dropdown panel -->
+          <Transition name="dropdown">
+            <div v-show="openDropdown === item.id" class="dropdown-panel">
+              <div class="dropdown-gold-bar"/>
+              <div class="dropdown-inner">
+                <a
+                  v-for="child in item.children" :key="child.id || child.label"
+                  :href="child.href || '#'"
+                  class="dropdown-item"
+                >
+                  <div class="di-num">{{ child.num }}</div>
+                  <div class="di-body">
+                    <span class="di-title">{{ child.label }}</span>
+                    <span class="di-desc">{{ child.desc }}</span>
+                  </div>
+                  <svg class="di-arrow" viewBox="0 0 16 16" fill="none" width="13" height="13">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              </div>
             </div>
-          </div>
-        </Transition>
-      </li>
+          </Transition>
+        </li>
+
+      </template>
     </ul>
 
     <!-- CTA -->
     <div class="nav-cta">
-      <a href="/work-with-us" class="btn-join">
-        <span>Work With Us</span>
+      <a :href="ctaHref" class="btn-join">
+        <span>{{ ctaLabel }}</span>
         <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
           <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
@@ -92,43 +97,48 @@
     <Transition name="drawer">
       <div v-if="menuOpen" class="mobile-drawer">
         <ul>
-          <li v-for="link in navLinks" :key="link.label">
-            <a :href="link.href" @click="handleNavClick(link); menuOpen = false">
-              {{ link.label }}
-            </a>
-          </li>
+          <template v-for="item in navItems" :key="item.id">
 
-          <!-- About accordion -->
-          <li class="mobile-about-item">
-            <button
-              class="mobile-about-toggle"
-              @click="mobileAboutOpen = !mobileAboutOpen"
-            >
-              <span>About</span>
-              <svg
-                class="mobile-chevron"
-                :class="{ 'mobile-chevron-open': mobileAboutOpen }"
-                viewBox="0 0 10 6" fill="none" width="10" height="10"
+            <!-- Simple link -->
+            <li v-if="item.type === 'link'">
+              <a :href="item.href" @click="handleNavClick(item); menuOpen = false">
+                {{ item.label }}
+              </a>
+            </li>
+
+            <!-- Dropdown accordion -->
+            <li v-else-if="item.type === 'dropdown'" class="mobile-about-item">
+              <button
+                class="mobile-about-toggle"
+                @click="toggleMobileDropdown(item.id)"
               >
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              </svg>
-            </button>
+                <span>{{ item.label }}</span>
+                <svg
+                  class="mobile-chevron"
+                  :class="{ 'mobile-chevron-open': mobileOpen === item.id }"
+                  viewBox="0 0 10 6" fill="none" width="10" height="10"
+                >
+                  <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </button>
 
-            <Transition name="mobile-sub">
-              <ul v-if="mobileAboutOpen" class="mobile-submenu">
-                <li v-for="item in aboutLinks" :key="item.href">
-                  <a :href="item.href" @click="menuOpen = false">
-                    <span class="ms-num">{{ item.num }}</span>
-                    {{ item.label }}
-                  </a>
-                </li>
-              </ul>
-            </Transition>
-          </li>
+              <Transition name="mobile-sub">
+                <ul v-if="mobileOpen === item.id" class="mobile-submenu">
+                  <li v-for="child in item.children" :key="child.id || child.label">
+                    <a :href="child.href || '#'" @click="menuOpen = false">
+                      <span class="ms-num">{{ child.num }}</span>
+                      {{ child.label }}
+                    </a>
+                  </li>
+                </ul>
+              </Transition>
+            </li>
+
+          </template>
         </ul>
 
-        <a href="/work-with-us" class="btn-join-mobile" @click="menuOpen = false">
-          Work With Us
+        <a :href="ctaHref" class="btn-join-mobile" @click="menuOpen = false">
+          {{ ctaLabel }}
         </a>
       </div>
     </Transition>
@@ -137,63 +147,71 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 
-const scrolled        = ref(false)
-const menuOpen        = ref(false)
-const aboutOpen       = ref(false)
-const mobileAboutOpen = ref(false)
+const page    = usePage()
+const scrolled = ref(false)
+const menuOpen = ref(false)
 
-const navLinks = [
-  { label: 'Focus Areas',   href: '/#focus'        },
-  { label: 'Publications',  href: '/#publications' },
-  { label: 'Events',        href: '/#events'       },
-  { label: 'Council',       href: '/#voices'       },
-  { label: 'Discussions',   href: '/#discussions'  },
-  { label: 'Insights',      href: '/insights'      },
-]
+/* ── Shared header data ─────────────────────────────── */
+const headerData = computed(() => page.props.header ?? {})
 
-const aboutLinks = [
-  {
-    num: '01',
-    label: 'Who We Are',
-    desc:  'Our story, founding team & values',
-    href:  '/who-we-are',
-  },
-  {
-    num: '02',
-    label: 'Governing Board',
-    desc:  'Chairman, executive officers & full board',
-    href:  '/governing-board',
-  },
-  {
-    num: '03',
-    label: 'Work With Us',
-    desc:  'Internships, fellowships & membership',
-    href:  '/work-with-us',
-  },
-]
+/* ── Logo ───────────────────────────────────────────── */
+const logoUrl = computed(() => headerData.value.logo?.url || '/BGC.png')
 
-function handleNavClick(link) {
-  // Direct links (not hash-based) — navigate immediately
-  if (!link.href.startsWith('/#')) {
-    window.location.href = link.href
+/* ── Nav items (with fallback defaults) ─────────────── */
+const navItems = computed(() => {
+  const saved = headerData.value.navigation?.items
+  if (saved?.length) return saved
+  return [
+    { id: 'focus',       type: 'link',     label: 'Focus Areas',  href: '/#focus',        children: [] },
+    { id: 'pubs',        type: 'link',     label: 'Publications', href: '/#publications', children: [] },
+    { id: 'events',      type: 'link',     label: 'Events',       href: '/#events',       children: [] },
+    { id: 'council',     type: 'link',     label: 'Council',      href: '/#voices',       children: [] },
+    { id: 'discussions', type: 'link',     label: 'Discussions',  href: '/#discussions',  children: [] },
+    { id: 'insights',    type: 'link',     label: 'Insights',     href: '/insights',      children: [] },
+    {
+      id: 'about', type: 'dropdown', label: 'About', href: '#',
+      children: [
+        { id: 'wwa', num: '01', label: 'Who We Are',      desc: 'Our story, founding team & values',        href: '/who-we-are'      },
+        { id: 'gb',  num: '02', label: 'Governing Board', desc: 'Chairman, executive officers & full board', href: '/governing-board' },
+        { id: 'wwu', num: '03', label: 'Work With Us',    desc: 'Internships, fellowships & membership',    href: '/work-with-us'    },
+      ],
+    },
+  ]
+})
+
+/* ── CTA ────────────────────────────────────────────── */
+const ctaLabel = computed(() => headerData.value.cta?.label || 'Work With Us')
+const ctaHref  = computed(() => headerData.value.cta?.href  || '/work-with-us')
+
+/* ── Desktop dropdown state ─────────────────────────── */
+const openDropdown = ref(null)
+
+/* ── Mobile accordion state ─────────────────────────── */
+const mobileOpen = ref(null)
+function toggleMobileDropdown(id) {
+  mobileOpen.value = mobileOpen.value === id ? null : id
+}
+
+/* ── Nav click handler ──────────────────────────────── */
+function handleNavClick(item) {
+  const href = item.href || '/'
+  if (!href.startsWith('/#')) {
+    window.location.href = href
     return
   }
-  // If on homepage, smooth-scroll to section; otherwise navigate
   if (window.location.pathname === '/') {
-    const id = link.href.replace('/#', '')
+    const id = href.replace('/#', '')
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   } else {
-    window.location.href = link.href
+    window.location.href = href
   }
 }
 
-function onScroll() {
-  scrolled.value = window.scrollY > 20
-}
-
-onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
+function onScroll() { scrolled.value = window.scrollY > 20 }
+onMounted(()   => window.addEventListener('scroll', onScroll, { passive: true }))
 onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 
@@ -314,8 +332,8 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   color: #e8cf8a;
 }
 
-/* ── About dropdown item ─────────────────────────── */
-.nav-item-about {
+/* ── Dropdown item wrapper ───────────────────────── */
+.nav-item-dropdown {
   position: relative;
   list-style: none;
 }
@@ -371,9 +389,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   transform: scaleY(0); transform-origin: top;
   transition: transform 0.22s ease;
 }
-.dropdown-item:hover {
-  background: rgba(201,168,76,0.06);
-}
+.dropdown-item:hover { background: rgba(201,168,76,0.06); }
 .dropdown-item:hover::before { transform: scaleY(1); }
 
 /* Numbered circle */

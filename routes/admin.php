@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\FooterController;
+use App\Http\Controllers\Admin\HeaderController;
 use App\Http\Controllers\Admin\GoverningBoardController;
 use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\WorkWithUsController;
@@ -65,6 +66,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Work With Us page management
         Route::get('/work-with-us',                      [WorkWithUsController::class, 'index'])->name('work-with-us');
         Route::put('/work-with-us/{section}',            [WorkWithUsController::class, 'updateSection'])->name('work-with-us.update');
+
+        // Header management
+        Route::get('/header',                            [HeaderController::class, 'index'])->name('header');
+        Route::post('/header/upload-logo',               [HeaderController::class, 'uploadLogo'])->name('header.upload-logo');
+        Route::put('/header/{section}',                  [HeaderController::class, 'updateSection'])->name('header.update');
 
         // Footer management
         Route::get('/footer',                            [FooterController::class, 'index'])->name('footer');
